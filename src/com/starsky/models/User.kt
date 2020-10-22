@@ -1,4 +1,4 @@
-package starsky.api.database.models
+package com.starsky.models
 
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -23,7 +23,7 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var password by Users.password
     var dateCreated by Users.dateCreated
 
-    fun toModel():UserDto{
+    fun toModel(): UserDto {
         return UserDto(name, email, password, ISODateTimeFormat.dateTimeNoMillis().print(dateCreated))
     }
 }

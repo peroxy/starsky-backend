@@ -12,10 +12,10 @@ Please note that this has only been tested on Ubuntu 20.04.
     ```ssh
     git clone https://github.com/peroxy/starsky-backend.git
     ```
-2. Go to `src` directory:
+2. Go to root directory:
  
     ```ssh
-    cd starsky-backend/src
+    cd starsky-backend
     ```
 3. You must specify PostgreSQL password for `starsky` user. Create a file called `.env`
  and specify environment variable `POSTGRES_PASSWORD`:
