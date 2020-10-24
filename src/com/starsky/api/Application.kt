@@ -3,17 +3,19 @@ package com.starsky.api
 import com.starsky.api.routes.getAuthRoutes
 import com.starsky.api.security.JwtConfig
 import com.starsky.api.security.JwtUser
+import com.starsky.api.security.UserPrincipal
+import com.starsky.models.User
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.request.*
+import io.ktor.response.*
+import io.ktor.routing.*
 import org.slf4j.event.Level
 
 fun main(args: Array<String>): Unit = io.ktor.server.jetty.EngineMain.main(args)
-
-//val ApplicationCall.user get() = authentication.principal<UserJwt>()
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
@@ -25,17 +27,11 @@ fun Application.module(testing: Boolean = false) {
 
     install(Authentication) {
         jwt {
-            //TODO: move to separate file and use bcrypt for comparing with db..
             verifier(JwtConfig.verifier)
             realm = "com.starsky"
             validate {
-                val email = it.payload.getClaim("email").asString()
-                val password = it.payload.getClaim("password").asString()
-                if(email != null && password != null){
-                    JwtUser(email, password )
-                }else{
-                    null
-                }
+                val id = it.payload.getClaim("id").toString().toInt()
+                UserPrincipal(id)
             }
         }
     }
@@ -47,21 +43,13 @@ fun Application.module(testing: Boolean = false) {
     }
 
     getAuthRoutes()
-//    routing {
-//        getRoutes()
-//        contact()
-//        get("/"){
-//            call.respond(UserGateway().getById(1)?: "null")
-//        }
-//
-//
-//
-//        authenticate{
-//            get("/authenticate"){
-//                call.respond("get authenticated value from token " +
-//                        "email = ${call.user?.email}, password= ${call.user?.password}")
-//            }
-//        }
-//    }
+    routing {
+
+        authenticate{
+            get("/"){
+                call.respond("id = ${call.principal<UserPrincipal>()?.id}")
+            }
+        }
+    }
 
 }

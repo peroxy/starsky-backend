@@ -7,7 +7,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.jodatime.datetime
 import org.joda.time.format.ISODateTimeFormat
 
-data class UserDto(val name: String, val email: String, val password: String, val dateCreated: String)
+//data class UserDto(val name: String, val email: String, val password: String, val dateCreated: String)
 
 object Users : IntIdTable("user") {
     val name = text("name")
@@ -23,7 +23,7 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var password by Users.password
     var dateCreated by Users.dateCreated
 
-    fun toModel(): UserDto {
-        return UserDto(name, email, password, ISODateTimeFormat.dateTimeNoMillis().print(dateCreated))
-    }
+//    fun toModel(): UserDto {
+//        return UserDto(name, email, password, ISODateTimeFormat.dateTimeNoMillis().print(dateCreated))
+//    }
 }
