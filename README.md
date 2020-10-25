@@ -56,3 +56,4 @@ docker-compose up
 
  
 You can login to `starsky` database with username `starsky` and password specified in `.env` file.
+Database will be filled up with mock data from `mockData.sql` file. All users' passwords are set to `password`.
