@@ -1,6 +1,7 @@
 package com.starsky.api
 
 import com.starsky.api.routes.getAuthRoutes
+import com.starsky.api.routes.getUserRoutes
 import com.starsky.api.security.JwtConfig
 import com.starsky.api.security.UserPrincipal
 import io.ktor.application.*
@@ -31,8 +32,13 @@ fun Application.module(testing: Boolean = false) {
             verifier(JwtConfig.verifier)
             realm = "com.starsky"
             validate {
-                val id = it.payload.getClaim("id").toString().toInt()
-                UserPrincipal(id)
+                val id = it.payload.getClaim("id")?.asInt()
+                if (id == null){
+                    null
+                }else {
+                    UserPrincipal(id)
+                }
+
             }
         }
     }
@@ -47,13 +53,6 @@ fun Application.module(testing: Boolean = false) {
     }
 
     getAuthRoutes()
-
-    routing {
-        authenticate{
-            get("/"){
-                call.respond("id = ${call.principal<UserPrincipal>()?.id}")
-            }
-        }
-    }
+    getUserRoutes()
 
 }

@@ -1,13 +1,13 @@
 package com.starsky.api.validations
 
 import com.starsky.api.responses.ErrorResponse
-import com.starsky.api.security.JwtUser
+import com.starsky.api.models.GetTokenModel
 import com.starsky.models.User
 import io.ktor.http.*
 import org.mindrot.jbcrypt.BCrypt
 
 object AuthValidation {
-    fun validateJwtUser(user: JwtUser): ErrorResponse? {
+    fun validateJwtUser(user: GetTokenModel): ErrorResponse? {
         if (user.email.isBlank() || !user.email.contains("@")) {
             return ErrorResponse(HttpStatusCode.BadRequest, "Invalid Body", "Email in body has invalid format.")
         }

@@ -2,7 +2,7 @@ package com.starsky.api.routes
 
 import com.starsky.api.responses.TokenResponse
 import com.starsky.api.security.JwtConfig
-import com.starsky.api.security.JwtUser
+import com.starsky.api.models.GetTokenModel
 import com.starsky.api.validations.AuthValidation
 import com.starsky.database.gateways.UserGateway
 import io.ktor.application.*
@@ -20,12 +20,12 @@ fun Application.getAuthRoutes() {
 
 fun Route.getTokenRoute() {
     post("/auth/token") {
-        val user = call.receive<JwtUser>()
+        val user = call.receive<GetTokenModel>()
         var error = AuthValidation.validateJwtUser(user)
         if (error != null) {
             call.respond(error.errorCode, error)
         } else {
-            val userDto = UserGateway().getByEmail(user.email)
+            val userDto = UserGateway.getByEmail(user.email)
             error = AuthValidation.validateCredentials(userDto, user.password)
             if (error != null) {
                 call.respond(error.errorCode, error)

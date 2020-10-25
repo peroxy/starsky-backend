@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
-class UserGateway : Gateway() {
+object UserGateway : Gateway() {
 
     fun getById(id: Int): User? {
         var user : User? = null

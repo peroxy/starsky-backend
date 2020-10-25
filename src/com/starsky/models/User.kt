@@ -1,13 +1,12 @@
 package com.starsky.models
 
+import com.starsky.api.responses.UserResponse
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.jodatime.datetime
 import org.joda.time.format.ISODateTimeFormat
-
-//data class UserDto(val name: String, val email: String, val password: String, val dateCreated: String)
 
 object Users : IntIdTable("user") {
     val name = text("name")
@@ -23,7 +22,7 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var password by Users.password
     var dateCreated by Users.dateCreated
 
-//    fun toModel(): UserDto {
-//        return UserDto(name, email, password, ISODateTimeFormat.dateTimeNoMillis().print(dateCreated))
-//    }
+    fun toResponse(): UserResponse {
+        return UserResponse(id.value, name, email, ISODateTimeFormat.dateTimeNoMillis().print(dateCreated))
+    }
 }
