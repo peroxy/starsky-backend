@@ -2,9 +2,7 @@ package com.starsky.api
 
 import com.starsky.api.routes.getAuthRoutes
 import com.starsky.api.security.JwtConfig
-import com.starsky.api.security.JwtUser
 import com.starsky.api.security.UserPrincipal
-import com.starsky.models.User
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -17,11 +15,14 @@ import org.slf4j.event.Level
 
 fun main(args: Array<String>): Unit = io.ktor.server.jetty.EngineMain.main(args)
 
-@Suppress("unused") // Referenced in application.conf
+@Suppress("unused")
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
+
+    val environment: Environment = Environment.values().firstOrNull { it.name == System.getenv("STARSKY_ENVIRONMENT") } ?: Environment.DEV
+
     install(CallLogging) {
-        level = Level.INFO
+        level = if (environment == Environment.DEV) Level.DEBUG else Level.INFO
         filter { call -> call.request.path().startsWith("/") }
     }
 
@@ -38,13 +39,15 @@ fun Application.module(testing: Boolean = false) {
 
     install(ContentNegotiation) {
         gson {
-            setPrettyPrinting() //todo: set for development only
+            if (environment == Environment.DEV){
+                setPrettyPrinting()
+            }
+
         }
     }
 
     getAuthRoutes()
     routing {
-
         authenticate{
             get("/"){
                 call.respond("id = ${call.principal<UserPrincipal>()?.id}")

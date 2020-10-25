@@ -1,7 +1,7 @@
 # Starsky backend
 Starsky backend represents the API and database portion of starsky application for employee scheduling.
 
-It uses Kotlin and OpenJDK for REST API operations and PostgreSQL for data storage.
+It uses Kotlin and OpenJDK for REST API and PostgreSQL for data storage.
 
 ### Requirements 
 - [docker](https://docs.docker.com/get-docker/) 
@@ -23,11 +23,18 @@ cd starsky-backend
 
 3. You must specify PostgreSQL password for `starsky` user and JWT secret for API authentication. 
 
+(Optional) You can also setup `STARSKY_ENVIRONMENT` environment variable, which can be either of those:
+- DEV (default value if no environment variable is found),
+- STAGE,
+- PROD.
+
 Create a `.env` file and specify environment variables `POSTGRES_PASSWORD` and `STARSKY_JWT_SECRET`:
  
 ```shell script
 echo "POSTGRES_PASSWORD=password" > .env
 echo "STARSKY_JWT_SECRET=secret" >> .env
+
+echo "STARSKY_ENVIRONMENT=DEV" >> .env  #optional
 ```
     
    JWT secret will be used to generate bearer tokens for clients. Easy way to generate a strong JWT secret by using OpenSSL:
