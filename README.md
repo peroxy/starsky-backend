@@ -44,6 +44,7 @@ openssl rand --base64 64
 ```
  
    Environment variables specified in `.env` file will be automatically used by `docker-compose`.
+   
 4. Build and run the database and API:
  
 ```shell script
