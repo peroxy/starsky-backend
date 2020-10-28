@@ -31,7 +31,7 @@ fun Route.getTokenRoute() {
                 call.respond(error.errorCode, error)
             } else {
                 val token = JwtConfig.generateToken(userDto!!)
-                call.respond(HttpStatusCode.OK, TokenResponse(token, "bearer", Duration.ofDays(1).toSeconds()))
+                call.respond(HttpStatusCode.OK, TokenResponse(token, "bearer", Duration.ofDays(1).seconds))
             }
         }
     }
