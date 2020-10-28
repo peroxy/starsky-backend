@@ -25,7 +25,6 @@ cd starsky-backend
 
 (Optional) You can also setup `STARSKY_ENVIRONMENT` environment variable, which can be either of those:
 - DEV (default value if no environment variable is found),
-- STAGE,
 - PROD.
 
 Create a `.env` file and specify environment variables `POSTGRES_PASSWORD` and `STARSKY_JWT_SECRET`:
