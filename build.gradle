@@ -16,20 +16,20 @@ apply plugin: "com.github.johnrengelman.shadow"
 
 mainClassName = 'com.starsky.api.ApplicationKt'
 
-task stage {
-    dependsOn installDist
-}
+//task stage {
+//    dependsOn installDist
+//}
 
 group 'com.starsky.api'
 version '0.0.1'
 
-jar {
-    manifest {
-        attributes(
-            'Main-Class': 'com.starsky.api.ApplicationKt'
-        )
-    }
-}
+//jar {
+//    manifest {
+//        attributes(
+//            'Main-Class': 'com.starsky.api.ApplicationKt'
+//        )
+//    }
+//}
 
 sourceSets {
     main.kotlin.srcDirs = main.java.srcDirs = ['src']
