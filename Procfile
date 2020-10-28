@@ -1,0 +1,1 @@
+web: java -jar build/libs/starsky-api.jar
