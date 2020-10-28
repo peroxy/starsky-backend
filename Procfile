@@ -1,1 +1,1 @@
-web: java -jar build/libs/starsky-api.jar
+web: java -jar build/libs/starsky-*.jar
