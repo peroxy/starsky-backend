@@ -16,6 +16,10 @@ apply plugin: "com.github.johnrengelman.shadow"
 
 mainClassName = 'com.starsky.api.ApplicationKt'
 
+task stage {
+    dependsOn installDist
+}
+
 group 'com.starsky.api'
 version '0.0.1'
 
