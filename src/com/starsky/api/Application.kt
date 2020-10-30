@@ -4,14 +4,14 @@ import com.starsky.api.routes.getAuthRoutes
 import com.starsky.api.routes.getUserRoutes
 import com.starsky.api.security.JwtConfig
 import com.starsky.api.security.UserPrincipal
+import com.starsky.env.Environment
+import com.starsky.env.EnvironmentVars
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
 import org.slf4j.event.Level
 
 fun main(args: Array<String>): Unit = io.ktor.server.jetty.EngineMain.main(args)
@@ -20,10 +20,8 @@ fun main(args: Array<String>): Unit = io.ktor.server.jetty.EngineMain.main(args)
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
 
-    val environment: Environment = Environment.values().firstOrNull { it.name == System.getenv("STARSKY_ENVIRONMENT") } ?: Environment.DEV
-
     install(CallLogging) {
-        level = if (environment == Environment.DEV) Level.DEBUG else Level.INFO
+        level = if (EnvironmentVars.environment == Environment.DEV) Level.DEBUG else Level.INFO
         filter { call -> call.request.path().startsWith("/") }
     }
 
@@ -45,7 +43,7 @@ fun Application.module(testing: Boolean = false) {
 
     install(ContentNegotiation) {
         gson {
-            if (environment == Environment.DEV){
+            if (EnvironmentVars.environment == Environment.DEV){
                 setPrettyPrinting()
             }
 

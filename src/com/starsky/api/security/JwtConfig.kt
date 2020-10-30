@@ -3,6 +3,7 @@ package com.starsky.api.security
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.starsky.env.EnvironmentVars
 import com.starsky.models.User
 import io.ktor.auth.*
 import java.time.Duration
@@ -10,11 +11,10 @@ import java.util.*
 
 object JwtConfig {
 
-    private val secret: String = System.getenv("STARSKY_JWT_SECRET")
-        ?: throw java.lang.IllegalStateException("STARSKY_JWT_SECRET environment variable is missing, API authentication will not work!")
+
     private const val issuer = "com.starsky"
     private val tokenDuration = Duration.ofDays(1)
-    private val algorithm = Algorithm.HMAC512(secret)
+    private val algorithm = Algorithm.HMAC512(EnvironmentVars.jwtSecret)
 
     val verifier: JWTVerifier = JWT.require(algorithm)
         .withIssuer(issuer)

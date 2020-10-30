@@ -1,7 +1,6 @@
-package com.starsky.api
+package com.starsky.env
 
 enum class Environment {
     DEV,
-    STAGE,
     PROD
 }
