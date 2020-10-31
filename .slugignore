@@ -1,0 +1,13 @@
+.gradle
+.dockerignore
+.gitignore
+.idea
+build
+.env
+docker-compose.yml
+starskyInfrastructure.drawio
+README.md
+LICENSE
+log.txt
+.git
+test
