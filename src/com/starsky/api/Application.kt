@@ -49,7 +49,6 @@ fun Application.module(testing: Boolean = false) {
 
         }
     }
-
     getAuthRoutes()
     getUserRoutes()
 
