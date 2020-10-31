@@ -97,7 +97,7 @@ heroku addons:attach heroku-postgresql
 heroku addons:open heroku-postgresql -a starsky-backend
 ```
 
-- Go to `Settings` tab and click on Database Credentials --> View Credentials.
+- Go to _Settings_ tab and click on _Database Credentials_ --> _View Credentials_.
 - Copy your database's credentials and host:port info.
 - Open your favorite PostgreSQL client and connect to your database.
 - Open `init.sql` file located in `\starsky-backend\src\com\starsky\database\scripts`.

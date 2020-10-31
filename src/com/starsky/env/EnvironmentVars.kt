@@ -12,15 +12,27 @@ object EnvironmentVars {
      * Connection string with username and password appended.
      * This is always present in Heroku container and is only used if environment is production.
      **/
-    val connectionString: String = System.getenv("JDBC_DATABASE_URL")
-        ?: throw java.lang.IllegalStateException("JDBC_DATABASE_URL environment variable is missing!")
+    val connectionString: String
+        get() {
+            return when (environment) {
+                Environment.PROD -> System.getenv("JDBC_DATABASE_URL")
+                    ?: throw java.lang.IllegalStateException("JDBC_DATABASE_URL environment variable is missing!")
+                else -> throw NotImplementedError("JDBC_DATABASE_URL is not supported in non-production environment!")
+            }
+        }
 
     /**
      * Postgres password that is used to connect to local development docker database.
      * This is only used for development purposes and is not used in production.
      **/
-    val postgresPassword: String = System.getenv("POSTGRES_PASSWORD")
-        ?: throw java.lang.IllegalStateException("POSTGRES_PASSWORD environment variable is missing!")
+    val postgresPassword: String
+        get() {
+            return when (environment) {
+                Environment.DEV -> System.getenv("POSTGRES_PASSWORD")
+                    ?: throw java.lang.IllegalStateException("POSTGRES_PASSWORD environment variable is missing!")
+                else -> throw NotImplementedError("POSTGRES_PASSWORD is not supported in production environment!")
+            }
+        }
 
     /**
      * JWT secret value used for generating authentication bearer tokens.

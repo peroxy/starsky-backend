@@ -19,6 +19,8 @@ services:
       dockerfile: src/com/starsky/api/Dockerfile
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - STARSKY_JWT_SECRET=${STARSKY_JWT_SECRET}
+      - STARSKY_ENVIRONMENT=${STARSKY_ENVIRONMENT}
     ports:
       - "8080:8080"
     network_mode: "host"
