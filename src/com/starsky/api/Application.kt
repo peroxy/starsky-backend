@@ -11,6 +11,7 @@ import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.features.*
 import io.ktor.gson.*
+import io.ktor.http.*
 import io.ktor.request.*
 import org.slf4j.event.Level
 
@@ -25,15 +26,26 @@ fun Application.module(testing: Boolean = false) {
         filter { call -> call.request.path().startsWith("/") }
     }
 
+    //TODO: add environment variable for frontend host domain, e.g. dev will be localhost:3000, heroku will be nejc.me
+    install(CORS) {
+        // these is the minimum required configuration for cross origin to work
+        // NOTE: if you change these settings and restart backend - frontend (browser) must also be restarted,
+        // since OPTIONS API call stays in cache (firefox 24h, chrome 2h), see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+        header(HttpHeaders.AccessControlAllowHeaders)
+        header(HttpHeaders.ContentType)
+        header(HttpHeaders.AccessControlAllowOrigin)
+        host("localhost:3000")
+    }
+
     install(Authentication) {
         jwt {
             verifier(JwtConfig.verifier)
             realm = "com.starsky"
             validate {
                 val id = it.payload.getClaim("id")?.asInt()
-                if (id == null){
+                if (id == null) {
                     null
-                }else {
+                } else {
                     UserPrincipal(id)
                 }
 
