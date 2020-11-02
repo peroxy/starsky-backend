@@ -1,5 +1,7 @@
 # Starsky backend
-Starsky backend represents the API and database portion of starsky application for employee scheduling.
+Starsky backend represents the API and database portion of starsky application for employee scheduling. 
+Front-end React application is located in a different repository called 
+[starsky-frontend](https://github.com/peroxy/starsky-frontend). 
 
 It uses Kotlin and OpenJDK for REST API and PostgreSQL for data storage.
 
