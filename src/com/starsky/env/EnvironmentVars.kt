@@ -9,6 +9,20 @@ object EnvironmentVars {
         Environment.values().firstOrNull { it.name == System.getenv("STARSKY_ENVIRONMENT") } ?: Environment.DEV
 
     /**
+     * Starsky front-end hostname used for CORS Origin host access, e.g. api.domain.com (defaults to localhost:3000 for DEV environment).
+     */
+    val frontendHost: String
+        get() {
+            return when (environment) {
+                Environment.DEV -> System.getenv("STARSKY_FRONTEND_HOST") ?: "localhost:3000"
+                Environment.PROD -> System.getenv("STARSKY_FRONTEND_HOST")
+                    ?: throw java.lang.IllegalStateException("STARSKY_FRONTEND_HOST environment variable is missing, CORS will not work!")
+                else -> throw NotImplementedError() // in case we add a new environment we won't forget this way
+            }
+        }
+
+
+    /**
      * Connection string with username and password appended.
      * This is always present in Heroku container and is only used if environment is production.
      **/

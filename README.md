@@ -31,17 +31,21 @@ cd starsky-backend
 
 3. You must specify PostgreSQL password for `starsky` user and JWT secret for API authentication. 
 
-(Optional) You can also setup `STARSKY_ENVIRONMENT` environment variable, which can be either of those:
-- DEV (default value if no environment variable is found),
-- PROD.
+    - (Optional) Set `STARSKY_ENVIRONMENT` environment variable, which can be either of those:
+        - DEV (default value if no environment variable is found),
+        - PROD.
+    - (Optional) Set `STARSKY_FRONTEND_HOST` environment variable with front-end hostname for CORS access, e.g. `domain.com`.
+    You can set this variable if you want to override default DEV front-end React application hosted at `localhost:3000`.
+     This front-end origin will receive `AccessControlAllowOrigin` header.
 
-Create a `.env` file and specify environment variables `POSTGRES_PASSWORD` and `STARSKY_JWT_SECRET`:
+Create an `.env` file and specify environment variables `POSTGRES_PASSWORD` and `STARSKY_JWT_SECRET`:
  
 ```shell script
 echo "POSTGRES_PASSWORD=password" > .env
 echo "STARSKY_JWT_SECRET=secret" >> .env
 
-echo "STARSKY_ENVIRONMENT=DEV" >> .env  #optional
+echo "STARSKY_ENVIRONMENT=DEV" >> .env  # optional
+echo "STARSKY_FRONTEND_HOST=localhost:3000" >> .env  # optional
 ```
     
    JWT secret will be used to generate bearer tokens for clients. An easy way to generate a strong JWT secret is by using OpenSSL:
@@ -103,12 +107,13 @@ heroku addons:open heroku-postgresql -a starsky-backend
 - Open `init.sql` file located in `\starsky-backend\src\com\starsky\database\scripts`.
 - Execute `init.sql` file.
 
-4. Add Heroku config vars (see Local Development in README for more info about environment variables):
+4. Add Heroku config vars (see Local Development in README for details about environment variables):
 
 ```shell script
 heroku config:set GRADLE_TASK="shadowJar" -a starsky-backend
 heroku config:set STARSKY_ENVIRONMENT="PROD" -a starsky-backend
 heroku config:set STARSKY_JWT_SECRET="JWT secret" -a starsky-backend
+heroku config:set STARSKY_FRONTEND_HOST="domain.com" -a starsky-backend
 ```
 
 5. Go to Heroku's website and login, open your app and connect this Github repo to your app.

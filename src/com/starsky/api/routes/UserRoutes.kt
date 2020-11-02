@@ -47,7 +47,7 @@ private fun Route.getUserRoute() {
             call.respond(HttpStatusCode.OK, user.toResponse())
         }
 
-        //TODO: add email verification
+        //TODO: add email verification?
         // - 1. insert (random) unique hash for verification into user table
         // - 2. create rest api method for verification that accepts this unique hash, and sets verifiedMail to true
         // - 3. send verification URL GET, then make a POST on the website, do not include token in get https://stackoverflow.com/questions/39690159/whats-the-rest-way-to-verify-an-email

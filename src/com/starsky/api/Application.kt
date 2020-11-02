@@ -26,7 +26,6 @@ fun Application.module(testing: Boolean = false) {
         filter { call -> call.request.path().startsWith("/") }
     }
 
-    //TODO: add environment variable for frontend host domain, e.g. dev will be localhost:3000, heroku will be nejc.me
     install(CORS) {
         // these is the minimum required configuration for cross origin to work
         // NOTE: if you change these settings and restart backend - frontend (browser) must also be restarted,
@@ -34,7 +33,7 @@ fun Application.module(testing: Boolean = false) {
         header(HttpHeaders.AccessControlAllowHeaders)
         header(HttpHeaders.ContentType)
         header(HttpHeaders.AccessControlAllowOrigin)
-        host("localhost:3000")
+        host(EnvironmentVars.frontendHost)
     }
 
     install(Authentication) {
