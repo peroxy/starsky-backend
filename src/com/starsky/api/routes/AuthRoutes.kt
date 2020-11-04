@@ -6,6 +6,7 @@ import com.starsky.api.security.JwtConfig
 import com.starsky.api.validations.UserValidation
 import com.starsky.database.gateways.UserGateway
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
@@ -35,5 +36,13 @@ private fun Route.getTokenRoute() {
             }
         }
     }
+
+    authenticate {
+        get("/auth/token/validate") {
+            call.respond(HttpStatusCode.OK);
+        }
+    }
+
+
 }
 
