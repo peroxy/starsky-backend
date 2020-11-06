@@ -30,9 +30,16 @@ fun Application.module(testing: Boolean = false) {
         // these is the minimum required configuration for cross origin to work
         // NOTE: if you change these settings and restart backend - frontend (browser) must also be restarted,
         // since OPTIONS API call stays in cache (firefox 24h, chrome 2h), see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Max-Age
+        method(HttpMethod.Options)
+        method(HttpMethod.Get)
+        method(HttpMethod.Post)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        method(HttpMethod.Patch)
         header(HttpHeaders.AccessControlAllowHeaders)
         header(HttpHeaders.ContentType)
         header(HttpHeaders.AccessControlAllowOrigin)
+        header(HttpHeaders.Authorization)
         host(EnvironmentVars.frontendHost)
     }
 
