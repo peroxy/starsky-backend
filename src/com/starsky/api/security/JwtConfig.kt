@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.starsky.env.EnvironmentVars
 import com.starsky.models.User
-import io.ktor.auth.*
 import java.time.Duration
 import java.util.*
 
@@ -27,6 +26,8 @@ object JwtConfig {
         .withSubject("Authentication")
         .withIssuer(issuer)
         .withClaim("id", user.id.value)
+        .withClaim("roleId", user.userRole.id.value)
+        .withIssuedAt(Date(System.currentTimeMillis()))
         .withExpiresAt(getExpiration())
         .sign(algorithm)
 

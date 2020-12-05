@@ -17,6 +17,9 @@ object UserValidation {
         if (user.name.isBlank()) {
             return ErrorResponse(HttpStatusCode.BadRequest, "Invalid Body", "Name in body can't be blank.")
         }
+        if (user.jobTitle.isBlank()) {
+            return ErrorResponse(HttpStatusCode.BadRequest, "Invalid Body", "Job title in body can't be blank.")
+        }
         if (UserGateway.getByEmail(user.email) != null) {
             return ErrorResponse(
                 HttpStatusCode.Conflict,

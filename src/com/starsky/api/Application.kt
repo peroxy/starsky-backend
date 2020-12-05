@@ -49,12 +49,12 @@ fun Application.module(testing: Boolean = false) {
             realm = "com.starsky"
             validate {
                 val id = it.payload.getClaim("id")?.asInt()
-                if (id == null) {
+                val roleId = it.payload.getClaim("roleId")?.asInt()
+                if (id == null || roleId == null) {
                     null
                 } else {
-                    UserPrincipal(id)
+                    UserPrincipal(id, roleId)
                 }
-
             }
         }
     }
