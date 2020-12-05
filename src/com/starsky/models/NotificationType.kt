@@ -18,5 +18,9 @@ class NotificationType(id: EntityID<Int>) : IntEntity(id) {
 
 enum class NotificationTypeEnum(val id: Int) {
     Email(1),
-    TextMessage(2),
+    TextMessage(2);
+
+    companion object {
+        fun valueOf(value: Int): NotificationTypeEnum? = NotificationTypeEnum.values().find { it.id == value }
+    }
 }

@@ -1,7 +1,7 @@
 package com.starsky.database.gateways
 
-import com.starsky.models.*
-import org.jetbrains.exposed.dao.id.EntityID
+import com.starsky.models.User
+import com.starsky.models.Users
 import org.jetbrains.exposed.sql.and
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -12,6 +12,7 @@ object UserGateway : Gateway() {
         var user: User? = null
         transaction {
             user = User.find { Users.id eq id and Users.enabled }.limit(1).firstOrNull()
+
         }
         return user
     }
@@ -43,10 +44,10 @@ object UserGateway : Gateway() {
                 this.dateCreated = DateTime.now(DateTimeZone.UTC)
                 this.enabled = true
                 this.jobTitle = jobTitle
-                this.notificationType = NotificationType(EntityID(notificationTypeId, NotificationTypes))
+                this.notificationTypeId = notificationTypeId
                 this.phoneNumber = phoneNumber
-                this.userRole = UserRole(EntityID(userRoleId, UserRoles))
-                this.parentUser = if (parentUserId == null) null else User(EntityID(parentUserId, Users))
+                this.userRoleId = userRoleId
+                this.parentUserId = parentUserId
             }
         }
         return user!!

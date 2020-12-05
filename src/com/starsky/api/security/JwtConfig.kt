@@ -26,7 +26,7 @@ object JwtConfig {
         .withSubject("Authentication")
         .withIssuer(issuer)
         .withClaim("id", user.id.value)
-        .withClaim("roleId", user.userRole.id.value)
+        .withClaim("roleId", user.userRoleId)
         .withIssuedAt(Date(System.currentTimeMillis()))
         .withExpiresAt(getExpiration())
         .sign(algorithm)

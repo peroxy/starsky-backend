@@ -14,9 +14,9 @@ object Users : IntIdTable("user") {
     val password = text("password")
     val jobTitle = text("job_title")
     val phoneNumber = text("phone_number").nullable()
-    val notificationType = reference("notification_type_id", NotificationTypes)
-    val userRole = reference("user_role_id", UserRoles)
-    val parentUser = reference("parent_user_id", Users).nullable()
+    val notificationTypeId = integer("notification_type_id")
+    val userRoleId = integer("user_role_id")
+    val parentUserId = integer("parent_user_id").nullable()
     val dateCreated = datetime("date_created")
     val enabled = bool("enabled")
 }
@@ -29,9 +29,9 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     var password by Users.password
     var jobTitle by Users.jobTitle
     var phoneNumber by Users.phoneNumber
-    var notificationType by NotificationType referencedOn Users.notificationType
-    var userRole by UserRole referencedOn Users.userRole
-    var parentUser by User optionalReferencedOn Users.parentUser
+    var notificationTypeId by Users.notificationTypeId
+    var userRoleId by Users.userRoleId
+    var parentUserId by Users.parentUserId
     var enabled by Users.enabled
     var dateCreated by Users.dateCreated
 
@@ -42,8 +42,8 @@ class User(id: EntityID<Int>) : IntEntity(id) {
             email,
             jobTitle,
             phoneNumber,
-            notificationType.name,
-            userRole.name,
+            NotificationTypeEnum.valueOf(notificationTypeId).toString().toLowerCase(),
+            UserRoleEnum.valueOf(userRoleId).toString().toLowerCase(),
             ISODateTimeFormat.dateTimeNoMillis().print(dateCreated)
         )
     }
