@@ -1,16 +1,18 @@
 CREATE TABLE public.user_role
 (
     id   serial PRIMARY KEY,
-    name text NOT NULL
+    name text NOT NULL UNIQUE
 );
 
 ALTER TABLE public.user_role
     OWNER to starsky;
 
+
+
 CREATE TABLE public.notification_type
 (
     id   serial PRIMARY KEY,
-    name text NOT NULL
+    name text NOT NULL UNIQUE
 );
 
 ALTER TABLE public.notification_type
@@ -42,6 +44,10 @@ ALTER TABLE public.user
         FOREIGN KEY (parent_user_id)
             REFERENCES public.user (id);
 
+CREATE
+UNIQUE INDEX user_email_enabled_constraint ON public.user (email, enabled)
+    WHERE enabled;
+
 ALTER TABLE public.user
     OWNER to starsky;
 
@@ -50,6 +56,7 @@ CREATE TABLE public.team
     id            serial PRIMARY KEY,
     name          text    NOT NULL,
     owner_user_id integer NOT NULL,
+    UNIQUE (name, owner_user_id),
     CONSTRAINT fk_user
         FOREIGN KEY (owner_user_id)
             REFERENCES public.user (id)
@@ -63,6 +70,7 @@ CREATE TABLE public.team_member
     id      serial PRIMARY KEY,
     team_id integer NOT NULL,
     user_id integer NOT NULL,
+    UNIQUE (team_id, user_id),
     CONSTRAINT fk_user
         FOREIGN KEY (user_id)
             REFERENCES public.user (id),
