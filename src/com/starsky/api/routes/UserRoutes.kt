@@ -45,6 +45,8 @@ private fun Route.getUserRoute() {
                 throw NotImplementedError()
             }
         }
+
+
     }
 
     /*
@@ -69,6 +71,7 @@ private fun Route.getUserRoute() {
             )
             call.respond(HttpStatusCode.OK, user.toResponse())
         }
+
 
         //TODO: add email verification?
         // - 1. insert (random) unique hash for verification into user table

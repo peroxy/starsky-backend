@@ -1,5 +1,6 @@
 package com.starsky.models
 
+import com.starsky.api.responses.TeamResponse
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -15,4 +16,11 @@ class Team(id: EntityID<Int>) : IntEntity(id) {
 
     var name by Teams.name
     var owner by User referencedOn Teams.owner
+
+    fun toResponse(): TeamResponse {
+        return TeamResponse(
+            id.value,
+            name
+        )
+    }
 }
