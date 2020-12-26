@@ -24,11 +24,11 @@ private fun Route.getTeamRoute() {
                 when {
                     RoleValidation.hasAnyRole(principal, setOf(UserRoleEnum.Manager)) -> {
                         val teams = TeamGateway.getByOwnerId(principal.id)
-                        call.respond(teams)
+                        call.respond(teams.map { it.toResponse() })
                     }
                     RoleValidation.hasAnyRole(principal, setOf(UserRoleEnum.Employee)) -> {
                         val teams = TeamGateway.getByEmployeeId(principal.id)
-                        call.respond(teams)
+                        call.respond(teams.map { it.toResponse() })
                     }
                     else -> {
                         call.respond(HttpStatusCode.Forbidden)
