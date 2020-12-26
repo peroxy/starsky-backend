@@ -27,14 +27,11 @@ private fun Route.getUserRoute() {
             get {
                 val principal = call.principal<UserPrincipal>()!!
 
-                // example for how to do role validation:
-                //RoleValidation.hasAnyRole(principal, setOf(UserRoleEnum.Manager, UserRoleEnum.Admin))
-
                 val user = UserGateway.getById(principal.id)
                 if (user == null) {
                     call.respond(
                         HttpStatusCode.NotFound,
-                        ErrorResponse(HttpStatusCode.NotFound, "Not Found", "User does not exist in database.")
+                        ErrorResponse(HttpStatusCode.NotFound, "Not Found", "User does not exist or is disabled.")
                     )
                 } else {
                     call.respond(user.toResponse())

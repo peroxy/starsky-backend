@@ -1,6 +1,7 @@
 package com.starsky.api
 
 import com.starsky.api.routes.getAuthRoutes
+import com.starsky.api.routes.getInviteRoutes
 import com.starsky.api.routes.getTeamRoutes
 import com.starsky.api.routes.getUserRoutes
 import com.starsky.api.security.JwtConfig
@@ -71,5 +72,5 @@ fun Application.module(testing: Boolean = false) {
     getAuthRoutes()
     getUserRoutes()
     getTeamRoutes()
-
+    getInviteRoutes()
 }
