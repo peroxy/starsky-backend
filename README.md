@@ -7,11 +7,12 @@ It uses Kotlin and OpenJDK for REST API and PostgreSQL for data storage.
 
 ## Requirements
 
-#### Development 
+### Development
+
 - [docker](https://docs.docker.com/get-docker/) 
 - [docker-compose](https://docs.docker.com/compose/install/) (at least 3.3 version support)
 
-#### Deployment
+### Deployment
 - [heroku-cli](https://devcenter.heroku.com/articles/heroku-cli) (optional but nice)
 - PostgreSQL client to execute a SQL script, e.g. [pgAdmin](https://www.pgadmin.org/)
 
