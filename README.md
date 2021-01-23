@@ -3,8 +3,14 @@ Starsky backend represents the API and database portion of starsky application f
 Front-end React application is located in a different repository called 
 [starsky-frontend](https://github.com/peroxy/starsky-frontend). 
 
-It uses Kotlin and OpenJDK for REST API and PostgreSQL for data storage.
+It uses Java (Spring Boot) for REST API and PostgreSQL for data storage.
 
+## Work In Progress
+Currently rewriting the entire project from Kotlin with Ktor and Exposed ORM to Java with SpringBoot, OpenAPI swagger gen and JPA. This will speed up the entire process, since Kotlin with Ktor and Exposed feels very unfinished and slow to develop anything.
+
+This will happen slowly in `java-rewrite` branch, hopefully I can convert everything without much pain.
+
+<del>
 ## Requirements
 
 ### Development
@@ -129,4 +135,4 @@ heroku config:set STARSKY_FRONTEND_HOST="domain.com" -a starsky-backend
  
  You cannot push to `master` branch directly; you can only create pull requests that have to be manually approved. 
  
- 
+ </del>
