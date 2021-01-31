@@ -8,7 +8,7 @@ public class UserRole extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user-role-id-generator")
-    @SequenceGenerator(name = "user-role-id-generator", sequenceName = "user-role-sequence")
+    @SequenceGenerator(name = "user-role-id-generator", sequenceName = "user_role_sequence", allocationSize = 1)
     private long id;
 
     @Column(unique = true)

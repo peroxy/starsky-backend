@@ -8,7 +8,7 @@ public class Team extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team-id-generator")
-    @SequenceGenerator(name = "team-id-generator", sequenceName = "team-sequence")
+    @SequenceGenerator(name = "team-id-generator", sequenceName = "team_sequence", allocationSize = 1)
     private long id;
 
     @NotNull
