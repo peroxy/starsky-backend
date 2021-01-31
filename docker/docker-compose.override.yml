@@ -1,0 +1,6 @@
+version: "3.3"
+services:
+  database:
+    environment:
+      - POSTGRES_USER=starsky
+      - POSTGRES_PASSWORD=starsky

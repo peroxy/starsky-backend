@@ -1,4 +1,4 @@
-.gradle
+../.gradle
 .dockerignore
 .gitignore
 .idea
