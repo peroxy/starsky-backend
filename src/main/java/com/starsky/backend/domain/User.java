@@ -1,16 +1,31 @@
 package com.starsky.backend.domain;
 
 import com.starsky.backend.api.UserResponse;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import java.time.LocalDateTime;
 
 @Entity
 public class User extends BaseEntity {
+
+    public User() {
+    }
+
+
+    /** Register a new manager type user.
+     * @param password bcrypt hashed password, do not pass raw version
+     */
+    public User(@NotNull String name, @NotNull String email, @NotNull String password, @NotNull String jobTitle) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.jobTitle = jobTitle;
+        this.enabled = true;
+        this.notificationType = NotificationType.EMAIL;
+        this.role = Role.MANAGER;
+        this.parentUser = null; //managers dont have parent users
+        this.phoneNumber = null; //we dont use phone notifications atm, TODO fix this if we ever use them
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user-id-generator")
@@ -36,18 +51,18 @@ public class User extends BaseEntity {
     private boolean enabled;
 
     @NotNull
-    @OneToOne
+    @Enumerated(EnumType.ORDINAL)
     private NotificationType notificationType;
 
     @NotNull
-    @OneToOne
-    private UserRole userRole;
+    @Enumerated(EnumType.ORDINAL)
+    private Role role;
 
     @OneToOne
     private User parentUser;
 
     public UserResponse toResponse(){
-        return new UserResponse(getId(), getName(), getEmail(), getJobTitle(), getPhoneNumber(), getNotificationType().getName(), getUserRole().getName());
+        return new UserResponse(getId(), getName(), getEmail(), getJobTitle(), getPhoneNumber(), getNotificationType().name(), getRole().name());
     }
 
     public long getId() {
@@ -106,6 +121,14 @@ public class User extends BaseEntity {
         this.enabled = enabled;
     }
 
+    public User getParentUser() {
+        return parentUser;
+    }
+
+    public void setParentUser(User parentUser) {
+        this.parentUser = parentUser;
+    }
+
     public NotificationType getNotificationType() {
         return notificationType;
     }
@@ -114,20 +137,12 @@ public class User extends BaseEntity {
         this.notificationType = notificationType;
     }
 
-    public UserRole getUserRole() {
-        return userRole;
+    public Role getRole() {
+        return role;
     }
 
-    public void setUserRole(UserRole userRole) {
-        this.userRole = userRole;
-    }
-
-    public User getParentUser() {
-        return parentUser;
-    }
-
-    public void setParentUser(User parentUser) {
-        this.parentUser = parentUser;
+    public void setRole(Role role) {
+        this.role = role;
     }
 }
 
