@@ -1,5 +1,6 @@
 package com.starsky.backend.domain;
 
+import com.starsky.backend.api.UserResponse;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -44,6 +45,10 @@ public class User extends BaseEntity {
 
     @OneToOne
     private User parentUser;
+
+    public UserResponse toResponse(){
+        return new UserResponse(getId(), getName(), getEmail(), getJobTitle(), getPhoneNumber(), getNotificationType().getName(), getUserRole().getName());
+    }
 
     public long getId() {
         return id;
