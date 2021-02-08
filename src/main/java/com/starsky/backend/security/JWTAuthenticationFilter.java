@@ -3,18 +3,14 @@ package com.starsky.backend.security;
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.api.LoginRequest;
+import com.starsky.backend.api.TokenResponse;
 import com.starsky.backend.config.JwtConfig;
-import org.springframework.beans.factory.annotation.Autowire;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -46,11 +42,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
+    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException {
+        var expiration = new Date(System.currentTimeMillis() + jwtConfig.getExpirationTime());
         String token = JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + jwtConfig.getExpirationTime()))
+                .withExpiresAt(expiration)
                 .sign(HMAC512(jwtConfig.getSecret().getBytes()));
-        res.addHeader(jwtConfig.getAuthorizationHeader(), "%s%s".formatted(jwtConfig.getTokenPrefix(), token));
+        res.setContentType("application/json");
+        var mapper = new ObjectMapper();
+        res.getWriter().write(mapper.writeValueAsString(new TokenResponse(token, jwtConfig.getTokenPrefix().trim(), expiration)));
+        res.getWriter().flush();
     }
 }
