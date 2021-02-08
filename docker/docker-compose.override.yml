@@ -4,3 +4,8 @@ services:
     environment:
       - POSTGRES_USER=starsky
       - POSTGRES_PASSWORD=starsky
+  api:
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - POSTGRES_USER=starsky
+      - POSTGRES_PASSWORD=starsky

@@ -5,3 +5,14 @@ services:
     ports:
       - "5432:5432"
     network_mode: "host"
+  api:
+    build:
+      context: ../.
+      dockerfile: api/Dockerfile
+    ports:
+      - 8080:8080
+    container_name: starsky_backend_api
+    restart: on-failure
+    depends_on:
+      - database
+    network_mode: host
