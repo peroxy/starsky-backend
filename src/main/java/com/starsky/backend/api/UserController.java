@@ -22,14 +22,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/users/{email}")
-    @ApiResponse(responseCode = "200", description = "Found the user with this email.")
-    @ApiResponse(responseCode = "404", description = "User with this email does not exist.", content = @Content)
-    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable @Email String email){
-        var user = userService.getUserByEmail(email);
-        return ResponseEntity.ok(user.toResponse());
-    }
-
     @PostMapping("/users/")
     @ApiResponse(responseCode = "200", description = "Created a new user successfully.")
     @ApiResponse(responseCode = "400", description = "User info invalid.", content = @Content)
