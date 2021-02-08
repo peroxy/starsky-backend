@@ -1,4 +1,4 @@
-package com.starsky.backend.api;
+package com.starsky.backend.api.authentication;
 
 public class LoginRequest {
 

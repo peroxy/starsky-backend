@@ -33,8 +33,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, jwtConfig.getRegisterUrl()).permitAll()
-//                .antMatchers(HttpMethod.GET, "/swagger-ui/*").permitAll()
-//                .antMatchers(HttpMethod.GET, "/api-docs/*").permitAll()
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtConfig))

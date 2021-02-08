@@ -1,4 +1,4 @@
-package com.starsky.backend.api;
+package com.starsky.backend.api.user;
 
 import com.starsky.backend.domain.User;
 

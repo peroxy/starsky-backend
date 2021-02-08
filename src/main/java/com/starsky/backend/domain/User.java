@@ -1,6 +1,6 @@
 package com.starsky.backend.domain;
 
-import com.starsky.backend.api.UserResponse;
+import com.starsky.backend.api.user.UserResponse;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

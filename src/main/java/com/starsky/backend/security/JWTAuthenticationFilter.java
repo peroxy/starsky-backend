@@ -2,8 +2,8 @@ package com.starsky.backend.security;
 
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.starsky.backend.api.LoginRequest;
-import com.starsky.backend.api.TokenResponse;
+import com.starsky.backend.api.authentication.LoginRequest;
+import com.starsky.backend.api.authentication.TokenResponse;
 import com.starsky.backend.config.JwtConfig;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
