@@ -37,3 +37,4 @@ out/
 .vscode/
 
 docker/.env
+/log.txt

@@ -13,6 +13,12 @@ process, since Kotlin with Ktor and Exposed feels very unfinished and slow to de
 
 This will happen slowly in `java-rewrite` branch, hopefully I can convert everything without much pain.
 
+### OpenAPI client generate
+Run starsky REST API locally, then you can run:
+```shell
+docker run --rm --network host -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://localhost:8080/starsky/v3/api-docs -g typescript -o /local/out/ts
+```
+
 <del>
 ## Requirements
 
