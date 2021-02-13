@@ -8,7 +8,7 @@ services:
   api:
     build:
       context: ../.
-      dockerfile: api/Dockerfile
+      dockerfile: docker/api/Dockerfile
     ports:
       - 8080:8080
     container_name: starsky_backend_api
