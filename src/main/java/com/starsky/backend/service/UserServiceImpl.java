@@ -1,6 +1,8 @@
 package com.starsky.backend.service;
 
 import com.starsky.backend.api.user.CreateUserRequest;
+import com.starsky.backend.domain.NotificationType;
+import com.starsky.backend.domain.Role;
 import com.starsky.backend.domain.User;
 import com.starsky.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(CreateUserRequest request) {
-        var user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle());
+        var user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
+                null, true, NotificationType.EMAIL, Role.MANAGER, null);
         return userRepository.save(user);
     }
 }

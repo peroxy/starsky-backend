@@ -12,19 +12,25 @@ public class User extends BaseEntity {
     }
 
 
-    /** Register a new manager type user.
-     * @param password bcrypt hashed password, do not pass raw version
-     */
-    public User(@NotNull String name, @NotNull String email, @NotNull String password, @NotNull String jobTitle) {
+    public User(@NotNull String name,
+                @NotNull String email,
+                @NotNull String password,
+                @NotNull String jobTitle,
+                String phoneNumber,
+                @NotNull boolean enabled,
+                @NotNull NotificationType notificationType,
+                @NotNull Role role,
+                User parentUser) {
+
         this.name = name;
         this.email = email;
         this.password = password;
         this.jobTitle = jobTitle;
-        this.enabled = true;
-        this.notificationType = NotificationType.EMAIL;
-        this.role = Role.MANAGER;
-        this.parentUser = null; //managers dont have parent users
-        this.phoneNumber = null; //we dont use phone notifications atm, TODO fix this if we ever use them
+        this.phoneNumber = phoneNumber;
+        this.enabled = enabled;
+        this.notificationType = notificationType;
+        this.role = role;
+        this.parentUser = parentUser;
     }
 
     @Id
@@ -61,7 +67,7 @@ public class User extends BaseEntity {
     @OneToOne
     private User parentUser;
 
-    public UserResponse toResponse(){
+    public UserResponse toResponse() {
         return new UserResponse(getId(), getName(), getEmail(), getJobTitle(), getPhoneNumber(), getNotificationType().name(), getRole().name());
     }
 

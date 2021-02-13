@@ -6,6 +6,15 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Team extends BaseEntity {
 
+    public Team(@NotNull String name, User owner) {
+        this.name = name;
+        this.owner = owner;
+    }
+
+    public Team() {
+
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team-id-generator")
     @SequenceGenerator(name = "team-id-generator", sequenceName = "team_sequence", allocationSize = 1)
