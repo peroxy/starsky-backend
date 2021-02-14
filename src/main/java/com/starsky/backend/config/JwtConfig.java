@@ -29,6 +29,6 @@ public class JwtConfig {
     }
 
     public String getRegisterUrl() {
-        return "/users/";
+        return "/users";
     }
 }
