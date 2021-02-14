@@ -30,9 +30,4 @@ public class UserController {
         return ResponseEntity.ok(user.toResponse());
     }
 
-    @GetMapping("/test")
-    public String test(){
-        return "Hello world!";
-    }
-
 }

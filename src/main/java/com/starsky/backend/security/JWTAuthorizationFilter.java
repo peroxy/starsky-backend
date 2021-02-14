@@ -2,9 +2,11 @@ package com.starsky.backend.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.Claim;
 import com.starsky.backend.config.JwtConfig;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
@@ -45,13 +48,14 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader(jwtConfig.getAuthorizationHeader());
         if (token != null) {
             // parse the token.
-            String user = JWT.require(Algorithm.HMAC512(jwtConfig.getSecret().getBytes()))
+            var jwt = JWT.require(Algorithm.HMAC512(jwtConfig.getSecret().getBytes()))
                     .build()
-                    .verify(token.replace(jwtConfig.getTokenPrefix(), ""))
-                    .getSubject();
+                    .verify(token.replace(jwtConfig.getTokenPrefix(), ""));
+            String user = jwt.getSubject();
+            var roles = List.of(new SimpleGrantedAuthority(jwt.getClaim("role").asString()));
 
             if (user != null) {
-                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+                return new UsernamePasswordAuthenticationToken(user, null, roles);
             }
             return null;
         }
