@@ -23,15 +23,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        var user = userRepository.findByEmail(email);
-        if (user == null){
-            throw new ResourceNotFoundException("User with mail %s does not exist".formatted(email));
-        }
-        return user;
-    }
-
-    @Override
     public User createUser(CreateUserRequest request) {
         var user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
                 null, true, NotificationType.EMAIL, Role.MANAGER, null);
