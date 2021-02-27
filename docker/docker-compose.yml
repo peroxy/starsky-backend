@@ -3,8 +3,7 @@ services:
   database:
     image: postgres:13.1-alpine
     ports:
-      - "5432:5432"
-    network_mode: "host"
+      - 5432:5432
   api:
     build:
       context: ../.
@@ -15,4 +14,3 @@ services:
     restart: on-failure
     depends_on:
       - database
-    network_mode: host
