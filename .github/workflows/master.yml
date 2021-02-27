@@ -45,7 +45,7 @@ jobs:
         with:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
-          source: "docker/api/docker-compose.yml,docker/api/docker-compose.prod.yml,.env"
+          source: "docker/api/docker-compose.yml,docker/api/docker-compose.prod.yml,.env,nginx/conf.d/api.conf"
           target: "~/docker/starsky-backend/"
           key: ${{ secrets.SERVER_SSH_KEY }}
       - name: Stop, pull and start application on Azure VM
@@ -56,6 +56,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ~/docker/starsky-backend/
+            mv api.conf nginx/conf.d/
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull
             docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
