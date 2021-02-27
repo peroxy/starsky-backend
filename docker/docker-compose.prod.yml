@@ -12,3 +12,12 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     restart: always
+  nginx:
+    image: nginx:1.19.7-alpine
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ../nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - api
