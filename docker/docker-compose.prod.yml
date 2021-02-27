@@ -11,6 +11,7 @@ services:
       - SPRING_PROFILES_ACTIVE=prod
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - STARSKY_JWT_SECRET=${STARSKY_JWT_SECRET}
     restart: always
   nginx:
     image: nginx:1.19.7-alpine
