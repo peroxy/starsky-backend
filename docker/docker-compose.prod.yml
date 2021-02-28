@@ -17,8 +17,9 @@ services:
     image: nginx:1.19.7-alpine
     restart: always
     ports:
-      - 80:80
+      - 443:443
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/conf.d:/etc/nginx/conf.d  # Must include ./ at the beginning! :) otherwise it uses the system /nginx/conf.d directory, instead of current dir
+      - ~/certs:/etc/nginx/certs  # machine must have /data/certs folder with public cert and private key both named starsky
     depends_on:
       - api
