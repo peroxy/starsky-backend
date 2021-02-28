@@ -20,6 +20,5 @@ services:
       - 80:80
     volumes:
       - /nginx/conf.d:/etc/nginx/conf.d
-    network_mode: host
     depends_on:
       - api
