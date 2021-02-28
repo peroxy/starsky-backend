@@ -19,6 +19,18 @@ Run starsky REST API locally, then you can run:
 docker run --rm --network host -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://localhost:8080/starsky/v3/api-docs -g typescript -o /local/out/ts
 ```
 
+### SSL Setup
+Currently SSL is done manually by using ZeroSSL and copying certs to Azure VM.
+1. Generate a certificate, you will get 3 files: certificate.crt, private.key, ca_bundle.crt.
+2. Copy them to Azure VM with rsync:
+```shell
+cd ~/certs
+rsync ./* user@host:~/certs
+```
+3. Deploy by using automated git workflow or just restart nginx on Azure VM. Nginx will now work correctly.
+4. Test it out by requesting: https://domain/api/test
+
+TODO: automated certificate renewal with Let's Encrypt, setup on Azure VM.. no manual copying of certs should be used ideally. 
 <del>
 ## Requirements
 
