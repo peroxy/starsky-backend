@@ -39,3 +39,4 @@ out/
 docker/.env
 /log.txt
 /.env
+/docker/rsyncAzureVm.sh

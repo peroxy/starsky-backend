@@ -1,9 +1,9 @@
 ../.gradle
 .dockerignore
-.gitignore
+**/.gitignore
 .idea
 build
-.env
+**/.env
 docker-compose.yml
 starskyInfrastructure.drawio
 README.md

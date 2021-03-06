@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.8"
 services:
   database:
     environment:
@@ -18,8 +18,10 @@ services:
     restart: always
     ports:
       - 443:443
+    networks:
+      - starskynet
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d  # Must include ./ at the beginning! :) otherwise it uses the system /nginx/conf.d directory, instead of current dir
-      - ~/certs:/etc/nginx/certs  # machine must have /data/certs folder with public cert and private key both named starsky
+      - ./nginx/conf.d:/etc/nginx/conf.d  # Must include ./ in the beginning! :) otherwise it uses the system /nginx/conf.d directory, instead of current dir
+      - ~/certs:/etc/nginx/certs  # machine must have /data/certs folder with public cert and private key
     depends_on:
       - api

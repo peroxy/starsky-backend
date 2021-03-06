@@ -1,4 +1,4 @@
-version: "3.3"
+version: "3.8"
 services:
   database:
     image: postgres:13.1-alpine
@@ -6,13 +6,19 @@ services:
       - POSTGRES_DB=starsky
     ports:
       - 5432:5432
+    networks:
+      - starskynet
   api:
     build:
       context: ../.
       dockerfile: docker/api/Dockerfile
     ports:
       - 8080:8080
-    container_name: starsky_backend_api
-    restart: on-failure
     depends_on:
       - database
+    networks:
+      - starskynet
+networks:
+  starskynet:
+    external:
+      name: starsky_network
