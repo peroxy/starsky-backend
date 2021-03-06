@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
@@ -31,8 +34,18 @@ public class UserController {
     }
 
     @GetMapping("/test")
-    public String hello(){
-        return "hello world!";
+    public ResponseEntity<String> hello(){
+        return ResponseEntity.ok("hello world!");
     }
+
+    @GetMapping("/test-rabbit")
+    public Mono<String> testRabbit(){
+        var client = WebClient.create("http://mail-api:56789");
+        var req = client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue("yolo"));
+        var response = req.retrieve();
+        return response.bodyToMono(String.class);
+    }
+
+
 
 }
