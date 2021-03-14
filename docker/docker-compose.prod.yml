@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  database:
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    restart: always
+  api:
+    image: peroxy12/starsky-backend-api:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - STARSKY_JWT_SECRET=${STARSKY_JWT_SECRET}
+    restart: always
+  nginx:
+    image: nginx:1.19.7-alpine
+    restart: always
+    ports:
+      - 443:443
+    networks:
+      - starskynet
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d  # Must include ./ in the beginning! :) otherwise it uses the system /nginx/conf.d directory, instead of current dir
+      - ~/certs:/etc/nginx/certs  # machine must have /data/certs folder with public cert and private key
+    depends_on:
+      - api
