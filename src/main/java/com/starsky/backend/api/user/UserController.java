@@ -33,19 +33,4 @@ public class UserController {
         return ResponseEntity.ok(user.toResponse());
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<String> hello(){
-        return ResponseEntity.ok("hello world!");
-    }
-
-    @GetMapping("/test-rabbit")
-    public Mono<String> testRabbit(){
-        var client = WebClient.create("http://mail-api:56789");
-        var req = client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue("yolo"));
-        var response = req.retrieve();
-        return response.bodyToMono(String.class);
-    }
-
-
-
 }
