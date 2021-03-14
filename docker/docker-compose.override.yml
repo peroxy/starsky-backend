@@ -9,3 +9,4 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - POSTGRES_USER=starsky
       - POSTGRES_PASSWORD=starsky
+      - STARSKY_JWT_SECRET=starsky
