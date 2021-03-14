@@ -1,159 +1,144 @@
 # Starsky backend
 
-Starsky backend represents the API and database portion of starsky application for employee scheduling. Front-end React application is located in a different
-repository called
-[starsky-frontend](https://github.com/peroxy/starsky-frontend).
+Starsky backend represents the API and database portion of starsky application for employee scheduling. 
+It uses Java (Spring Boot) for REST API, PostgreSQL for data storage and Nginx for reverse proxy in production. 
 
-It uses Java (Spring Boot) for REST API and PostgreSQL for data storage.
+Front-end React application is located in a repository called [starsky-frontend](https://github.com/peroxy/starsky-frontend).
 
-## Work In Progress
+It also uses the transactional email API that is located in a repository called [starsky-mail](https://github.com/peroxy/starsky-mail).
 
-Currently rewriting the entire project from Kotlin with Ktor and Exposed ORM to Java with SpringBoot, OpenAPI swagger gen and JPA. This will speed up the entire
-process, since Kotlin with Ktor and Exposed feels very unfinished and slow to develop anything.
-
-This will happen slowly in `java-rewrite` branch, hopefully I can convert everything without much pain.
-
-### OpenAPI client generate
-Run starsky REST API locally, then you can run:
-```shell
-docker run --rm --network host -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://localhost:8080/starsky/v3/api-docs -g typescript -o /local/out/ts
-```
-
-### SSL Setup
-Currently SSL is done manually by using ZeroSSL and copying certs to Azure VM.
-1. Generate a certificate, you will get 3 files: certificate.crt, private.key, ca_bundle.crt.
-2. Copy them to Azure VM with rsync:
-```shell
-cd ~/certs
-rsync ./* user@host:~/certs
-```
-3. Deploy by using automated git workflow or just restart nginx on Azure VM. Nginx will now work correctly.
-4. Test it out by requesting: https://domain/api/test
-
-TODO: automated certificate renewal with Let's Encrypt, setup on Azure VM.. no manual copying of certs should be used ideally. 
-<del>
 ## Requirements
 
-### Development
-
 - [docker](https://docs.docker.com/get-docker/)
-- [docker-compose](https://docs.docker.com/compose/install/) (at least 3.3 version support)
+- [docker-compose](https://docs.docker.com/compose/install/) (at least 3.8 version support)
 
-### Deployment
+## Development
 
-- [heroku-cli](https://devcenter.heroku.com/articles/heroku-cli) (optional but nice)
-- PostgreSQL client to execute a SQL script, e.g. [pgAdmin](https://www.pgadmin.org/)
-
-## Local Development
+### Running with docker
 
 Please note that this has only been tested with docker on Ubuntu 20.04.
 
-1. Download source files:
+1. Download source files and go to `docker` directory:
 
 ```shell script
 git clone https://github.com/peroxy/starsky-backend.git
+cd starsky-backend/docker
 ```
 
-2. Go to root directory:
-
-```shell script
-cd starsky-backend
-```
-
-3. You must specify PostgreSQL password for `starsky` user and JWT secret for API authentication.
-
-    - (Optional) Set `STARSKY_ENVIRONMENT` environment variable, which can be either of those:
-        - DEV (default value if no environment variable is found),
-        - PROD.
-    - (Optional) Set `STARSKY_FRONTEND_HOST` environment variable with front-end hostname for CORS access, e.g. `domain.com`. You can set this variable if you
-      want to override default DEV front-end React application hosted at `localhost:3000`. This front-end origin will receive `AccessControlAllowOrigin` header.
-
-Create an `.env` file and specify environment variables `POSTGRES_PASSWORD` and `STARSKY_JWT_SECRET`:
-
-```shell script
-echo "POSTGRES_PASSWORD=password" > .env
-echo "STARSKY_JWT_SECRET=secret" >> .env
-
-echo "STARSKY_ENVIRONMENT=DEV" >> .env  # optional
-echo "STARSKY_FRONTEND_HOST=localhost:3000" >> .env  # optional
-```
-
-JWT secret will be used to generate bearer tokens for clients. An easy way to generate a strong JWT secret is by using OpenSSL:
-
-```shell script
-openssl rand --base64 64
-```
-
-Environment variables specified in `.env` file will be automatically used by `docker-compose`.
-
-4. Build and run the database and API:
+2. Build and run the entire stack:
 
 ```shell script
 docker-compose up
 ```
 
-5. You will now be able to access:
+3. You will now be able to access:
 
-- API at http://localhost:8080/
+- API at http://localhost:8080/ and swagger-ui at http://localhost:8080/api/swagger-ui.html
 - database at http://localhost:5432/
 
-You can login to `starsky` database with username `starsky` and password specified in `.env` file. Database will be filled up with mock data from `mockData.sql`
-file. All mock users' passwords are set to `password`.
+You can access the `starsky` database by using credentials (this can be changed in the `docker-compose.override.yml` file):
+- username: `starsky`
+- password: `starsky`
+
+### Debugging
+You can run the API locally using your favorite Java IDE:  
+1. Run the database:
+
+```shell script
+cd starsky-backend/docker
+docker-compose up database
+```
+2. Set Spring active profiles: `dev` and `local`
+3. Run and debug the application 
+
+### OpenAPI client
+You can generate an OpenAPI client by running backend API locally, then running (for example TypeScript client):
+
+```shell
+docker run --rm --network host -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://localhost:8080/api/v3/api-docs -g typescript -o /local/out/ts
+```
 
 ## Deployment
 
-### Heroku
+We host entire infrastructure on Azure, specifically using Azure Virtual Machine.
 
-Starsky Backend can be deployed to Heroku's free dyno plan. Please check out Heroku's pricing [here](https://www.heroku.com/pricing)
-to be aware of limitations and features offered by the free plan.
+### Server requirements
 
-#### Creating and configuring your app
+The server (in our case Azure VM) must have these installed:
 
-**Note**: `heroku-cli` is not required, you can also use Heroku's website.
+- [docker](https://docs.docker.com/get-docker/),
+- [docker-compose](https://docs.docker.com/compose/install/) (at least 3.8 version support).
 
-1. Login and create a Heroku app:
+#### Setup on Azure Virtual Machine:
+1. Create Azure Virtual Machine with Ubuntu installed and setup your public SSH key. Ubuntu 18.04 was used at the time of writing this.
+2. Enable SSH (port 22) and whitelist your IP.
+3. Connect to your machine:
 
-```shell script
-heroku login
-heroku create starsky-backend
+   ```shell script
+   ssh username@ipAddress
+   ```
+
+4. [Install docker](https://docs.docker.com/get-docker/):
+
+    ```shell script
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sudo usermod -aG docker <your-user>
+    ```
+   Log out and log back in to be able to use `docker` without `sudo`.
+
+
+5. [Install docker-compose](https://docs.docker.com/compose/install/):
+
+   ```shell script
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    ```
+
+6. Generate a SSH key:bb
+
+    ```shell script
+    ssh-keygen -t rsa -b 4096 -c "starsky_deploy"
+    ```
+
+#### SSL Setup
+Currently, SSL is done manually by using ZeroSSL and copying certificates to Azure VM.
+
+1. Generate a certificate, you will get 3 files: certificate.crt, private.key, ca_bundle.crt.
+2. Copy them to Azure VM with rsync:
+
+```shell
+cd ~/certs
+rsync ./* user@host:~/certs
 ```
 
-2. Attach Heroku Postgres addon:
+3. Restart Nginx on Azure VM.
 
-```shell script
-heroku addons:attach heroku-postgresql
-```
+### Repository secrets
 
-3. Configuring database:
+These are the required secrets that should be stored inside Github repository secrets:
 
-- Open the `starsky-backend` postgresql addon page .
+- Dockerhub:
+   - `DOCKERHUB_USERNAME`
+   - `DOCKERHUB_TOKEN` - see [Create an access token](https://docs.docker.com/docker-hub/access-tokens/#create-an-access-token) for more information
+- PostgreSQL:
+   - `POSTGRES_USER`
+   - `POSTGRES_PASSWORD` - don't make it too long, there were some issues with authentication with a 128 character password, even though it should be supported in theory...
+- Server host (Azure VM):
+   - `REMOTE_HOST` - remote host IP address / domain to SSH into
+   - `REMOTE_USER` - username to SSH with
+   - `SERVER_SSH_KEY` - private SSH key (OpenSSH, for example the contents of your `~/.ssh/id_rsa` key) to connect to your server
+- API:
+   - `STARSKY_JWT_SECRET` - needed for generating JWT tokens, use a random 32 character secret
 
-```shell script
-heroku addons:open heroku-postgresql -a starsky-backend
-```
+### How to deploy
 
-- Go to _Settings_ tab and click on _Database Credentials_ --> _View Credentials_.
-- Copy your database's credentials and host:port info.
-- Open your favorite PostgreSQL client and connect to your database.
-- Open `1_create_tables.sql` and `2_fill_tables.sql` files located in `\starsky-backend\src\com\starsky\database\scripts`.
-- Execute `1_create_tables.sql` first, then `2_fill_tables.sql`.
+Push a tag `*.*.*` (e.g. `1.0.3`) to `master` branch and it will automatically deploy everything via Github workflow.
+See `.github/main.yml` workflow for more info.
 
-4. Add Heroku config vars (see Local Development in README for details about environment variables):
+In short, it does this if it gets triggered by a new tag:
 
-```shell script
-heroku config:set GRADLE_TASK="shadowJar" -a starsky-backend
-heroku config:set STARSKY_ENVIRONMENT="PROD" -a starsky-backend
-heroku config:set STARSKY_JWT_SECRET="JWT secret" -a starsky-backend
-heroku config:set STARSKY_FRONTEND_HOST="domain.com" -a starsky-backend
-```
-
-5. Go to Heroku's website and login, open your app and connect this Github repo to your app. You can now manually deploy the app to Heroku. **Success!**
-
-#### Automatic deployment
-
-This GitHub repository uses Heroku's automatic deployment functionality; everything that gets pushed to `master` branch will be automatically deployed to
-production.
-
-You cannot push to `master` branch directly; you can only create pull requests that have to be manually approved.
-
- </del>
+- Takes source code from `master` branch and extracts the newest version from tag.
+- Configures environment variables used by docker containers from Github repository's secrets.
+- Builds and pushes all apps as Docker images to DockerHub.
+- Copies environment variables and docker-compose files to Azure VM.
+- Stops `starsky-backend` containers on Azure VM, pulls the newest images and starts the containers again.
