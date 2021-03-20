@@ -1,11 +1,10 @@
 package com.starsky.backend.security;
 
 import com.starsky.backend.config.JwtConfig;
-import com.starsky.backend.service.UserDetailsServiceImpl;
+import com.starsky.backend.service.authentication.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -34,7 +33,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, jwtConfig.getRegisterUrl()).permitAll()
                 .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                //.antMatchers(HttpMethod.GET, "/test").hasRole("ADMIN") //example of role based authentication
+                .antMatchers(HttpMethod.POST, "/invites").hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET, "/version").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .anyRequest().authenticated()

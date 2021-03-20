@@ -1,6 +1,7 @@
-package com.starsky.backend.service;
+package com.starsky.backend.service.authentication;
 
 import com.starsky.backend.repository.UserRepository;
+import com.starsky.backend.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,16 +15,16 @@ import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    public UserDetailsServiceImpl(UserRepository applicationUserRepository) {
-        this.userRepository = applicationUserRepository;
+    public UserDetailsServiceImpl(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user = userRepository.findByEmail(email);
+        var user = userService.getUserByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException(email);
         }

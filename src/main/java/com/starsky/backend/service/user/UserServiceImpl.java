@@ -1,4 +1,4 @@
-package com.starsky.backend.service;
+package com.starsky.backend.service.user;
 
 import com.starsky.backend.api.user.CreateUserRequest;
 import com.starsky.backend.domain.NotificationType;
@@ -6,7 +6,6 @@ import com.starsky.backend.domain.Role;
 import com.starsky.backend.domain.User;
 import com.starsky.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,5 +26,10 @@ public class UserServiceImpl implements UserService {
         var user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
                 null, true, NotificationType.EMAIL, Role.MANAGER, null);
         return userRepository.save(user);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

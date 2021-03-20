@@ -1,6 +1,7 @@
 package com.starsky.backend;
 
 import com.starsky.backend.domain.*;
+import com.starsky.backend.repository.InviteRepository;
 import com.starsky.backend.repository.TeamMemberRepository;
 import com.starsky.backend.repository.TeamRepository;
 import com.starsky.backend.repository.UserRepository;
@@ -22,13 +23,15 @@ public class StarskyApplication {
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final InviteRepository inviteRepository;
     private final Environment environment;
 
     @Autowired
-    public StarskyApplication(UserRepository userRepository, TeamRepository teamRepository, TeamMemberRepository teamMemberRepository, Environment environment) {
+    public StarskyApplication(UserRepository userRepository, TeamRepository teamRepository, TeamMemberRepository teamMemberRepository, InviteRepository inviteRepository, Environment environment) {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.teamMemberRepository = teamMemberRepository;
+        this.inviteRepository = inviteRepository;
         this.environment = environment;
     }
 
@@ -47,7 +50,9 @@ public class StarskyApplication {
             if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
                 teamMemberRepository.deleteAllInBatch();
                 teamRepository.deleteAllInBatch();
+                inviteRepository.deleteAllInBatch();
                 userRepository.deleteAllInBatch();
+
 
                 List<User> users = new ArrayList<>(Arrays.asList(
                         new User("John Doe", "john@doe.com", bCryptPasswordEncoder().encode("password"), "School Manager",
