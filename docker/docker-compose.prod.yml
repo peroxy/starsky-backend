@@ -12,6 +12,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - STARSKY_JWT_SECRET=${STARSKY_JWT_SECRET}
+      - STARSKY_FRONTEND_REGISTER_URL=${STARSKY_FRONTEND_REGISTER_URL}
     restart: always
   nginx:
     image: nginx:1.19.7-alpine

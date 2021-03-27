@@ -129,6 +129,7 @@ These are the required secrets that should be stored inside Github repository se
    - `SERVER_SSH_KEY` - private SSH key (OpenSSH, for example the contents of your `~/.ssh/id_rsa` key) to connect to your server
 - API:
    - `STARSKY_JWT_SECRET` - needed for generating JWT tokens, use a random 32 character secret
+   - `STARSKY_FRONTEND_REGISTER_URL` - needed to send invite links with proper URL
 
 ### How to deploy
 

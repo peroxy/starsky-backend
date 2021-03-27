@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.util.UUID;
@@ -23,13 +24,17 @@ public class InviteServiceImpl implements InviteService {
 
     private final InviteRepository inviteRepository;
     private final String mailApiHostname;
+    private final String frontendRegisterUrl;
 
     private final Logger logger = LoggerFactory.getLogger(InviteServiceImpl.class);
 
     @Autowired
-    public InviteServiceImpl(InviteRepository inviteRepository, @Value("${starsky.mail-api.host}") String mailApiHostname) {
+    public InviteServiceImpl(InviteRepository inviteRepository,
+                             @Value("${starsky.mail-api.host}") String mailApiHostname,
+                             @Value("${starsky.frontend.register-url}") String frontendRegisterUrl) {
         this.inviteRepository = inviteRepository;
         this.mailApiHostname = mailApiHostname;
+        this.frontendRegisterUrl = frontendRegisterUrl;
     }
 
     @Override
@@ -45,7 +50,14 @@ public class InviteServiceImpl implements InviteService {
         var invite = new Invite(token, manager, request.getEmployeeName(), request.getEmployeeEmail(), false);
         invite = inviteRepository.save(invite);
 
-        var body = new InvitationsModel(manager.getName(), request.getEmployeeName(), request.getEmployeeEmail(), "http://TODO.com/%s".formatted(invite.getToken()));
+        var url = UriComponentsBuilder.fromHttpUrl(frontendRegisterUrl)
+                .queryParam("token", invite.getToken())
+                .queryParam("manager", manager.getName())
+                .queryParam("name", request.getEmployeeName())
+                .queryParam("email", request.getEmployeeEmail())
+                .build().encode().toUriString();
+
+        var body = new InvitationsModel(manager.getName(), request.getEmployeeName(), request.getEmployeeEmail(), url);
         this.logger.info("Sending request to mail-api: {}", body);
         var client = WebClient.create(mailApiHostname);
         var response = client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().toBodilessEntity();

@@ -20,6 +20,7 @@ jobs:
           echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" > .env
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
           echo "STARSKY_JWT_SECRET=${{ secrets.STARSKY_JWT_SECRET }}" >> .env
+          echo "STARSKY_FRONTEND_REGISTER_URL=${{ secrets.STARSKY_FRONTEND_REGISTER_URL }}" >> .env
       - name: Extract Git Tag
         run: echo "GIT_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
       - name: Set up QEMU
