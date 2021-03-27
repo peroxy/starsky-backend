@@ -31,14 +31,12 @@ public class InviteController {
     }
 
     @PostMapping("/invites")
-    @ApiResponse(responseCode = "200", description = "Created a new invite successfully.")
+    @ApiResponse(responseCode = "200", description = "Created a new invite successfully.", content = @Content)
     @ApiResponse(responseCode = "400", description = "Invite body invalid.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
-    public ResponseEntity<?> createUser(@Valid @RequestBody CreateInviteRequest request) {
-
+    public ResponseEntity<?> createInvite(@Valid @RequestBody CreateInviteRequest request) {
         var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var manager = userService.getUserByEmail(email);
-
         var invite = inviteService.createInvite(manager, request);
         return ResponseEntity.ok().build();
     }

@@ -63,7 +63,7 @@ public class Invite extends BaseEntity {
         this.employeeEmail = employeeEmail;
     }
 
-    public boolean isHasRegistered() {
+    public boolean getHasRegistered() {
         return hasRegistered;
     }
 

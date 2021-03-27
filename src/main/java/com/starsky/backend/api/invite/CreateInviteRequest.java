@@ -1,6 +1,7 @@
 package com.starsky.backend.api.invite;
 
 import javax.persistence.Column;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
 public class CreateInviteRequest {
@@ -9,6 +10,7 @@ public class CreateInviteRequest {
     private String employeeName;
     @NotNull
     @Column(unique = true)
+    @Email
     private String employeeEmail;
 
     public CreateInviteRequest(@NotNull String employeeName, @NotNull String employeeEmail) {

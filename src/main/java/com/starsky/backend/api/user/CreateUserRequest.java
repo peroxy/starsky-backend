@@ -1,35 +1,36 @@
 package com.starsky.backend.api.user;
 
-import com.starsky.backend.domain.User;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.UUID;
 
 public class CreateUserRequest {
 
-    public CreateUserRequest(String name, String email, String password, String jobTitle) {
+    @NotBlank
+    @Size(max = 256)
+    private String name;
+    @Email
+    @NotBlank
+    private String email;
+    @Size(min = 8, max = 71)
+    private String password;
+    @NotBlank
+    @Size(max = 256)
+    private String jobTitle;
+    private UUID inviteToken;
+
+    public CreateUserRequest(@NotBlank @Size(max = 256) String name,
+                             @Email @NotBlank String email,
+                             @Size(min = 8, max = 71) String password,
+                             @NotBlank @Size(max = 256) String jobTitle,
+                             UUID inviteToken) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.jobTitle = jobTitle;
+        this.inviteToken = inviteToken;
     }
-
-    @NotBlank
-    @Size(max=256)
-    private String name;
-
-    @Email
-    @NotBlank
-    private String email;
-
-    @Size(min=8, max=71)
-    private String password;
-
-    @NotBlank
-    @Size(max=256)
-    private String jobTitle;
 
     public String getName() {
         return name;
@@ -61,5 +62,13 @@ public class CreateUserRequest {
 
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
+    }
+
+    public UUID getInviteToken() {
+        return inviteToken;
+    }
+
+    public void setInviteToken(UUID inviteToken) {
+        this.inviteToken = inviteToken;
     }
 }

@@ -66,4 +66,14 @@ public class InviteServiceImpl implements InviteService {
 
         return invite;
     }
+
+    @Override
+    public Invite findByToken(UUID token) {
+        return inviteRepository.findByToken(token);
+    }
+
+    @Override
+    public Invite updateInvite(Invite invite) {
+        return inviteRepository.save(invite);
+    }
 }
