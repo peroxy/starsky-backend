@@ -16,6 +16,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -75,5 +77,19 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public Invite updateInvite(Invite invite) {
         return inviteRepository.save(invite);
+    }
+
+    @Override
+    public InviteValidation validateInvite(Invite invite) {
+        if (invite == null){
+            return new InviteValidation("Invite token does not exist.", false);
+        }
+        if (invite.getHasRegistered()){
+            return new InviteValidation("Invite has already been used, user has already been registered.", false);
+        }
+        if (Duration.between(invite.getUpdatedAt(), LocalDateTime.now()).toDays() > 3){
+            return new InviteValidation("Invite has expired - all invites have expiry date of 3 days.", false);
+        }
+        return new InviteValidation("No error.", true);
     }
 }

@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -37,14 +34,9 @@ public class UserServiceImpl implements UserService {
                     null, true, NotificationType.EMAIL, Role.MANAGER, null);
         } else {
             invite = inviteService.findByToken(request.getInviteToken());
-            if (invite == null){
-                throw new IllegalArgumentException("Invite token does not exist.");
-            }
-            if (invite.getHasRegistered()){
-                throw new IllegalArgumentException("Invite has already been used, user has already been registered.");
-            }
-            if (Duration.between(invite.getUpdatedAt(), LocalDateTime.now()).toDays() > 3){
-                throw new IllegalArgumentException("Invite has expired - all invites have expiry date of 3 days.");
+            var validation = inviteService.validateInvite(invite);
+            if (validation.hasError()){
+                throw new IllegalArgumentException(validation.getError());
             }
 
             user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),

@@ -10,4 +10,5 @@ public interface InviteService {
     Invite createInvite(User manager, CreateInviteRequest request);
     Invite findByToken(UUID token);
     Invite updateInvite(Invite invite);
+    InviteValidation validateInvite(Invite invite);
 }
