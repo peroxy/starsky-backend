@@ -26,7 +26,7 @@ public class VersionController {
     @Operation(summary = "Get current version",
             description = "Return the current version of the API which is specified inside gradle.build file.")
     @ApiResponse(responseCode = "200", description = "Returns current API version.")
-    public ResponseEntity<VersionResponse> getVersion(){
+    public ResponseEntity<VersionResponse> getVersion() {
         return ResponseEntity.ok(new VersionResponse(buildProperties.getVersion()));
     }
 }

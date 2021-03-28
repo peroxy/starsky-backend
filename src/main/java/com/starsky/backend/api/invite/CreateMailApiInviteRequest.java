@@ -1,14 +1,21 @@
 package com.starsky.backend.api.invite;
 
 /*
-* InvitationsModel used by starsky-mail API
-* */
+ * InvitationsModel used by starsky-mail API
+ * */
 
 public class CreateMailApiInviteRequest {
     private final String managerName;
     private final String employeeName;
     private final String employeeEmail;
     private final String registerUrl;
+
+    public CreateMailApiInviteRequest(String managerName, String employeeName, String employeeEmail, String registerUrl) {
+        this.managerName = managerName;
+        this.employeeName = employeeName;
+        this.employeeEmail = employeeEmail;
+        this.registerUrl = registerUrl;
+    }
 
     public String getManagerName() {
         return managerName;
@@ -24,13 +31,6 @@ public class CreateMailApiInviteRequest {
 
     public String getRegisterUrl() {
         return registerUrl;
-    }
-
-    public CreateMailApiInviteRequest(String managerName, String employeeName, String employeeEmail, String registerUrl) {
-        this.managerName = managerName;
-        this.employeeName = employeeName;
-        this.employeeEmail = employeeEmail;
-        this.registerUrl = registerUrl;
     }
 
     public String toString() {

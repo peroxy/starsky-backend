@@ -1,13 +1,12 @@
 package com.starsky.backend.api.user;
 
 public class InviteInvalidResponse {
+    private String inviteToken;
+    private String error;
     public InviteInvalidResponse(String inviteToken, String error) {
         this.inviteToken = inviteToken;
         this.error = error;
     }
-
-    private String inviteToken;
-    private String error;
 
     public String getInviteToken() {
         return inviteToken;

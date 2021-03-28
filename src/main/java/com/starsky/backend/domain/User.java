@@ -8,9 +8,33 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class User extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user-id-generator")
+    @SequenceGenerator(name = "user-id-generator", sequenceName = "user_sequence", allocationSize = 1)
+    private long id;
+    @NotNull
+    private String name;
+    @NotNull
+    @Column(unique = true)
+    private String email;
+    @NotNull
+    private String password;
+    @NotNull
+    private String jobTitle;
+    private String phoneNumber;
+    @NotNull
+    private boolean enabled;
+    @NotNull
+    @Enumerated(EnumType.ORDINAL)
+    private NotificationType notificationType;
+    @NotNull
+    @Enumerated(EnumType.ORDINAL)
+    private Role role;
+    @OneToOne
+    private User parentUser;
+
     public User() {
     }
-
 
     public User(@NotNull String name,
                 @NotNull String email,
@@ -32,40 +56,6 @@ public class User extends BaseEntity {
         this.role = role;
         this.parentUser = parentUser;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user-id-generator")
-    @SequenceGenerator(name = "user-id-generator", sequenceName = "user_sequence", allocationSize = 1)
-    private long id;
-
-    @NotNull
-    private String name;
-
-    @NotNull
-    @Column(unique = true)
-    private String email;
-
-    @NotNull
-    private String password;
-
-    @NotNull
-    private String jobTitle;
-
-    private String phoneNumber;
-
-    @NotNull
-    private boolean enabled;
-
-    @NotNull
-    @Enumerated(EnumType.ORDINAL)
-    private NotificationType notificationType;
-
-    @NotNull
-    @Enumerated(EnumType.ORDINAL)
-    private Role role;
-
-    @OneToOne
-    private User parentUser;
 
     public UserResponse toResponse() {
         return new UserResponse(getId(), getName(), getEmail(), getJobTitle(), getPhoneNumber(), getNotificationType().name(), getRole().name());

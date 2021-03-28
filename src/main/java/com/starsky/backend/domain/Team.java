@@ -6,6 +6,15 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Team extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team-id-generator")
+    @SequenceGenerator(name = "team-id-generator", sequenceName = "team_sequence", allocationSize = 1)
+    private long id;
+    @NotNull
+    private String name;
+    @OneToOne
+    private User owner;
+
     public Team(@NotNull String name, User owner) {
         this.name = name;
         this.owner = owner;
@@ -14,17 +23,6 @@ public class Team extends BaseEntity {
     public Team() {
 
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team-id-generator")
-    @SequenceGenerator(name = "team-id-generator", sequenceName = "team_sequence", allocationSize = 1)
-    private long id;
-
-    @NotNull
-    private String name;
-
-    @OneToOne
-    private User owner;
 
     public long getId() {
         return id;

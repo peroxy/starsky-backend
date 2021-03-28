@@ -29,13 +29,13 @@ public class UserServiceImpl implements UserService {
     public User createUser(CreateUserRequest request) throws IllegalArgumentException {
         User user;
         Invite invite = null;
-        if (request.getInviteToken() == null){
+        if (request.getInviteToken() == null) {
             user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
                     null, true, NotificationType.EMAIL, Role.MANAGER, null);
         } else {
             invite = inviteService.findByToken(request.getInviteToken());
             var validation = inviteService.validateInvite(invite);
-            if (validation.hasError()){
+            if (validation.hasError()) {
                 throw new IllegalArgumentException(validation.getError());
             }
 
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
         }
 
         user = userRepository.save(user);
-        if (invite != null){
+        if (invite != null) {
             invite.setHasRegistered(true);
             inviteService.updateInvite(invite);
         }

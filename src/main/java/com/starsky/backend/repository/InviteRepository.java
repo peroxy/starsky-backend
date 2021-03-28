@@ -11,6 +11,8 @@ import java.util.UUID;
 @RepositoryRestResource(exported = false)
 public interface InviteRepository extends JpaRepository<Invite, Long> {
     Invite findByEmployeeEmail(String email);
+
     Invite findByToken(UUID token);
+
     List<Invite> findAllByManager(User manager);
 }

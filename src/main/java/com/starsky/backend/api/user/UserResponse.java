@@ -2,6 +2,14 @@ package com.starsky.backend.api.user;
 
 public class UserResponse {
 
+    private final long id;
+    private final String name;
+    private final String email;
+    private final String jobTitle;
+    private final String phoneNumber;
+    private final String notificationType;
+    private final String role;
+
     public UserResponse(long id, String name, String email, String jobTitle, String phoneNumber, String notificationType, String role) {
         this.id = id;
         this.name = name;
@@ -11,20 +19,6 @@ public class UserResponse {
         this.notificationType = notificationType;
         this.role = role;
     }
-
-    private final long id;
-
-    private final String name;
-
-    private final String email;
-
-    private final String jobTitle;
-
-    private final String phoneNumber;
-
-    private final String notificationType;
-
-    private final String role;
 
     public long getId() {
         return id;

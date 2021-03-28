@@ -78,7 +78,7 @@ public class Invite extends BaseEntity {
         return token;
     }
 
-    public InviteResponse toResponse(){
+    public InviteResponse toResponse() {
         return new InviteResponse(id, employeeName, employeeEmail, hasRegistered, getUpdatedAt().plus(Duration.ofDays(3)));
     }
 }

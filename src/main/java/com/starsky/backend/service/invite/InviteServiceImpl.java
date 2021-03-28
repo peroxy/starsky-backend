@@ -82,13 +82,13 @@ public class InviteServiceImpl implements InviteService {
 
     @Override
     public InviteValidation validateInvite(Invite invite) {
-        if (invite == null){
+        if (invite == null) {
             return new InviteValidation("Invite token does not exist.", false);
         }
-        if (invite.getHasRegistered()){
+        if (invite.getHasRegistered()) {
             return new InviteValidation("Invite has already been used, user has already been registered.", false);
         }
-        if (Duration.between(invite.getUpdatedAt(), LocalDateTime.now()).toDays() > 3){
+        if (Duration.between(invite.getUpdatedAt(), LocalDateTime.now()).toDays() > 3) {
             return new InviteValidation("Invite has expired - all invites have expiry date of 3 days.", false);
         }
         return new InviteValidation("No error.", true);

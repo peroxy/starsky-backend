@@ -12,9 +12,10 @@ import java.util.TimeZone;
 public class LocaleConfig {
 
     private final Logger logger = LoggerFactory.getLogger(LocaleConfig.class);
+
     @PostConstruct
     public void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        logger.info("Locale set to UTC, current time: "+ new Date());
+        logger.info("Locale set to UTC, current time: " + new Date());
     }
 }

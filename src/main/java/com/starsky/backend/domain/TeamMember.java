@@ -5,6 +5,15 @@ import javax.persistence.*;
 @Entity
 public class TeamMember extends BaseEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team-member-id-generator")
+    @SequenceGenerator(name = "team-member-id-generator", sequenceName = "team_member_sequence", allocationSize = 1)
+    private long id;
+    @OneToOne
+    private User member;
+    @OneToOne
+    private Team team;
+
     public TeamMember() {
     }
 
@@ -12,17 +21,6 @@ public class TeamMember extends BaseEntity {
         this.member = member;
         this.team = team;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team-member-id-generator")
-    @SequenceGenerator(name = "team-member-id-generator", sequenceName = "team_member_sequence", allocationSize = 1)
-    private long id;
-
-    @OneToOne
-    private User member;
-
-    @OneToOne
-    private Team team;
 
     public long getId() {
         return id;
