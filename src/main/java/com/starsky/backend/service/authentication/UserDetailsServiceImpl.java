@@ -1,6 +1,5 @@
 package com.starsky.backend.service.authentication;
 
-import com.starsky.backend.repository.UserRepository;
 import com.starsky.backend.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;

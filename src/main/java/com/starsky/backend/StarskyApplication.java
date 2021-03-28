@@ -47,7 +47,8 @@ public class StarskyApplication {
     @Bean
     CommandLineRunner runner() {
         return args -> {
-            if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+            var profiles = Arrays.asList(environment.getActiveProfiles());
+            if (profiles.contains("dev") || profiles.contains("test")) {
                 teamMemberRepository.deleteAllInBatch();
                 teamRepository.deleteAllInBatch();
                 inviteRepository.deleteAllInBatch();

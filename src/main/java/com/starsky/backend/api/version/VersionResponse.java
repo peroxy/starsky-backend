@@ -3,6 +3,9 @@ package com.starsky.backend.api.version;
 public class VersionResponse {
     private String version;
 
+    public VersionResponse() {
+    }
+
     public VersionResponse(String version) {
         this.version = version;
     }

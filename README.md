@@ -51,6 +51,12 @@ docker-compose up database
 2. Set Spring active profiles: `dev` and `local`
 3. Run and debug the application 
 
+### Testing
+We are using JUnit5 for tests with Spring Boot. An in-memory H2 database is used.
+
+1. Set Spring active profile: `test`
+2. Run tests: `gradle test`
+
 ### OpenAPI client
 You can generate an OpenAPI client by running backend API locally, then running (for example TypeScript client):
 
