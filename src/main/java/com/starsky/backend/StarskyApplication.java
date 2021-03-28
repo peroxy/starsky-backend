@@ -1,5 +1,6 @@
 package com.starsky.backend;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.domain.*;
 import com.starsky.backend.repository.InviteRepository;
 import com.starsky.backend.repository.TeamMemberRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootApplication
 public class StarskyApplication {
@@ -43,6 +45,14 @@ public class StarskyApplication {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
+
+    @Bean
+    public ObjectMapper mapper() {
+        var objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        return objectMapper;
+    }
+
 
     @Bean
     CommandLineRunner runner() {
@@ -83,6 +93,12 @@ public class StarskyApplication {
                         new TeamMember(users.get(4), teams.get(1))
                 );
                 teamMemberRepository.saveAll(teamMembers);
+
+                List<Invite> invites = Arrays.asList(
+                        new Invite(UUID.randomUUID(), users.get(1), "David Michael Starsky", "david@starsky.com", false),
+                        new Invite(UUID.randomUUID(), users.get(1), "Kenneth Richard Hutchinson", "kenny@starsky.com", true)
+                );
+                inviteRepository.saveAll(invites);
             }
         };
     }

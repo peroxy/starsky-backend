@@ -19,6 +19,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -30,8 +31,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final JwtConfig jwtConfig;
     private final AuthenticationManager authenticationManager;
+    private final ObjectMapper mapper;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JwtConfig jwtConfig) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JwtConfig jwtConfig, ObjectMapper mapper) {
+        this.mapper = mapper;
         super.setAuthenticationFailureHandler(new JWTAuthenticationFailureHandler());
         this.authenticationManager = authenticationManager;
         this.jwtConfig = jwtConfig;
@@ -50,15 +53,15 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException {
-        var expiration = new Date(System.currentTimeMillis() + jwtConfig.getExpirationTime());
+        var expiresOn = Instant.now().plus(jwtConfig.getExpirationTime());
+        var expiresIn = jwtConfig.getExpirationTime().getSeconds();
         String token = JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getUsername())
                 .withClaim("role", auth.getAuthorities().stream().findFirst().get().getAuthority())
-                .withExpiresAt(expiration)
+                .withExpiresAt(Date.from(expiresOn))
                 .sign(HMAC512(jwtConfig.getSecret().getBytes()));
         res.setContentType("application/json");
-        var mapper = new ObjectMapper();
-        res.getWriter().write(mapper.writeValueAsString(new TokenResponse(token, jwtConfig.getTokenPrefix().trim(), expiration)));
+        res.getWriter().write(mapper.writeValueAsString(new TokenResponse(token, jwtConfig.getTokenPrefix().trim(), expiresOn, expiresIn)));
         res.getWriter().flush();
     }
 }

@@ -1,16 +1,27 @@
 package com.starsky.backend.api.authentication;
 
-import java.util.Date;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.Instant;
 
 public class TokenResponse {
 
+    @Schema(example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9...", title = "JWT access token")
     private String accessToken;
-    private String tokenType;
-    private Date expiresIn;
 
-    public TokenResponse(String accessToken, String tokenType, Date expiresIn) {
+    @Schema(example = "Bearer", title = "Type of JWT token")
+    private String tokenType;
+
+    @Schema(example = "1617032176.7171679", title = "Epoch timestamp", implementation = Double.class)
+    private Instant expiresOn;
+
+    @Schema(example = "86400", title = "Expires in x seconds")
+    private long expiresIn;
+
+    public TokenResponse(String accessToken, String tokenType, Instant expiresOn, long expiresIn) {
         this.accessToken = accessToken;
         this.tokenType = tokenType;
+        this.expiresOn = expiresOn;
         this.expiresIn = expiresIn;
     }
 
@@ -30,11 +41,19 @@ public class TokenResponse {
         this.tokenType = tokenType;
     }
 
-    public Date getExpiresIn() {
+    public Instant getExpiresOn() {
+        return expiresOn;
+    }
+
+    public void setExpiresOn(Instant expiresOn) {
+        this.expiresOn = expiresOn;
+    }
+
+    public long getExpiresIn() {
         return expiresIn;
     }
 
-    public void setExpiresIn(Date expiresIn) {
+    public void setExpiresIn(long expiresIn) {
         this.expiresIn = expiresIn;
     }
 }

@@ -1,12 +1,10 @@
 package com.starsky.backend.api.invite;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 /*
 * InvitationsModel used by starsky-mail API
 * */
 
-public class InvitationsModel {
+public class CreateMailApiInviteRequest {
     private final String managerName;
     private final String employeeName;
     private final String employeeEmail;
@@ -28,7 +26,7 @@ public class InvitationsModel {
         return registerUrl;
     }
 
-    public InvitationsModel(String managerName, String employeeName, String employeeEmail, String registerUrl) {
+    public CreateMailApiInviteRequest(String managerName, String employeeName, String employeeEmail, String registerUrl) {
         this.managerName = managerName;
         this.employeeName = employeeName;
         this.employeeEmail = employeeEmail;

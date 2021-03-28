@@ -1,6 +1,7 @@
 package com.starsky.backend.api.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.starsky.backend.config.JwtConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ public class AuthenticationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private JwtConfig jwtConfig;
+
     @Test
     @DisplayName("Try login, should get jwt token")
     public void testCorrectLogin() throws Exception {
@@ -42,7 +46,8 @@ public class AuthenticationControllerTest {
         var response = objectMapper.readValue(result.getResponse().getContentAsString(), TokenResponse.class);
         Assertions.assertEquals("Bearer", response.getTokenType());
         Assertions.assertNotNull(response.getAccessToken());
-        Assertions.assertNotNull(response.getExpiresIn());
+        Assertions.assertNotNull(response.getExpiresOn());
+        Assertions.assertEquals(response.getExpiresIn(), jwtConfig.getExpirationTime().getSeconds());
     }
 
     @Test

@@ -1,7 +1,10 @@
 package com.starsky.backend.domain;
 
+import com.starsky.backend.api.invite.InviteResponse;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.UUID;
 
 @Entity
@@ -73,5 +76,9 @@ public class Invite extends BaseEntity {
 
     public UUID getToken() {
         return token;
+    }
+
+    public InviteResponse toResponse(){
+        return new InviteResponse(id, employeeName, employeeEmail, hasRegistered, getUpdatedAt().plus(Duration.ofDays(3)));
     }
 }

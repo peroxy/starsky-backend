@@ -2,7 +2,6 @@ package com.starsky.backend.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 
 import java.time.Duration;
 
@@ -24,8 +23,8 @@ public class JwtConfig {
         return "Authorization";
     }
 
-    public long getExpirationTime() {
-        return Duration.ofDays(1).toMillis();
+    public Duration getExpirationTime() {
+        return Duration.ofDays(1);
     }
 
     public String getRegisterUrl() {

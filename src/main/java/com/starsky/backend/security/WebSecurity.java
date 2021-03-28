@@ -1,5 +1,6 @@
 package com.starsky.backend.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.config.JwtConfig;
 import com.starsky.backend.service.authentication.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtConfig jwtConfig;
+    private final ObjectMapper mapper;
 
     @Autowired
-    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtConfig jwtConfig) {
+    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtConfig jwtConfig, ObjectMapper mapper) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtConfig = jwtConfig;
+        this.mapper = mapper;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtConfig))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtConfig, mapper))
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(), jwtConfig))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

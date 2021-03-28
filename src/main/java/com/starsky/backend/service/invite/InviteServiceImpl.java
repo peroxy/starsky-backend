@@ -1,7 +1,7 @@
 package com.starsky.backend.service.invite;
 
 import com.starsky.backend.api.invite.CreateInviteRequest;
-import com.starsky.backend.api.invite.InvitationsModel;
+import com.starsky.backend.api.invite.CreateMailApiInviteRequest;
 import com.starsky.backend.domain.Invite;
 import com.starsky.backend.domain.User;
 import com.starsky.backend.repository.InviteRepository;
@@ -18,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -59,7 +60,7 @@ public class InviteServiceImpl implements InviteService {
                 .queryParam("email", request.getEmployeeEmail())
                 .build().encode().toUriString();
 
-        var body = new InvitationsModel(manager.getName(), request.getEmployeeName(), request.getEmployeeEmail(), url);
+        var body = new CreateMailApiInviteRequest(manager.getName(), request.getEmployeeName(), request.getEmployeeEmail(), url);
         this.logger.info("Sending request to mail-api: {}", body);
         var client = WebClient.create(mailApiHostname);
         var response = client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().toBodilessEntity();
@@ -91,5 +92,10 @@ public class InviteServiceImpl implements InviteService {
             return new InviteValidation("Invite has expired - all invites have expiry date of 3 days.", false);
         }
         return new InviteValidation("No error.", true);
+    }
+
+    @Override
+    public List<Invite> getAllManagerInvites(User manager) {
+        return inviteRepository.findAllByManager(manager);
     }
 }

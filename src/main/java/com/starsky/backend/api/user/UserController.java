@@ -5,14 +5,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -45,6 +44,18 @@ public class UserController {
             var error = new InviteInvalidResponse(request.getInviteToken().toString(), ex.getMessage());
             return ResponseEntity.unprocessableEntity().body(error);
         }
+    }
+
+    @GetMapping("/user")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Get the authenticated user", description = "Returns the currently authenticated user's information.")
+    @ApiResponse(responseCode = "200", description = "Response with user information.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponse.class)))
+    @ApiResponse(responseCode = "403", description = "Unauthorized, user is not authenticated.", content = @Content)
+    public ResponseEntity<UserResponse> getUser() {
+        var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = userService.getUserByEmail(email);
+        return ResponseEntity.ok(user.toResponse());
     }
 
 }

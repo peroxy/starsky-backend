@@ -21,6 +21,7 @@ dependencies {
     implementation 'com.auth0:java-jwt:3.4.0'
     implementation 'org.springframework.session:spring-session-core'
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.2'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
