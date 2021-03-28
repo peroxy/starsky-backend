@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.api.authentication.LoginRequest;
 import com.starsky.backend.api.authentication.TokenResponse;
 import com.starsky.backend.config.JwtConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -24,10 +26,13 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final Logger logger = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+
     private final JwtConfig jwtConfig;
     private final AuthenticationManager authenticationManager;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JwtConfig jwtConfig) {
+        super.setAuthenticationFailureHandler(new JWTAuthenticationFailureHandler());
         this.authenticationManager = authenticationManager;
         this.jwtConfig = jwtConfig;
     }
@@ -38,7 +43,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             var loginRequest = new ObjectMapper().readValue(req.getInputStream(), LoginRequest.class);
             return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword(), new ArrayList<>()));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.warn(e.getMessage());
+            throw new BadCredentialsException("Login failed", e);
         }
     }
 

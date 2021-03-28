@@ -14,8 +14,9 @@ import javax.validation.Valid;
 public class AuthenticationController {
 
     @ApiResponse(responseCode = "200", description = "Successfully logged in.")
+    @ApiResponse(responseCode = "401", description = "Login failed.")
     @PostMapping(value = "/login")
-    public void fakeLogin(@Valid @RequestBody LoginRequest loginRequest) {
+    public void login(@Valid @RequestBody LoginRequest loginRequest) {
         throw new IllegalStateException("This is actually implemented by Spring Security, this method is only used for OpenAPI generation.");
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
+@ActiveProfiles("test")
 public class VersionControllerTest {
 
     @Autowired
@@ -33,8 +35,8 @@ public class VersionControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("Should get version from version controller")
-    void testGetVersion() throws Exception {
+    @DisplayName("Should get correct version")
+    public void testGetVersion() throws Exception {
         Mockito.when(buildProperties.getVersion()).thenReturn("1.5.0");
         var result = mockMvc.perform(MockMvcRequestBuilders.get("/version"))
                 .andDo(print())
