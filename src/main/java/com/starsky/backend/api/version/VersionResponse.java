@@ -1,6 +1,9 @@
 package com.starsky.backend.api.version;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class VersionResponse {
+    @Schema(example = "1.0.0", title = "Current version")
     private String version;
 
     public VersionResponse() {

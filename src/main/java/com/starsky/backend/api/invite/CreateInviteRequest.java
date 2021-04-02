@@ -1,5 +1,8 @@
 package com.starsky.backend.api.invite;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -7,10 +10,14 @@ import javax.validation.constraints.NotNull;
 public class CreateInviteRequest {
 
     @NotNull
+    @JsonProperty("employee_name")
+    @Schema(example = "Kenneth Hutchinson", title = "Employee's name")
     private String employeeName;
     @NotNull
     @Column(unique = true)
     @Email
+    @JsonProperty("employee_email")
+    @Schema(example = "kenneth@example.com", title = "Employee's email address")
     private String employeeEmail;
 
     public CreateInviteRequest(@NotNull String employeeName, @NotNull String employeeEmail) {

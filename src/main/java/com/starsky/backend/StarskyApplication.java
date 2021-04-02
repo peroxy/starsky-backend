@@ -66,15 +66,15 @@ public class StarskyApplication {
 
 
                 List<User> users = new ArrayList<>(Arrays.asList(
-                        new User("John Doe", "john@doe.com", bCryptPasswordEncoder().encode("password"), "School Manager",
+                        new User("Harold C. Dobey", "mail@example.com", bCryptPasswordEncoder().encode("password"), "Police Captain",
                                 null, true, NotificationType.EMAIL, Role.MANAGER, null),
                         new User("Test Manager", "a@a.com", bCryptPasswordEncoder().encode("password"), "Test Manager",
                                 null, true, NotificationType.EMAIL, Role.MANAGER, null)
                 ));
 
-                users.add(new User("Mother Theresa", "mother@t.com", bCryptPasswordEncoder().encode("password"), "Teacher",
+                users.add(new User("David Starsky", "david@starsky.net", bCryptPasswordEncoder().encode("password"), "Police Detective",
                         null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(0)));
-                users.add(new User("Will Smith", "w@s.com", bCryptPasswordEncoder().encode("password"), "Animator",
+                users.add(new User("Kenneth Hutchinson", "kenneth@starsky.net", bCryptPasswordEncoder().encode("password"), "Police Detective",
                         null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(0)));
                 users.add(new User("Test Employee", "t@t.com", bCryptPasswordEncoder().encode("password"), "Animator",
                         null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1)));
@@ -82,7 +82,7 @@ public class StarskyApplication {
                 userRepository.saveAll(users);
 
                 List<Team> teams = Arrays.asList(
-                        new Team("John's Team", users.get(0)),
+                        new Team("Harold's Police Squad", users.get(0)),
                         new Team("Test Team", users.get(1))
                 );
                 teamRepository.saveAll(teams);
@@ -95,8 +95,9 @@ public class StarskyApplication {
                 teamMemberRepository.saveAll(teamMembers);
 
                 List<Invite> invites = Arrays.asList(
-                        new Invite(UUID.randomUUID(), users.get(1), "David Michael Starsky", "david@starsky.com", false),
-                        new Invite(UUID.randomUUID(), users.get(1), "Kenneth Richard Hutchinson", "kenny@starsky.com", true)
+                        new Invite(UUID.randomUUID(), users.get(0), "David Michael Starsky", "david@starsky.com", false),
+                        new Invite(UUID.randomUUID(), users.get(0), "Kenneth Richard Hutchinson", "kenny@starsky.com", true),
+                        new Invite(UUID.randomUUID(), users.get(0), "Huggy Bear", "huggy@bear.com", false)
                 );
                 inviteRepository.saveAll(invites);
             }

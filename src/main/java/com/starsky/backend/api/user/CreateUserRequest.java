@@ -1,5 +1,8 @@
 package com.starsky.backend.api.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -9,15 +12,22 @@ public class CreateUserRequest {
 
     @NotBlank
     @Size(max = 256)
+    @Schema(example = "David Starsky", title = "User's name")
     private String name;
     @Email
     @NotBlank
+    @Schema(example = "david@example.com", title = "User's email")
     private String email;
     @Size(min = 8, max = 71)
+    @Schema(example = "password")
     private String password;
     @NotBlank
     @Size(max = 256)
+    @JsonProperty("job_title")
+    @Schema(example = "Police detective", title = "User's job title")
     private String jobTitle;
+    @JsonProperty("invite_token")
+    @Schema(example = "acaa86b2-ce32-4911-89b8-e1e2a1d39a01", title = "Optional token, if the user was invited by a manager")
     private UUID inviteToken;
 
     public CreateUserRequest(@NotBlank @Size(max = 256) String name,

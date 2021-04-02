@@ -27,6 +27,8 @@ public class Invite extends BaseEntity {
     @NotNull
     private boolean hasRegistered;
 
+    private static final Duration expireAfter = Duration.ofDays(3);
+
     public Invite(@NotNull UUID token, @NotNull User manager, @NotNull String employeeName, @NotNull String employeeEmail, boolean hasRegistered) {
         this.token = token;
         this.manager = manager;
@@ -79,6 +81,6 @@ public class Invite extends BaseEntity {
     }
 
     public InviteResponse toResponse() {
-        return new InviteResponse(id, employeeName, employeeEmail, hasRegistered, getUpdatedAt().plus(Duration.ofDays(3)));
+        return new InviteResponse(id, employeeName, employeeEmail, hasRegistered, getUpdatedAt().plus(expireAfter), expireAfter.getSeconds());
     }
 }
