@@ -10,6 +10,7 @@ import java.util.UUID;
 @Entity
 public class Invite extends BaseEntity {
 
+    private static final Duration expireAfter = Duration.ofDays(3);
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "invite-id-generator")
     @SequenceGenerator(name = "invite-id-generator", sequenceName = "invite_sequence", allocationSize = 1)
@@ -26,8 +27,6 @@ public class Invite extends BaseEntity {
     private String employeeEmail;
     @NotNull
     private boolean hasRegistered;
-
-    private static final Duration expireAfter = Duration.ofDays(3);
 
     public Invite(@NotNull UUID token, @NotNull User manager, @NotNull String employeeName, @NotNull String employeeEmail, boolean hasRegistered) {
         this.token = token;

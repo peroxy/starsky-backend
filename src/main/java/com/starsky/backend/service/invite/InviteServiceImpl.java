@@ -75,7 +75,7 @@ public class InviteServiceImpl implements InviteService {
         var body = new CreateMailApiInviteRequest(manager.getName(), request.getEmployeeName(), request.getEmployeeEmail(), url);
         this.logger.info("Sending request to mail-api: {}", body);
         var client = WebClient.create(mailApiHostname);
-        var response =  client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().toBodilessEntity().block();
+        var response = client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().toBodilessEntity().block();
         //4xx and 5xx errors are thrown and then the transaction gets rollbacked
         this.logger.info("Response code from starsky mail-api: {}", response.getStatusCode());
         return response;

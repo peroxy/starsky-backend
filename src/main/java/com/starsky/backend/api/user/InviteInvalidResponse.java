@@ -9,6 +9,7 @@ public class InviteInvalidResponse {
     private String inviteToken;
     @Schema(example = "This invite token has expired.", title = "Error describing the invite token issue")
     private String error;
+
     public InviteInvalidResponse(String inviteToken, String error) {
         this.inviteToken = inviteToken;
         this.error = error;
