@@ -17,7 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,15 +83,15 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public InviteValidation validateInvite(Invite invite) {
         if (invite == null) {
-            return new InviteValidation("Invite token does not exist.", false);
+            return new InviteValidation("Invite token does not exist.", true);
         }
         if (invite.getHasRegistered()) {
-            return new InviteValidation("Invite has already been used, user has already been registered.", false);
+            return new InviteValidation("Invite has already been used, user has already been registered.", true);
         }
-        if (Duration.between(invite.getUpdatedAt(), LocalDateTime.now()).toDays() > 3) {
-            return new InviteValidation("Invite has expired - all invites have expiry date of 3 days.", false);
+        if (Duration.between(invite.getUpdatedAt(), Instant.now()).toDays() > 3) {
+            return new InviteValidation("Invite has expired - all invites have expiry date of 3 days.", true);
         }
-        return new InviteValidation("No error.", true);
+        return new InviteValidation("No error.", false);
     }
 
     @Override

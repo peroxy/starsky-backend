@@ -34,7 +34,7 @@ public class AuthenticationControllerTest {
     private JwtConfig jwtConfig;
 
     @Test
-    @DisplayName("Try login, should get jwt token")
+    @DisplayName("Should get jwt token")
     public void testCorrectLogin() throws Exception {
         var result = mockMvc.perform(
                 MockMvcRequestBuilders.post("/login")
@@ -51,7 +51,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    @DisplayName("Try invalid login, should be unauthorized")
+    @DisplayName("Invalid login should be unauthorized")
     public void testInvalidLogin() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/login")
@@ -62,7 +62,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    @DisplayName("Try bad login requests, should be unauthorized")
+    @DisplayName("Bad login requests should be unauthorized")
     public void testMalformedRequest() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/login")

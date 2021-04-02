@@ -64,6 +64,7 @@ public class StarskyApplication {
                 inviteRepository.deleteAllInBatch();
                 userRepository.deleteAllInBatch();
 
+                // Don't modify the values as they are used in testing.. make sure to run tests if you change the mock data
 
                 List<User> users = new ArrayList<>(Arrays.asList(
                         new User("Harold C. Dobey", "mail@example.com", bCryptPasswordEncoder().encode("password"), "Police Captain",
@@ -94,11 +95,14 @@ public class StarskyApplication {
                 );
                 teamMemberRepository.saveAll(teamMembers);
 
+
+
                 List<Invite> invites = Arrays.asList(
-                        new Invite(UUID.randomUUID(), users.get(0), "David Michael Starsky", "david@starsky.com", false),
-                        new Invite(UUID.randomUUID(), users.get(0), "Kenneth Richard Hutchinson", "kenny@starsky.com", true),
-                        new Invite(UUID.randomUUID(), users.get(0), "Huggy Bear", "huggy@bear.com", false)
+                        new Invite(UUID.fromString("38400000-8cf0-11bd-b23e-10b96e4ef00d"), users.get(0), "David Michael Starsky", "david@starsky.com", false),
+                        new Invite(UUID.fromString("acaa86b2-ce32-4911-89b8-e1e2a1d39a01"), users.get(0), "Kenneth Richard Hutchinson", "kenny@starsky.com", true),
+                        new Invite(UUID.fromString("acaa86b2-ce32-4911-89b8-e1e2a1d39a05"), users.get(0), "Huggy Bear", "huggy@bear.com", false)
                 );
+
                 inviteRepository.saveAll(invites);
             }
         };
