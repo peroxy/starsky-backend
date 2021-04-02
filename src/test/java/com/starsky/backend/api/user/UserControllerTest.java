@@ -143,6 +143,17 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Unauthenticated user should get forbidden")
+    public void testGetNonAuthenticatedUser() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/user")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
+    @Test
     @DisplayName("Should get bad request responses")
     public void testCreateNewManagerWithInvalidBody() throws Exception {
         mockMvc.perform(

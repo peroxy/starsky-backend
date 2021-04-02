@@ -36,7 +36,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, jwtConfig.getRegisterUrl()).permitAll()
                 .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .antMatchers(HttpMethod.POST, "/invites").hasRole("MANAGER")
+                .antMatchers(HttpMethod.POST, "/invites", "/invite").hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET, "/version").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .anyRequest().authenticated()

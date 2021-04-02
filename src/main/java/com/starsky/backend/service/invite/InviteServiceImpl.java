@@ -5,12 +5,14 @@ import com.starsky.backend.api.invite.CreateMailApiInviteRequest;
 import com.starsky.backend.domain.Invite;
 import com.starsky.backend.domain.User;
 import com.starsky.backend.repository.InviteRepository;
+import com.starsky.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -25,6 +27,7 @@ import java.util.UUID;
 @Transactional
 public class InviteServiceImpl implements InviteService {
 
+    private final UserRepository userRepository;
     private final InviteRepository inviteRepository;
     private final String mailApiHostname;
     private final String frontendRegisterUrl;
@@ -32,9 +35,10 @@ public class InviteServiceImpl implements InviteService {
     private final Logger logger = LoggerFactory.getLogger(InviteServiceImpl.class);
 
     @Autowired
-    public InviteServiceImpl(InviteRepository inviteRepository,
+    public InviteServiceImpl(UserRepository userRepository, InviteRepository inviteRepository,
                              @Value("${starsky.mail-api.host}") String mailApiHostname,
                              @Value("${starsky.frontend.register-url}") String frontendRegisterUrl) {
+        this.userRepository = userRepository;
         this.inviteRepository = inviteRepository;
         this.mailApiHostname = mailApiHostname;
         this.frontendRegisterUrl = frontendRegisterUrl;
@@ -43,7 +47,8 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public Invite createInvite(User manager, CreateInviteRequest request) {
         var existingInvite = inviteRepository.findByEmployeeEmail(request.getEmployeeEmail());
-        if (existingInvite != null) {
+        var existingUser = userRepository.findByEmail(request.getEmployeeEmail());
+        if (existingInvite != null || existingUser != null) {
             var error = "Key (employee email)=(%s) already exists.".formatted(request.getEmployeeEmail());
             this.logger.warn(error);
             throw new DataIntegrityViolationException(error);
@@ -53,6 +58,13 @@ public class InviteServiceImpl implements InviteService {
         var invite = new Invite(token, manager, request.getEmployeeName(), request.getEmployeeEmail(), false);
         invite = inviteRepository.save(invite);
 
+        sendInviteToMailApi(manager, request, invite);
+
+        return invite;
+    }
+
+    @Override
+    public ResponseEntity<Void> sendInviteToMailApi(User manager, CreateInviteRequest request, Invite invite) {
         var url = UriComponentsBuilder.fromHttpUrl(frontendRegisterUrl)
                 .queryParam("token", invite.getToken())
                 .queryParam("manager", manager.getName())
@@ -63,11 +75,10 @@ public class InviteServiceImpl implements InviteService {
         var body = new CreateMailApiInviteRequest(manager.getName(), request.getEmployeeName(), request.getEmployeeEmail(), url);
         this.logger.info("Sending request to mail-api: {}", body);
         var client = WebClient.create(mailApiHostname);
-        var response = client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().toBodilessEntity();
+        var response =  client.post().uri("/invitations").contentType(MediaType.APPLICATION_JSON).bodyValue(body).retrieve().toBodilessEntity().block();
         //4xx and 5xx errors are thrown and then the transaction gets rollbacked
-        this.logger.info("Response code from starsky mail-api: {}", response.block().getStatusCode());
-
-        return invite;
+        this.logger.info("Response code from starsky mail-api: {}", response.getStatusCode());
+        return response;
     }
 
     @Override
