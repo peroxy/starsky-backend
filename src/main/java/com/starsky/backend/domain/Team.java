@@ -1,5 +1,7 @@
 package com.starsky.backend.domain;
 
+import com.starsky.backend.api.team.TeamResponse;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -46,6 +48,10 @@ public class Team extends BaseEntity {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public TeamResponse toResponse() {
+        return new TeamResponse(id, name, owner.getName());
     }
 }
 

@@ -3,9 +3,12 @@ package com.starsky.backend.api.user;
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.invite.CreateInviteRequest;
 import com.starsky.backend.api.invite.InviteResponse;
+import com.starsky.backend.api.team.TeamResponse;
 import com.starsky.backend.domain.Invite;
+import com.starsky.backend.domain.Team;
 import com.starsky.backend.domain.User;
 import com.starsky.backend.service.invite.InviteService;
+import com.starsky.backend.service.team.TeamService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -29,11 +32,13 @@ public class UserController {
 
     private final UserService userService;
     private final InviteService inviteService;
+    private final TeamService teamService;
 
     @Autowired
-    public UserController(UserService userService, InviteService inviteService) {
+    public UserController(UserService userService, InviteService inviteService, TeamService teamService) {
         this.userService = userService;
         this.inviteService = inviteService;
+        this.teamService = teamService;
     }
 
     @PostMapping("/users")
@@ -95,7 +100,7 @@ public class UserController {
     @GetMapping("/user/invites")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(summary = "Get all sent invites", description = "Returns the currently authenticated user's invites. Authenticated user must have manager role.")
-    @ApiResponse(responseCode = "200", description = "Response with invites.",
+    @ApiResponse(responseCode = "200", description = "Response with a list of invites.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = InviteResponse.class))))
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     public ResponseEntity<InviteResponse[]> getInvites() {
@@ -115,6 +120,19 @@ public class UserController {
     public ResponseEntity<InviteResponse> getInvite(@PathVariable long id) {
         var invite = inviteService.getById(id);
         return invite.map(value -> ResponseEntity.ok(value.toResponse())).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/user/teams")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Get user's teams", description = "Returns the teams the user owns (manager) or the ones he is part of (employee).")
+    @ApiResponse(responseCode = "200", description = "Response with a list of teams.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamResponse.class))))
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated.", content = @Content)
+    public ResponseEntity<TeamResponse[]> getTeams() {
+        var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = userService.getUserByEmail(email);
+        var teams = teamService.getTeams(user).stream().map(Team::toResponse).toArray(TeamResponse[]::new);
+        return ResponseEntity.ok(teams);
     }
 
 }

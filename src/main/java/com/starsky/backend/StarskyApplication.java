@@ -84,6 +84,7 @@ public class StarskyApplication {
 
                 List<Team> teams = Arrays.asList(
                         new Team("Harold's Police Squad", users.get(0)),
+                        new Team("Harold's Detectives", users.get(0)),
                         new Team("Test Team", users.get(1))
                 );
                 teamRepository.saveAll(teams);
@@ -91,7 +92,8 @@ public class StarskyApplication {
                 List<TeamMember> teamMembers = Arrays.asList(
                         new TeamMember(users.get(2), teams.get(0)),
                         new TeamMember(users.get(3), teams.get(0)),
-                        new TeamMember(users.get(4), teams.get(1))
+                        new TeamMember(users.get(4), teams.get(1)),
+                        new TeamMember(users.get(4), teams.get(2))
                 );
                 teamMemberRepository.saveAll(teamMembers);
 
