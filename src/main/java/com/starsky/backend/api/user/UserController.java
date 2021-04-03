@@ -1,7 +1,12 @@
 package com.starsky.backend.api.user;
 
+import com.starsky.backend.api.invite.CreateInviteRequest;
+import com.starsky.backend.api.invite.InviteResponse;
+import com.starsky.backend.domain.Invite;
+import com.starsky.backend.service.invite.InviteService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,14 +22,16 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "User", description = "Endpoints for user information, new user registration...")
+@Tag(name = "User", description = "Endpoints for user information, new user registration, sending invites to employees...")
 public class UserController {
 
     private final UserService userService;
+    private final InviteService inviteService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, InviteService inviteService) {
         this.userService = userService;
+        this.inviteService = inviteService;
     }
 
     @PostMapping("/users")
@@ -56,6 +63,36 @@ public class UserController {
         var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user.toResponse());
+    }
+
+    @PostMapping("/user/invites")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Send a new invite",
+            description = "Send an invite email to the specified employee so they can create a new Starsky account and join the manager's team. " +
+                    "Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "200", description = "Created a new invite successfully.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = InviteResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Invite body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Unauthorized, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
+    public ResponseEntity<InviteResponse> createInvite(@Valid @RequestBody CreateInviteRequest request) {
+        var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var manager = userService.getUserByEmail(email);
+        var invite = inviteService.createInvite(manager, request);
+        return ResponseEntity.ok(invite.toResponse());
+    }
+
+    @GetMapping("/user/invites")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Get all sent invites", description = "Returns the currently authenticated user's invites. Authenticated user must have  manager role.")
+    @ApiResponse(responseCode = "200", description = "Response with invites.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = InviteResponse.class))))
+    @ApiResponse(responseCode = "403", description = "Unauthorized, user is not authenticated or does not have manager role.", content = @Content)
+    public ResponseEntity<InviteResponse[]> getInvites() {
+        var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = userService.getUserByEmail(email);
+        var invites = inviteService.getAllManagerInvites(user).stream().map(Invite::toResponse).toArray(InviteResponse[]::new);
+        return ResponseEntity.ok(invites);
     }
 
 }

@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class InviteControllerTest {
+public class InviteEndpointsTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -79,7 +79,7 @@ public class InviteControllerTest {
     @Test
     @DisplayName("Should send new invite")
     public void testSendNewInvite() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/invites")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", managerJwtHeader)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "david@mail.net"))))
@@ -90,14 +90,14 @@ public class InviteControllerTest {
     @Test
     @DisplayName("Should get bad request")
     public void testSendInviteBadRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/invites")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", managerJwtHeader)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "invalid mail"))))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/invites")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", managerJwtHeader)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest(null, "david2@mail.net"))))
@@ -109,25 +109,25 @@ public class InviteControllerTest {
     @DisplayName("Should get forbidden")
     public void testSendUnauthenticatedInvite() throws Exception {
         // no auth header - should not be allowed to see these endpoints
-        mockMvc.perform(MockMvcRequestBuilders.post("/invites")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "david@mail.net"))))
                 .andDo(print())
                 .andExpect(status().isForbidden());
-        mockMvc.perform(MockMvcRequestBuilders.post("/invite")
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "david@mail.net"))))
                 .andDo(print())
                 .andExpect(status().isForbidden());
 
         // auth header present, but authenticated user has employee role - should not be allowed to see these endpoints
-        mockMvc.perform(MockMvcRequestBuilders.post("/invites")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", employeeJwtHeader)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "david@mail.net"))))
                 .andDo(print())
                 .andExpect(status().isForbidden());
-        mockMvc.perform(MockMvcRequestBuilders.post("/invite")
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", employeeJwtHeader)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "david@mail.net"))))
@@ -138,13 +138,13 @@ public class InviteControllerTest {
     @Test
     @DisplayName("Should get email already exists conflict")
     public void testSendExistingMail() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/invites")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", managerJwtHeader)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "a@a.com"))))
                 .andDo(print())
                 .andExpect(status().isConflict());
-        mockMvc.perform(MockMvcRequestBuilders.post("/invites")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", managerJwtHeader)
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "t@t.com"))))
