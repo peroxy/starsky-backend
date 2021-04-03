@@ -1,5 +1,6 @@
 package com.starsky.backend.api.user;
 
+import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.invite.CreateInviteRequest;
 import com.starsky.backend.api.invite.InviteResponse;
 import com.starsky.backend.domain.Invite;
@@ -43,14 +44,9 @@ public class UserController {
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invite token invalid.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = InviteInvalidResponse.class)))
-    public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest request) {
-        try {
-            var user = userService.createUser(request);
-            return ResponseEntity.ok(user.toResponse());
-        } catch (IllegalArgumentException ex) {
-            var error = new InviteInvalidResponse(request.getInviteToken().toString(), ex.getMessage());
-            return ResponseEntity.unprocessableEntity().body(error);
-        }
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) throws InvalidInviteTokenException {
+        var user = userService.createUser(request);
+        return ResponseEntity.ok(user.toResponse());
     }
 
     @GetMapping("/user")
@@ -102,13 +98,9 @@ public class UserController {
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = InviteResponse.class)))
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Invite does not exist.", content = @Content)
-    public ResponseEntity<?> getInvite(@PathVariable long id) {
+    public ResponseEntity<InviteResponse> getInvite(@PathVariable long id) {
         var invite = inviteService.getById(id);
-        if (invite.isPresent()){
-            return ResponseEntity.ok(invite.get().toResponse());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return invite.map(value -> ResponseEntity.ok(value.toResponse())).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

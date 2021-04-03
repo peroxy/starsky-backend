@@ -1,5 +1,6 @@
 package com.starsky.backend.service.user;
 
+import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.user.CreateUserRequest;
 import com.starsky.backend.domain.Invite;
 import com.starsky.backend.domain.NotificationType;
@@ -26,7 +27,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(CreateUserRequest request) throws IllegalArgumentException {
+    public User createUser(CreateUserRequest request) throws InvalidInviteTokenException {
         User user;
         Invite invite = null;
         if (request.getInviteToken() == null) {
@@ -36,7 +37,7 @@ public class UserServiceImpl implements UserService {
             invite = inviteService.getByToken(request.getInviteToken());
             var validation = inviteService.validateInvite(invite);
             if (validation.hasError()) {
-                throw new IllegalArgumentException(validation.getError());
+                throw new InvalidInviteTokenException(request.getInviteToken(), validation.getError());
             }
 
             user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
