@@ -6,6 +6,7 @@ import com.starsky.backend.domain.User;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface InviteService {
@@ -13,7 +14,9 @@ public interface InviteService {
 
     ResponseEntity<Void> sendInviteToMailApi(User manager, CreateInviteRequest request, Invite invite);
 
-    Invite findByToken(UUID token);
+    Invite getByToken(UUID token);
+
+    Optional<Invite> getById(long id);
 
     Invite updateInvite(Invite invite);
 

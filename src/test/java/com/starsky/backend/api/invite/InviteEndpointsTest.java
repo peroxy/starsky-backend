@@ -72,7 +72,7 @@ public class InviteEndpointsTest {
     }
 
     @BeforeEach
-    void setupEach(){
+    void setupEach() {
         doReturn(null).when(inviteService).sendInviteToMailApi(any(User.class), any(CreateInviteRequest.class), any(Invite.class));
     }
 
@@ -85,6 +85,49 @@ public class InviteEndpointsTest {
                 .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "david@mail.net"))))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Should get existing invite")
+    public void testGetInvite() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/invites")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", managerJwtHeader))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var invitesResponse = objectMapper.readValue(result.getResponse().getContentAsString(), InviteResponse[].class);
+        Assertions.assertTrue(invitesResponse.length > 0);
+        var invite = invitesResponse[0];
+        Assertions.assertNotNull(invite);
+        Assertions.assertNotNull(invite.getEmployeeEmail());
+        Assertions.assertNotNull(invite.getEmployeeName());
+        Assertions.assertNotNull(invite.getExpiresOn());
+
+        result = mockMvc.perform(MockMvcRequestBuilders.get("/user/invites/%d".formatted(invite.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", managerJwtHeader))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), InviteResponse.class);
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(invite.getEmployeeEmail(), response.getEmployeeEmail());
+        Assertions.assertEquals(invite.getEmployeeName(), response.getEmployeeName());
+        Assertions.assertEquals(invite.getExpiresOn(), response.getExpiresOn());
+        Assertions.assertEquals(invite.getId(), response.getId());
+        Assertions.assertEquals(invite.getExpiresIn(), response.getExpiresIn());
+        Assertions.assertEquals(invite.getHasRegistered(), response.getHasRegistered());
+    }
+
+    @Test
+    @DisplayName("Should get no invite found")
+    public void testGetNotFoundInvite() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/user/invites/123456789")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", managerJwtHeader))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
     @Test

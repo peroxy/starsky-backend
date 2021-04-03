@@ -58,7 +58,7 @@ public class UserController {
     @Operation(summary = "Get the authenticated user", description = "Returns the currently authenticated user's information.")
     @ApiResponse(responseCode = "200", description = "Response with user information.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponse.class)))
-    @ApiResponse(responseCode = "403", description = "Unauthorized, user is not authenticated.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated.", content = @Content)
     public ResponseEntity<UserResponse> getUser() {
         var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var user = userService.getUserByEmail(email);
@@ -73,7 +73,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Created a new invite successfully.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = InviteResponse.class)))
     @ApiResponse(responseCode = "400", description = "Invite body invalid.", content = @Content)
-    @ApiResponse(responseCode = "403", description = "Unauthorized, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
     public ResponseEntity<InviteResponse> createInvite(@Valid @RequestBody CreateInviteRequest request) {
         var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -84,15 +84,31 @@ public class UserController {
 
     @GetMapping("/user/invites")
     @SecurityRequirement(name = "bearerAuth")
-    @Operation(summary = "Get all sent invites", description = "Returns the currently authenticated user's invites. Authenticated user must have  manager role.")
+    @Operation(summary = "Get all sent invites", description = "Returns the currently authenticated user's invites. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Response with invites.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = InviteResponse.class))))
-    @ApiResponse(responseCode = "403", description = "Unauthorized, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     public ResponseEntity<InviteResponse[]> getInvites() {
         var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var user = userService.getUserByEmail(email);
         var invites = inviteService.getAllManagerInvites(user).stream().map(Invite::toResponse).toArray(InviteResponse[]::new);
         return ResponseEntity.ok(invites);
+    }
+
+    @GetMapping("/user/invites/{id}")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Get sent invite", description = "Returns the invite by id. Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "200", description = "Response with invite.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = InviteResponse.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Invite does not exist.", content = @Content)
+    public ResponseEntity<?> getInvite(@PathVariable long id) {
+        var invite = inviteService.getById(id);
+        if (invite.isPresent()){
+            return ResponseEntity.ok(invite.get().toResponse());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

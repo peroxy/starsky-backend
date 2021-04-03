@@ -50,7 +50,7 @@ public class InviteResponse {
         return employeeEmail;
     }
 
-    public boolean isHasRegistered() {
+    public boolean getHasRegistered() {
         return hasRegistered;
     }
 

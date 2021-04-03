@@ -21,6 +21,7 @@ import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -82,8 +83,13 @@ public class InviteServiceImpl implements InviteService {
     }
 
     @Override
-    public Invite findByToken(UUID token) {
+    public Invite getByToken(UUID token) {
         return inviteRepository.findByToken(token);
+    }
+
+    @Override
+    public Optional<Invite> getById(long id) {
+        return inviteRepository.findById(id);
     }
 
     @Override

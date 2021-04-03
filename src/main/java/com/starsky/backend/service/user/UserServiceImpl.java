@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
             user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
                     null, true, NotificationType.EMAIL, Role.MANAGER, null);
         } else {
-            invite = inviteService.findByToken(request.getInviteToken());
+            invite = inviteService.getByToken(request.getInviteToken());
             var validation = inviteService.validateInvite(invite);
             if (validation.hasError()) {
                 throw new IllegalArgumentException(validation.getError());

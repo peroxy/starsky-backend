@@ -99,7 +99,8 @@ public class StarskyApplication {
                 List<Invite> invites = Arrays.asList(
                         new Invite(UUID.fromString("38400000-8cf0-11bd-b23e-10b96e4ef00d"), users.get(0), "David Michael Starsky", "david@starsky.com", false),
                         new Invite(UUID.fromString("acaa86b2-ce32-4911-89b8-e1e2a1d39a01"), users.get(0), "Kenneth Richard Hutchinson", "kenny@starsky.com", true),
-                        new Invite(UUID.fromString("acaa86b2-ce32-4911-89b8-e1e2a1d39a05"), users.get(0), "Huggy Bear", "huggy@bear.com", false)
+                        new Invite(UUID.fromString("acaa86b2-ce32-4911-89b8-e1e2a1d39a05"), users.get(0), "Huggy Bear", "huggy@bear.com", false),
+                        new Invite(UUID.fromString("bcaa86b2-ce32-4911-89b8-e1e2a1d39a06"), users.get(1), "Test Employee", "employee@test.com", false)
                 );
 
                 inviteRepository.saveAll(invites);
