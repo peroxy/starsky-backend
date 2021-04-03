@@ -4,6 +4,7 @@ import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.invite.CreateInviteRequest;
 import com.starsky.backend.api.invite.InviteResponse;
 import com.starsky.backend.domain.Invite;
+import com.starsky.backend.domain.User;
 import com.starsky.backend.service.invite.InviteService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,6 +60,19 @@ public class UserController {
         var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         var user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user.toResponse());
+    }
+
+    @GetMapping("/user/employees")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Get the authenticated manager's employees", description = "Returns the currently authenticated user's employees - manager only route.")
+    @ApiResponse(responseCode = "200", description = "Response with all employees.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
+    public ResponseEntity<UserResponse[]> getEmployees() {
+        var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var manager = userService.getUserByEmail(email);
+        var employees = userService.getEmployees(manager).stream().map(User::toResponse).toArray(UserResponse[]::new);
+        return ResponseEntity.ok(employees);
     }
 
     @PostMapping("/user/invites")

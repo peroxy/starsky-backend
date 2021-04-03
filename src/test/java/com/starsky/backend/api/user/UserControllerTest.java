@@ -6,9 +6,7 @@ import com.starsky.backend.api.authentication.TokenResponse;
 import com.starsky.backend.domain.Invite;
 import com.starsky.backend.domain.User;
 import com.starsky.backend.repository.InviteRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.ObjectProvider;
@@ -37,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @ActiveProfiles("test")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UserControllerTest {
 
     @Autowired
@@ -51,6 +50,8 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private String managerJwtHeader;
+
     @TestConfiguration
     static class TestConfig {
         @Primary
@@ -58,6 +59,22 @@ public class UserControllerTest {
         InviteRepository testBean(InviteRepository real) {
             return Mockito.mock(InviteRepository.class, AdditionalAnswers.delegatesTo(real));
         }
+    }
+
+    @BeforeAll
+    void setup() throws Exception {
+        var result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new LoginRequest("a@a.com", "password"))))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var tokenResponse = objectMapper.readValue(result.getResponse().getContentAsString(), TokenResponse.class);
+        Assertions.assertEquals("Bearer", tokenResponse.getTokenType());
+        Assertions.assertNotNull(tokenResponse.getAccessToken());
+        Assertions.assertNotNull(tokenResponse.getExpiresOn());
+        managerJwtHeader = "%s %s".formatted(tokenResponse.getTokenType(), tokenResponse.getAccessToken());
     }
 
     @Test
@@ -112,24 +129,12 @@ public class UserControllerTest {
     }
 
     @Test
-    @DisplayName("Should login and get the authenticated user")
+    @DisplayName("Should get the authenticated user")
     public void testGetAuthenticatedUser() throws Exception {
         var result = mockMvc.perform(
-                MockMvcRequestBuilders.post("/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new LoginRequest("a@a.com", "password"))))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn();
-        var response = objectMapper.readValue(result.getResponse().getContentAsString(), TokenResponse.class);
-        Assertions.assertEquals("Bearer", response.getTokenType());
-        Assertions.assertNotNull(response.getAccessToken());
-        Assertions.assertNotNull(response.getExpiresOn());
-
-        result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/user")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "%s %s".formatted(response.getTokenType(), response.getAccessToken())))
+                        .header("Authorization", managerJwtHeader))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
@@ -143,10 +148,36 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Should get employees")
+    public void testGetAuthenticatedUserEmployees() throws Exception {
+        var result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", managerJwtHeader))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var employees = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse[].class);
+        Assertions.assertEquals(1, employees.length);
+        Assertions.assertEquals("t@t.com", employees[0].getEmail());
+        Assertions.assertEquals("Test Employee", employees[0].getName());
+        Assertions.assertEquals("Animator", employees[0].getJobTitle());
+        Assertions.assertEquals("EMPLOYEE", employees[0].getRole());
+        Assertions.assertEquals("EMAIL", employees[0].getNotificationType());
+        Assertions.assertNull(employees[0].getPhoneNumber());
+    }
+
+    @Test
     @DisplayName("Unauthenticated user should get forbidden")
     public void testGetNonAuthenticatedUser() throws Exception {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/user")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isForbidden())
+                .andReturn();
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/user/employees")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isForbidden())
