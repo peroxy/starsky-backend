@@ -43,7 +43,7 @@ public class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-//    @SpyBean
+    //    @SpyBean
 //    private InviteRepository inviteRepository;
 //    does not work due to spring boot issue: https://github.com/spring-projects/spring-boot/issues/7033
 //    use the @TestConfiguration and ObjectProvider workaround below:
@@ -51,15 +51,6 @@ public class UserControllerTest {
     private ObjectMapper objectMapper;
 
     private String managerJwtHeader;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Primary
-        @Bean
-        InviteRepository testBean(InviteRepository real) {
-            return Mockito.mock(InviteRepository.class, AdditionalAnswers.delegatesTo(real));
-        }
-    }
 
     @BeforeAll
     void setup() throws Exception {
@@ -309,5 +300,14 @@ public class UserControllerTest {
         var response = objectMapper.readValue(result.getResponse().getContentAsString(), InviteInvalidResponse.class);
         Assertions.assertEquals("Invite has already been used, user has already been registered.", response.getError());
         Assertions.assertEquals(uuid.toString(), response.getInviteToken());
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Primary
+        @Bean
+        InviteRepository testBean(InviteRepository real) {
+            return Mockito.mock(InviteRepository.class, AdditionalAnswers.delegatesTo(real));
+        }
     }
 }

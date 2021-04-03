@@ -9,6 +9,7 @@ import java.util.List;
 @RepositoryRestResource(exported = false)
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmail(String email);
+
     List<User> findAllByParentUser(User parentUser);
 }
 
