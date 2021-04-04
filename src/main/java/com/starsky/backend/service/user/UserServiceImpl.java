@@ -8,7 +8,10 @@ import com.starsky.backend.domain.Role;
 import com.starsky.backend.domain.User;
 import com.starsky.backend.repository.UserRepository;
 import com.starsky.backend.service.invite.InviteService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final InviteService inviteService;
+    private final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, InviteService inviteService) {
@@ -57,6 +61,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User getUserById(long id) throws ResourceNotFoundException {
+        var user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return user.get();
+        }
+        var error = "User (id=%d) does not exist.".formatted(id);
+        this.logger.warn(error);
+        throw new ResourceNotFoundException(error);
+    }
+
+    @Override
+    public User getEmployeeById(long id, User owner) throws ResourceNotFoundException {
+        var employee = userRepository.findByIdAndParentUser(id, owner);
+        if (employee.isPresent()) {
+            return employee.get();
+        }
+        var error = "Employee (id=%d, owner=%d) does not exist.".formatted(id, owner.getId());
+        this.logger.warn(error);
+        throw new ResourceNotFoundException(error);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class EmployeeControllerTest extends TestJwtProvider {
                 .andExpect(status().isOk())
                 .andReturn();
         var employees = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse[].class);
-        Assertions.assertEquals(1, employees.length);
+        Assertions.assertEquals(2, employees.length);
         Assertions.assertEquals("t@t.com", employees[0].getEmail());
         Assertions.assertEquals("Test Employee", employees[0].getName());
         Assertions.assertEquals("Animator", employees[0].getJobTitle());
@@ -71,7 +71,7 @@ public class EmployeeControllerTest extends TestJwtProvider {
                 MockMvcRequestBuilders.get("/user/employees")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", getEmployeeJwtHeader()))
-                        .andDo(print())
+                .andDo(print())
                 .andExpect(status().isForbidden())
                 .andReturn();
     }

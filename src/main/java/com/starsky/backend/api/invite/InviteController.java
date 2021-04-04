@@ -58,14 +58,14 @@ public class InviteController extends BaseController {
         return ResponseEntity.ok(invites);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{invite_id}")
     @Operation(summary = "Get sent invite", description = "Returns the invite by id. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Response with invite.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = InviteResponse.class)))
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Invite does not exist.", content = @Content)
-    public ResponseEntity<InviteResponse> getInviteById(@PathVariable long id) {
-        var invite = inviteService.getById(id);
+    public ResponseEntity<InviteResponse> getInviteById(@PathVariable("invite_id") long inviteId) {
+        var invite = inviteService.getById(inviteId);
         return invite.map(value -> ResponseEntity.ok(value.toResponse())).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

@@ -79,6 +79,8 @@ public class StarskyApplication {
                         null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(0)));
                 users.add(new User("Test Employee", "t@t.com", bCryptPasswordEncoder().encode("password"), "Animator",
                         null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1)));
+                users.add(new User("Without Team", "no@team.com", bCryptPasswordEncoder().encode("password"), "Jobless",
+                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1)));
 
                 userRepository.saveAll(users);
 

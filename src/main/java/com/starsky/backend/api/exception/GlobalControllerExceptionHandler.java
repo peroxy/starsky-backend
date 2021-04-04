@@ -24,5 +24,6 @@ class GlobalControllerExceptionHandler {
     public InviteInvalidResponse handleInvalidToken(InvalidInviteTokenException ex) {
         return new InviteInvalidResponse(ex.getInviteToken().toString(), ex.getMessage());
     }
+
 }
 
