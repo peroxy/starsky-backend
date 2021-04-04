@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface TeamService {
     List<Team> getTeams(User user);
+
     Team createTeam(String teamName, User owner);
 }

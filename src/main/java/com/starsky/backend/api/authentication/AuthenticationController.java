@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Authentication", description = "Endpoint for login.")
+@Tag(name = "Authentication", description = "Endpoint for login")
 public class AuthenticationController {
 
     @PostMapping(value = "/login")

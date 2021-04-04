@@ -10,5 +10,6 @@ import java.util.List;
 @RepositoryRestResource(exported = false)
 public interface TeamRepository extends JpaRepository<Team, Long> {
     List<Team> getAllByOwner(User owner);
+
     boolean existsByOwnerAndName(User owner, String name);
 }

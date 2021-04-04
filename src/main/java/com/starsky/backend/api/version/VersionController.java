@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Version", description = "Endpoint for version information.")
+@Tag(name = "Version", description = "Endpoint for version information")
 public class VersionController {
 
     private final BuildProperties buildProperties;
