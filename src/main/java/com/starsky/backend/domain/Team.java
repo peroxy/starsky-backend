@@ -15,15 +15,15 @@ public class Team extends BaseEntity {
     @NotNull
     private String name;
     @OneToOne
+    @NotNull
     private User owner;
 
-    public Team(@NotNull String name, User owner) {
+    public Team(@NotNull String name, @NotNull User owner) {
         this.name = name;
         this.owner = owner;
     }
 
     public Team() {
-
     }
 
     public long getId() {

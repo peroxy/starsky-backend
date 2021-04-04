@@ -5,6 +5,7 @@ import com.starsky.backend.api.authentication.LoginRequest;
 import com.starsky.backend.api.authentication.TokenResponse;
 import com.starsky.backend.api.invite.CreateInviteRequest;
 import com.starsky.backend.api.invite.InviteResponse;
+import com.starsky.backend.api.team.CreateTeamRequest;
 import com.starsky.backend.api.team.TeamResponse;
 import com.starsky.backend.domain.Invite;
 import com.starsky.backend.domain.User;
@@ -28,6 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -94,6 +96,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("Should create new manager")
+    @Transactional
     public void testCreateNewManager() throws Exception {
         var result = mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
@@ -260,6 +263,7 @@ public class UserControllerTest {
 
     @Test
     @DisplayName("Should create new employee")
+    @Transactional
     public void testCreateNewEmployee() throws Exception {
         var result = mockMvc.perform(
                 MockMvcRequestBuilders.post("/users")
@@ -475,6 +479,65 @@ public class UserControllerTest {
         Assertions.assertTrue(Arrays.stream(response).anyMatch(teamResponse -> teamResponse.getOwnerName().equals("Harold C. Dobey")));
         Assertions.assertTrue(Arrays.stream(response).anyMatch(teamResponse -> teamResponse.getName().equals("Test Team")));
         Assertions.assertTrue(Arrays.stream(response).anyMatch(teamResponse -> teamResponse.getName().equals("Harold's Detectives")));
+    }
+
+    @Test
+    @DisplayName("Should create a new team")
+    @Transactional
+    public void testCreateNewTeam() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/user/teams")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CreateTeamRequest("new test team")))
+                .header("Authorization", managerJwtHeader))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse.class);
+        Assertions.assertEquals("Test Manager", response.getOwnerName());
+        Assertions.assertEquals("new test team", response.getName());
+    }
+
+    @Test
+    @DisplayName("Should get bad request when creating a new team")
+    public void testCreateTeamBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"invalid\":1}")
+                .header("Authorization", managerJwtHeader))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should get conflict when creating a new team with existing name")
+    public void testCreateExistingTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CreateTeamRequest("Test Team")))
+                .header("Authorization", managerJwtHeader))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DisplayName("Employee should get forbidden when creating a new team")
+    public void testEmployeeCreateNewTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CreateTeamRequest("new test team")))
+                .header("Authorization", employeeJwtHeader))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Not authenticated user should get forbidden when creating a new team")
+    public void testNoAuthenticationCreateNewTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CreateTeamRequest("new test team"))))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 
     @TestConfiguration

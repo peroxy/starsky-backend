@@ -3,6 +3,7 @@ package com.starsky.backend.api.user;
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.invite.CreateInviteRequest;
 import com.starsky.backend.api.invite.InviteResponse;
+import com.starsky.backend.api.team.CreateTeamRequest;
 import com.starsky.backend.api.team.TeamResponse;
 import com.starsky.backend.domain.Invite;
 import com.starsky.backend.domain.Team;
@@ -133,6 +134,21 @@ public class UserController {
         var user = userService.getUserByEmail(email);
         var teams = teamService.getTeams(user).stream().map(Team::toResponse).toArray(TeamResponse[]::new);
         return ResponseEntity.ok(teams);
+    }
+
+    @PostMapping("/user/teams")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Create a new team", description = "Create a new team - manager only route. Team name must be unique for this user, can't have 2 teams with same name.")
+    @ApiResponse(responseCode = "200", description = "Response with the newly created team.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamResponse.class))))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Team name already exists.", content = @Content)
+    public ResponseEntity<TeamResponse> createTeam(@Valid @RequestBody CreateTeamRequest request) {
+        var email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = userService.getUserByEmail(email);
+        var team = teamService.createTeam(request.getName(), user);
+        return ResponseEntity.ok(team.toResponse());
     }
 
 }
