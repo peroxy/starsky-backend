@@ -139,9 +139,39 @@ public class TeamControllerTest extends TestJwtProvider {
     }
 
     @Test
+    @DisplayName("Should get conflict when adding an existing member to team")
+    public void testAddExistingTeamMember() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(TEAMS_ROUTE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var teamResponse = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse[].class);
+        Assertions.assertEquals(1, teamResponse.length);
+        var team = teamResponse[0];
+
+        result = mockMvc.perform(MockMvcRequestBuilders.get("/user/teams/%d/members".formatted(team.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var membersResponse = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse[].class);
+        Assertions.assertEquals(1, membersResponse.length);
+        var teamMember = membersResponse[0];
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams/%d/members/%d".formatted(team.getId(), teamMember.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
     @DisplayName("Should get not found for non-existent team")
     public void testCreateTeamMemberTeamNotFound() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams/123/members/456")
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams/12345678/members/456789")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
@@ -161,7 +191,7 @@ public class TeamControllerTest extends TestJwtProvider {
         Assertions.assertEquals(1, teamResponse.length);
         var team = teamResponse[0];
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams/%d/members/123".formatted(team.getId()))
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/teams/%d/members/1234567".formatted(team.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
