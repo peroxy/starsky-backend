@@ -101,8 +101,6 @@ public class StarskyApplication {
                         new User("Harold C. Dobey", "mail@example.com", bCryptPasswordEncoder().encode("password"), "Police Captain",
                                 null, true, NotificationType.EMAIL, Role.MANAGER, null),
                         new User("Test Manager", "a@a.com", bCryptPasswordEncoder().encode("password"), "Test Manager",
-                                null, true, NotificationType.EMAIL, Role.MANAGER, null),
-                        new User("Scheduling test", "scheduling@a.com", bCryptPasswordEncoder().encode("password"), "Manager",
                                 null, true, NotificationType.EMAIL, Role.MANAGER, null)
                 ));
 
@@ -114,6 +112,8 @@ public class StarskyApplication {
                         null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1)));
                 users.add(new User("Without Team", "no@team.com", bCryptPasswordEncoder().encode("password"), "Jobless",
                         null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1)));
+                users.add(new User("Scheduling test", "scheduling@a.com", bCryptPasswordEncoder().encode("password"), "Manager",
+                        null, true, NotificationType.EMAIL, Role.MANAGER, null));
 
                 for (int i = 0; i < 20; i++) {
                     users.add(new User("Scheduling user %d".formatted(i), "scheduling@%d.com".formatted(i), bCryptPasswordEncoder().encode("password"), "Waiter",
@@ -125,7 +125,7 @@ public class StarskyApplication {
                         new Team("Harold's Police Squad", users.get(0)),
                         new Team("Harold's Detectives", users.get(0)),
                         new Team("Test Team", users.get(1)),
-                        new Team("Scheduling Test", users.get(2))
+                        new Team("Scheduling Test", users.get(6))
                 );
                 teamRepository.saveAll(teams);
 
