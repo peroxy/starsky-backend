@@ -13,21 +13,21 @@ public class ScheduleShift extends BaseEntity {
     @SequenceGenerator(name = "schedule-shift-id-generator", sequenceName = "schedule_shift_sequence", allocationSize = 1)
     private Long id;
     @NotNull
-    private Instant start;
+    private Instant shiftStart;
     @NotNull
-    private Instant end;
+    private Instant shiftEnd;
     @OneToOne
     @NotNull
     private Schedule schedule;
     @NotNull
     private int numberOfRequiredEmployees;
 
-    public ScheduleShift(@NotNull Instant start,
-                         @NotNull Instant end,
+    public ScheduleShift(@NotNull Instant shiftStart,
+                         @NotNull Instant shiftEnd,
                          @NotNull Schedule schedule,
                          @NotNull int numberOfRequiredEmployees) {
-        this.start = start;
-        this.end = end;
+        this.shiftStart = shiftStart;
+        this.shiftEnd = shiftEnd;
         this.schedule = schedule;
         this.numberOfRequiredEmployees = numberOfRequiredEmployees;
     }
@@ -35,20 +35,20 @@ public class ScheduleShift extends BaseEntity {
     public ScheduleShift() {
     }
 
-    public Instant getStart() {
-        return start;
+    public Instant getShiftStart() {
+        return shiftStart;
     }
 
-    public void setStart(Instant start) {
-        this.start = start;
+    public void setShiftStart(Instant start) {
+        this.shiftStart = start;
     }
 
-    public Instant getEnd() {
-        return end;
+    public Instant getShiftEnd() {
+        return shiftEnd;
     }
 
-    public void setEnd(Instant end) {
-        this.end = end;
+    public void setShiftEnd(Instant end) {
+        this.shiftEnd = end;
     }
 
     public Schedule getSchedule() {

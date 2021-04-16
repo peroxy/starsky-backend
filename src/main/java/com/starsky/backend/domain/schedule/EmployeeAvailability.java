@@ -20,21 +20,21 @@ public class EmployeeAvailability extends BaseEntity {
     @NotNull
     private ScheduleShift shift;
     @NotNull
-    private Instant start;
+    private Instant availabilityStart;
     @NotNull
-    private Instant end;
+    private Instant availabilityEnd;
     @NotNull
     private int maxHoursPerShift;
 
     public EmployeeAvailability(@NotNull User employee,
                                 @NotNull ScheduleShift shift,
-                                @NotNull Instant start,
-                                @NotNull Instant end,
+                                @NotNull Instant availabilityStart,
+                                @NotNull Instant availabilityEnd,
                                 @NotNull int maxHoursPerShift) {
         this.employee = employee;
         this.shift = shift;
-        this.start = start;
-        this.end = end;
+        this.availabilityStart = availabilityStart;
+        this.availabilityEnd = availabilityEnd;
         this.maxHoursPerShift = maxHoursPerShift;
     }
 
@@ -65,20 +65,20 @@ public class EmployeeAvailability extends BaseEntity {
         this.shift = shift;
     }
 
-    public Instant getStart() {
-        return start;
+    public Instant getAvailabilityStart() {
+        return availabilityStart;
     }
 
-    public void setStart(Instant start) {
-        this.start = start;
+    public void setAvailabilityStart(Instant start) {
+        this.availabilityStart = start;
     }
 
-    public Instant getEnd() {
-        return end;
+    public Instant getAvailabilityEnd() {
+        return availabilityEnd;
     }
 
-    public void setEnd(Instant end) {
-        this.end = end;
+    public void setAvailabilityEnd(Instant end) {
+        this.availabilityEnd = end;
     }
 
     public int getMaxHoursPerShift() {

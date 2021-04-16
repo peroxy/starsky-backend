@@ -16,9 +16,9 @@ public class Schedule extends BaseEntity {
     @NotNull
     private String name;
     @NotNull
-    private Instant start;
+    private Instant scheduleStart;
     @NotNull
-    private Instant end;
+    private Instant scheduleEnd;
     @OneToOne
     @NotNull
     private Team team;
@@ -30,15 +30,15 @@ public class Schedule extends BaseEntity {
     private int maxHoursPerShift;
 
     public Schedule(@NotNull String name,
-                    @NotNull Instant start,
-                    @NotNull Instant end,
+                    @NotNull Instant scheduleStart,
+                    @NotNull Instant scheduleEnd,
                     @NotNull Team team,
                     @NotNull int maxHoursPerEmployee,
                     @NotNull int maxShiftsPerEmployee,
                     @NotNull int maxHoursPerShift) {
         this.name = name;
-        this.start = start;
-        this.end = end;
+        this.scheduleStart = scheduleStart;
+        this.scheduleEnd = scheduleEnd;
         this.team = team;
         this.maxHoursPerEmployee = maxHoursPerEmployee;
         this.maxShiftsPerEmployee = maxShiftsPerEmployee;
@@ -64,20 +64,20 @@ public class Schedule extends BaseEntity {
         this.name = name;
     }
 
-    public Instant getStart() {
-        return start;
+    public Instant getScheduleStart() {
+        return scheduleStart;
     }
 
-    public void setStart(Instant start) {
-        this.start = start;
+    public void setScheduleStart(Instant start) {
+        this.scheduleStart = start;
     }
 
-    public Instant getEnd() {
-        return end;
+    public Instant getScheduleEnd() {
+        return scheduleEnd;
     }
 
-    public void setEnd(Instant end) {
-        this.end = end;
+    public void setScheduleEnd(Instant end) {
+        this.scheduleEnd = end;
     }
 
     public Team getTeam() {
