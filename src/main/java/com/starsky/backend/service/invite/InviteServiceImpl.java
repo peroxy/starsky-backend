@@ -2,8 +2,8 @@ package com.starsky.backend.service.invite;
 
 import com.starsky.backend.api.invite.CreateInviteRequest;
 import com.starsky.backend.api.invite.CreateMailApiInviteRequest;
-import com.starsky.backend.domain.Invite;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.invite.Invite;
+import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.InviteRepository;
 import com.starsky.backend.repository.UserRepository;
 import org.slf4j.Logger;

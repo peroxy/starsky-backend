@@ -2,7 +2,7 @@ package com.starsky.backend.api.team;
 
 import com.starsky.backend.api.BaseController;
 import com.starsky.backend.api.user.UserResponse;
-import com.starsky.backend.domain.Team;
+import com.starsky.backend.domain.team.Team;
 import com.starsky.backend.service.team.TeamService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;

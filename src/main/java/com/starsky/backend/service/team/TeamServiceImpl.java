@@ -1,9 +1,9 @@
 package com.starsky.backend.service.team;
 
-import com.starsky.backend.domain.Role;
-import com.starsky.backend.domain.Team;
-import com.starsky.backend.domain.TeamMember;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.team.Team;
+import com.starsky.backend.domain.team.TeamMember;
+import com.starsky.backend.domain.user.Role;
+import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.TeamMemberRepository;
 import com.starsky.backend.repository.TeamRepository;
 import org.slf4j.Logger;

@@ -2,10 +2,10 @@ package com.starsky.backend.service.user;
 
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.user.CreateUserRequest;
-import com.starsky.backend.domain.Invite;
-import com.starsky.backend.domain.NotificationType;
-import com.starsky.backend.domain.Role;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.invite.Invite;
+import com.starsky.backend.domain.user.NotificationType;
+import com.starsky.backend.domain.user.Role;
+import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.UserRepository;
 import com.starsky.backend.service.invite.InviteService;
 import org.slf4j.Logger;

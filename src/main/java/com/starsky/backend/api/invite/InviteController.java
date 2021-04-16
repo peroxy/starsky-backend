@@ -1,7 +1,7 @@
 package com.starsky.backend.api.invite;
 
 import com.starsky.backend.api.BaseController;
-import com.starsky.backend.domain.Invite;
+import com.starsky.backend.domain.invite.Invite;
 import com.starsky.backend.service.invite.InviteService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;

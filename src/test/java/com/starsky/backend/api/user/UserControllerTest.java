@@ -2,8 +2,8 @@ package com.starsky.backend.api.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.api.TestJwtProvider;
-import com.starsky.backend.domain.Invite;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.invite.Invite;
+import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.InviteRepository;
 import org.junit.jupiter.api.*;
 import org.mockito.AdditionalAnswers;

@@ -1,7 +1,12 @@
 package com.starsky.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.starsky.backend.domain.*;
+import com.starsky.backend.domain.invite.Invite;
+import com.starsky.backend.domain.team.Team;
+import com.starsky.backend.domain.team.TeamMember;
+import com.starsky.backend.domain.user.NotificationType;
+import com.starsky.backend.domain.user.Role;
+import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.InviteRepository;
 import com.starsky.backend.repository.TeamMemberRepository;
 import com.starsky.backend.repository.TeamRepository;

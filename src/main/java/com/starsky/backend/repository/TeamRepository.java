@@ -1,7 +1,7 @@
 package com.starsky.backend.repository;
 
-import com.starsky.backend.domain.Team;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.team.Team;
+import com.starsky.backend.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

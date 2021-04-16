@@ -1,8 +1,8 @@
 package com.starsky.backend.service.team;
 
-import com.starsky.backend.domain.Team;
-import com.starsky.backend.domain.TeamMember;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.team.Team;
+import com.starsky.backend.domain.team.TeamMember;
+import com.starsky.backend.domain.user.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 

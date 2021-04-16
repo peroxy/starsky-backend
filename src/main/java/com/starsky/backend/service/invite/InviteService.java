@@ -1,8 +1,8 @@
 package com.starsky.backend.service.invite;
 
 import com.starsky.backend.api.invite.CreateInviteRequest;
-import com.starsky.backend.domain.Invite;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.invite.Invite;
+import com.starsky.backend.domain.user.User;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.starsky.backend.api.user;
 
 import com.starsky.backend.api.BaseController;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.user.User;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

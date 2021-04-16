@@ -1,6 +1,6 @@
 package com.starsky.backend.api;
 
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.user.User;
 import com.starsky.backend.service.user.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 

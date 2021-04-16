@@ -1,6 +1,8 @@
-package com.starsky.backend.domain;
+package com.starsky.backend.domain.invite;
 
 import com.starsky.backend.api.invite.InviteResponse;
+import com.starsky.backend.domain.BaseEntity;
+import com.starsky.backend.domain.user.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -28,7 +30,11 @@ public class Invite extends BaseEntity {
     @NotNull
     private boolean hasRegistered;
 
-    public Invite(@NotNull UUID token, @NotNull User manager, @NotNull String employeeName, @NotNull String employeeEmail, boolean hasRegistered) {
+    public Invite(@NotNull UUID token,
+                  @NotNull User manager,
+                  @NotNull String employeeName,
+                  @NotNull String employeeEmail,
+                  @NotNull boolean hasRegistered) {
         this.token = token;
         this.manager = manager;
         this.employeeName = employeeName;

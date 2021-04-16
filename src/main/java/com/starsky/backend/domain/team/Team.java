@@ -1,6 +1,8 @@
-package com.starsky.backend.domain;
+package com.starsky.backend.domain.team;
 
 import com.starsky.backend.api.team.TeamResponse;
+import com.starsky.backend.domain.BaseEntity;
+import com.starsky.backend.domain.user.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

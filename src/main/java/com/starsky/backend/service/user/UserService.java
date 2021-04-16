@@ -2,7 +2,7 @@ package com.starsky.backend.service.user;
 
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.user.CreateUserRequest;
-import com.starsky.backend.domain.User;
+import com.starsky.backend.domain.user.User;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import java.util.List;
