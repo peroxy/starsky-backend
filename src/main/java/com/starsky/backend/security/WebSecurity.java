@@ -37,6 +37,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, jwtConfig.getRegisterUrl()).permitAll()
                 .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .antMatchers(HttpMethod.POST, "/user/invites", "/user/teams/{teamId}/members/{userId}", "/user/teams").hasRole("MANAGER")
+
+                .antMatchers(HttpMethod.POST, "/user/schedules/**").hasRole("MANAGER")
+                .antMatchers(HttpMethod.GET, "/user/schedules/**").hasRole("MANAGER")
+                .antMatchers(HttpMethod.PATCH, "/user/schedules/**").hasRole("MANAGER")
+                .antMatchers(HttpMethod.DELETE, "/user/schedules/**").hasRole("MANAGER")
+
                 .antMatchers(HttpMethod.GET, "/user/invites", "/user/employees").hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET, "/version").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()

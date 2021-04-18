@@ -1,5 +1,6 @@
 package com.starsky.backend.domain.schedule;
 
+import com.starsky.backend.api.schedule.ScheduleResponse;
 import com.starsky.backend.domain.BaseEntity;
 import com.starsky.backend.domain.team.Team;
 
@@ -110,6 +111,10 @@ public class Schedule extends BaseEntity {
 
     public void setMaxHoursPerShift(int maxHoursPerShift) {
         this.maxHoursPerShift = maxHoursPerShift;
+    }
+
+    public ScheduleResponse toResponse() {
+        return new ScheduleResponse(id, name, scheduleStart, scheduleEnd, team.getId(), maxHoursPerEmployee, maxShiftsPerEmployee, maxHoursPerShift);
     }
 
 }
