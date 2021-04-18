@@ -19,5 +19,5 @@ public interface ScheduleService {
 
     Schedule updateSchedule(Schedule schedule);
 
-    void deleteSchedule(long scheduleId) throws ResourceNotFoundException;
+    void deleteSchedule(long scheduleId, User owner) throws ResourceNotFoundException;
 }

@@ -68,9 +68,21 @@ public class ScheduleController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Team does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid schedule date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
-    public ResponseEntity<ScheduleResponse> createInvite(@Valid @RequestBody CreateScheduleRequest request, @PathVariable("team_id") long teamId) throws DateRangeException {
+    public ResponseEntity<ScheduleResponse> createSchedule(@Valid @RequestBody CreateScheduleRequest request, @PathVariable("team_id") long teamId) throws DateRangeException {
         var user = getAuthenticatedUser();
         var schedule = scheduleService.createSchedule(request, teamId, user);
         return ResponseEntity.ok(schedule.toResponse());
+    }
+
+    @DeleteMapping("/user/schedules/{schedule_id}")
+    @Operation(summary = "Delete schedule", description = "Delete a specified schedule. This will also cascade delete schedule shifts and employee availabilities." +
+            " Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "204", description = "Deleted the schedule successfully.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
+    public ResponseEntity<Void> deleteSchedule(@PathVariable("schedule_id") long scheduleId) {
+        var user = getAuthenticatedUser();
+        scheduleService.deleteSchedule(scheduleId, user);
+        return ResponseEntity.noContent().build();
     }
 }

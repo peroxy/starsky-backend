@@ -16,7 +16,7 @@ public class EmployeeAvailability extends BaseEntity {
     @OneToOne
     @NotNull
     private User employee;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     private ScheduleShift shift;
     @NotNull

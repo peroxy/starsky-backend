@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 public class Schedule extends BaseEntity {
@@ -33,6 +34,9 @@ public class Schedule extends BaseEntity {
     @NotNull
     @Min(0)
     private int maxHoursPerShift;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduleShift> shifts;
 
     public Schedule(@NotNull String name,
                     @NotNull Instant scheduleStart,

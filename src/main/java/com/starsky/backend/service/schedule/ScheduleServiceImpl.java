@@ -73,7 +73,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void deleteSchedule(long scheduleId) throws ResourceNotFoundException {
-        throw new NotImplementedException();
+    public void deleteSchedule(long scheduleId, User owner) throws ResourceNotFoundException {
+        getSchedule(scheduleId, owner); // will throw resource not found if not found
+        scheduleRepository.deleteById(scheduleId);
     }
+
 }

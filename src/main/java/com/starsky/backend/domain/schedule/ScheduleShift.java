@@ -5,6 +5,7 @@ import com.starsky.backend.domain.BaseEntity;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 public class ScheduleShift extends BaseEntity {
@@ -16,9 +17,11 @@ public class ScheduleShift extends BaseEntity {
     private Instant shiftStart;
     @NotNull
     private Instant shiftEnd;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     private Schedule schedule;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmployeeAvailability> employeeAvailabilities;
     @NotNull
     private int numberOfRequiredEmployees;
 
