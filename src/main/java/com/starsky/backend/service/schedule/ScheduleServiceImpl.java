@@ -1,13 +1,15 @@
 package com.starsky.backend.service.schedule;
 
+import com.starsky.backend.api.exception.DateRangeException;
+import com.starsky.backend.api.schedule.CreateScheduleRequest;
 import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.ScheduleRepository;
+import com.starsky.backend.service.team.TeamService;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +19,13 @@ import java.util.List;
 public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final TeamService teamService;
     private final Logger logger = LoggerFactory.getLogger(ScheduleServiceImpl.class);
 
     @Autowired
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository) {
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, TeamService teamService) {
         this.scheduleRepository = scheduleRepository;
+        this.teamService = teamService;
     }
 
     @Override
@@ -44,8 +48,23 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedule createSchedule(Schedule schedule) throws DataIntegrityViolationException {
-        throw new NotImplementedException();
+    public Schedule createSchedule(CreateScheduleRequest request, long teamId, User owner) throws DateRangeException, ResourceNotFoundException {
+        if (request.getScheduleStart().isAfter(request.getScheduleEnd())) {
+            throw new DateRangeException("Schedule start timestamp (%s) occurs after schedule end timestamp (%s). Start date has to occur before end date."
+                    .formatted(request.getScheduleStart(), request.getScheduleEnd()));
+        }
+
+        var team = teamService.getTeam(teamId, owner);
+
+        var schedule = new Schedule(request.getScheduleName(),
+                request.getScheduleStart(),
+                request.getScheduleEnd(),
+                team,
+                request.getMaxHoursPerEmployee(),
+                request.getMaxShiftsPerEmployee(),
+                request.getMaxHoursPerShift());
+
+        return scheduleRepository.save(schedule);
     }
 
     @Override

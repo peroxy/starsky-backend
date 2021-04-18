@@ -5,6 +5,7 @@ import com.starsky.backend.domain.BaseEntity;
 import com.starsky.backend.domain.team.Team;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
@@ -24,10 +25,13 @@ public class Schedule extends BaseEntity {
     @NotNull
     private Team team;
     @NotNull
+    @Min(0)
     private int maxHoursPerEmployee;
     @NotNull
+    @Min(0)
     private int maxShiftsPerEmployee;
     @NotNull
+    @Min(0)
     private int maxHoursPerShift;
 
     public Schedule(@NotNull String name,

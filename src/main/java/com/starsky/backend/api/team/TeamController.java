@@ -78,7 +78,7 @@ public class TeamController extends BaseController {
     @ApiResponse(responseCode = "409", description = "Employee already present in the team.", content = @Content)
     public ResponseEntity<Void> createTeamMember(@PathVariable("team_id") long teamId, @PathVariable("user_id") long employeeId) {
         var manager = getAuthenticatedUser();
-        var team = teamService.getTeam(teamId);
+        var team = teamService.getTeam(teamId, manager);
         var employee = userService.getEmployeeById(employeeId, manager);
         var teamMember = teamService.createTeamMember(employee, team);
         return ResponseEntity.ok().build();

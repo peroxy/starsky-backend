@@ -1,6 +1,7 @@
 package com.starsky.backend.api.schedule;
 
 import com.starsky.backend.api.BaseController;
+import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.service.schedule.ScheduleService;
 import com.starsky.backend.service.user.UserService;
@@ -15,10 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/user/schedules", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Schedule", description = "Endpoints for schedule management")
 @SecurityRequirement(name = "bearerAuth")
 public class ScheduleController extends BaseController {
@@ -29,8 +31,9 @@ public class ScheduleController extends BaseController {
         this.scheduleService = scheduleService;
     }
 
-    @GetMapping
-    @Operation(summary = "Get all schedules", description = "Returns a list of all schedules created by the currently authenticated user (manager-role only route).")
+    @GetMapping("/user/schedules")
+    @Operation(summary = "Get all schedules", description = "Returns a list of all schedules created by the currently authenticated user (manager-role only route)." +
+            " Optionally you can filter by team by supplying the query parameter.")
     @ApiResponse(responseCode = "200", description = "Response with a list of schedules.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ScheduleResponse.class))))
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
@@ -45,7 +48,7 @@ public class ScheduleController extends BaseController {
         return ResponseEntity.ok(schedules);
     }
 
-    @GetMapping("/{schedule_id}")
+    @GetMapping("/user/schedules/{schedule_id}")
     @Operation(summary = "Get schedule by id", description = "Returns a schedule with specified id that was created by the currently authenticated user (manager-role only route).")
     @ApiResponse(responseCode = "200", description = "Response with the schedule.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleResponse.class)))
@@ -54,6 +57,20 @@ public class ScheduleController extends BaseController {
     public ResponseEntity<ScheduleResponse> getScheduleById(@PathVariable("schedule_id") long scheduleId) {
         var user = getAuthenticatedUser();
         var schedule = scheduleService.getSchedule(scheduleId, user);
+        return ResponseEntity.ok(schedule.toResponse());
+    }
+
+    @PostMapping("/user/teams/{team_id}/schedules")
+    @Operation(summary = "Create a new schedule", description = "Creates a new schedule that is assigned to the specified team. Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "200", description = "Created a new schedule successfully.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Team does not exist.", content = @Content)
+    @ApiResponse(responseCode = "422", description = "Invalid schedule date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
+    public ResponseEntity<ScheduleResponse> createInvite(@Valid @RequestBody CreateScheduleRequest request, @PathVariable("team_id") long teamId) throws DateRangeException {
+        var user = getAuthenticatedUser();
+        var schedule = scheduleService.createSchedule(request, teamId, user);
         return ResponseEntity.ok(schedule.toResponse());
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 public interface TeamService {
     List<Team> getTeams(User user);
 
-    Team getTeam(long id) throws ResourceNotFoundException;
+    Team getTeam(long id, User owner) throws ResourceNotFoundException;
 
     List<TeamMember> getTeamMembers(long teamId) throws ResourceNotFoundException;
 

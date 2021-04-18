@@ -41,12 +41,12 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Team getTeam(long id) throws ResourceNotFoundException {
-        var team = teamRepository.findById(id);
+    public Team getTeam(long id, User owner) throws ResourceNotFoundException {
+        var team = teamRepository.findByIdAndOwner(id, owner);
         if (team.isPresent()) {
             return team.get();
         }
-        var error = "Team (id=%d) does not exist.".formatted(id);
+        var error = "Team (id=%d, owner=%d) does not exist.".formatted(id, owner.getId());
         this.logger.warn(error);
         throw new ResourceNotFoundException(error);
     }
