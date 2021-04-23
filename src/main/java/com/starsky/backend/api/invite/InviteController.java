@@ -65,7 +65,8 @@ public class InviteController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Invite does not exist.", content = @Content)
     public ResponseEntity<InviteResponse> getInviteById(@PathVariable("invite_id") long inviteId) {
-        var invite = inviteService.getById(inviteId);
+        var user = getAuthenticatedUser();
+        var invite = inviteService.getById(inviteId, user);
         return invite.map(value -> ResponseEntity.ok(value.toResponse())).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

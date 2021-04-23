@@ -88,8 +88,8 @@ public class InviteServiceImpl implements InviteService {
     }
 
     @Override
-    public Optional<Invite> getById(long id) {
-        return inviteRepository.findById(id);
+    public Optional<Invite> getById(long id, User manager) {
+        return inviteRepository.findByIdAndManager(id, manager);
     }
 
     @Override

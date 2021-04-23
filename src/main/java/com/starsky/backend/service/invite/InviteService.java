@@ -16,7 +16,7 @@ public interface InviteService {
 
     Invite getByToken(UUID token);
 
-    Optional<Invite> getById(long id);
+    Optional<Invite> getById(long id, User manager);
 
     Invite updateInvite(Invite invite);
 
