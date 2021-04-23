@@ -15,11 +15,11 @@ public abstract class TestJwtProvider {
     private String managerJwtHeader;
     private String employeeJwtHeader;
 
-    protected void setupLogins(MockMvc mockMvc, ObjectMapper objectMapper) throws Exception {
+    protected void setupLogins(MockMvc mockMvc, ObjectMapper objectMapper, LoginRequest manager, LoginRequest employee) throws Exception {
         var result = mockMvc.perform(
                 MockMvcRequestBuilders.post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new LoginRequest("a@a.com", "password"))))
+                        .content(objectMapper.writeValueAsString(manager)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
@@ -32,7 +32,7 @@ public abstract class TestJwtProvider {
         result = mockMvc.perform(
                 MockMvcRequestBuilders.post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new LoginRequest("t@t.com", "password"))))
+                        .content(objectMapper.writeValueAsString(employee)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();

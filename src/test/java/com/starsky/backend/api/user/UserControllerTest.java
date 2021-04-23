@@ -2,6 +2,7 @@ package com.starsky.backend.api.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.api.TestJwtProvider;
+import com.starsky.backend.api.authentication.LoginRequest;
 import com.starsky.backend.domain.invite.Invite;
 import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.InviteRepository;
@@ -47,7 +48,7 @@ public class UserControllerTest extends TestJwtProvider {
 
     @BeforeAll
     void setup() throws Exception {
-        setupLogins(mockMvc, objectMapper);
+        setupLogins(mockMvc, objectMapper, new LoginRequest("a@a.com", "password"), new LoginRequest("a@a.com", "password"));
     }
 
     @Test

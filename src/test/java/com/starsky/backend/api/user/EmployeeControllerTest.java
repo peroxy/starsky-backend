@@ -2,6 +2,7 @@ package com.starsky.backend.api.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.api.TestJwtProvider;
+import com.starsky.backend.api.authentication.LoginRequest;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -30,7 +31,7 @@ public class EmployeeControllerTest extends TestJwtProvider {
 
     @BeforeAll
     void setup() throws Exception {
-        setupLogins(mockMvc, objectMapper);
+        setupLogins(mockMvc, objectMapper, new LoginRequest("a@a.com", "password"), new LoginRequest("a@a.com", "password"));
     }
 
     @Test
