@@ -85,4 +85,18 @@ public class ScheduleController extends BaseController {
         scheduleService.deleteSchedule(scheduleId, user);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/user/schedules/{schedule_id}")
+    @Operation(summary = "Update schedule", description = "Update any property of the specified schedule. Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "200", description = "Updated the schedule successfully.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
+    @ApiResponse(responseCode = "422", description = "Invalid schedule date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
+    public ResponseEntity<ScheduleResponse> updateSchedule(@PathVariable("schedule_id") long scheduleId, @Valid @RequestBody UpdateScheduleRequest request) throws DateRangeException {
+        var user = getAuthenticatedUser();
+        var schedule = scheduleService.updateSchedule(request, scheduleId, user);
+        return ResponseEntity.ok(schedule.toResponse());
+    }
 }

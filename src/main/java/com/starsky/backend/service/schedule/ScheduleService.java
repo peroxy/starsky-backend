@@ -2,6 +2,7 @@ package com.starsky.backend.service.schedule;
 
 import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.schedule.CreateScheduleRequest;
+import com.starsky.backend.api.schedule.UpdateScheduleRequest;
 import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.domain.user.User;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -17,7 +18,7 @@ public interface ScheduleService {
 
     Schedule createSchedule(CreateScheduleRequest request, long teamId, User user) throws DateRangeException, ResourceNotFoundException;
 
-    Schedule updateSchedule(Schedule schedule);
+    Schedule updateSchedule(UpdateScheduleRequest request, long scheduleId, User owner) throws DateRangeException, ResourceNotFoundException;
 
     void deleteSchedule(long scheduleId, User owner) throws ResourceNotFoundException;
 }
