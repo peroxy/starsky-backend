@@ -126,7 +126,7 @@ public class TeamControllerTest extends TestJwtProvider {
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         result = mockMvc.perform(MockMvcRequestBuilders.get("/user/teams/%d/members".formatted(team.getId()))
                 .contentType(MediaType.APPLICATION_JSON)

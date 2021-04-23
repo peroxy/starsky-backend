@@ -73,7 +73,7 @@ public class TeamController extends BaseController {
 
     @PostMapping("/{team_id}/members/{user_id}")
     @Operation(summary = "Add a new team member", description = "Add a new team member (an employee with user ID) to a team - manager only route.")
-    @ApiResponse(responseCode = "200", description = "Employee successfully added to the team.", content = @Content)
+    @ApiResponse(responseCode = "202", description = "Employee successfully added to the team.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Team or employee does not exist.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Employee already present in the team.", content = @Content)
@@ -82,6 +82,6 @@ public class TeamController extends BaseController {
         var team = teamService.getTeam(teamId, manager);
         var employee = userService.getEmployeeById(employeeId, manager);
         var teamMember = teamService.createTeamMember(employee, team);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
