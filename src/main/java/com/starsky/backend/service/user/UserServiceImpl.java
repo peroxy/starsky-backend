@@ -59,13 +59,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User getUserByEmail(String email) throws ResourceNotFoundException {
+        var user = userRepository.findByEmailAndEnabled(email, true);
+        if (user.isPresent()) {
+            return user.get();
+        }
+        var error = "User (email=%s) does not exist.".formatted(email);
+        this.logger.warn(error);
+        throw new ResourceNotFoundException(error);
     }
 
     @Override
     public User getUserById(long id) throws ResourceNotFoundException {
-        var user = userRepository.findById(id);
+        var user = userRepository.findByIdAndEnabled(id, true);
         if (user.isPresent()) {
             return user.get();
         }
@@ -76,7 +82,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getEmployeeById(long id, User owner) throws ResourceNotFoundException {
-        var employee = userRepository.findByIdAndParentUser(id, owner);
+        var employee = userRepository.findByIdAndParentUserAndEnabled(id, owner, true);
         if (employee.isPresent()) {
             return employee.get();
         }
@@ -87,6 +93,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getEmployees(User manager) {
-        return userRepository.findAllByParentUser(manager);
+        return userRepository.findAllByParentUserAndEnabled(manager, true);
     }
 }

@@ -48,8 +48,8 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public Invite createInvite(User manager, CreateInviteRequest request) {
         var existingInvite = inviteRepository.findByEmployeeEmail(request.getEmployeeEmail());
-        var existingUser = userRepository.findByEmail(request.getEmployeeEmail());
-        if (existingInvite != null || existingUser != null) {
+        var existingUser = userRepository.findByEmailAndEnabled(request.getEmployeeEmail(), true);
+        if (existingInvite != null || existingUser.isPresent()) {
             var error = "Key (employee email)=(%s) already exists.".formatted(request.getEmployeeEmail());
             this.logger.warn(error);
             throw new DataIntegrityViolationException(error);

@@ -9,10 +9,12 @@ import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
 public interface UserRepository extends JpaRepository<User, Long> {
-    User findByEmail(String email);
+    Optional<User> findByEmailAndEnabled(String email, boolean enabled);
 
-    List<User> findAllByParentUser(User parentUser);
+    Optional<User> findByIdAndEnabled(long id, boolean enabled);
 
-    Optional<User> findByIdAndParentUser(long id, User owner);
+    List<User> findAllByParentUserAndEnabled(User parentUser, boolean enabled);
+
+    Optional<User> findByIdAndParentUserAndEnabled(long id, User owner, boolean enabled);
 }
 

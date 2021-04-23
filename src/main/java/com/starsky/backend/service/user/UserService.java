@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserService {
     User createUser(CreateUserRequest request) throws InvalidInviteTokenException;
 
-    User getUserByEmail(String email);
+    User getUserByEmail(String email) throws ResourceNotFoundException;
 
     User getUserById(long id) throws ResourceNotFoundException;
 
