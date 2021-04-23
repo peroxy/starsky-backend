@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface TeamRepository extends JpaRepository<Team, Long> {
     List<Team> getAllByOwner(User owner);
 
-    Optional<Team> findByIdAndOwner(long teamId, User owner);
+    Optional<Team> findByIdAndOwnerId(long teamId, long ownerId);
 
     boolean existsByOwnerAndName(User owner, String name);
 }

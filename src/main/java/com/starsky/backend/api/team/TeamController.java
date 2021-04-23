@@ -53,7 +53,8 @@ public class TeamController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Team does not exist.", content = @Content)
     public ResponseEntity<UserResponse[]> getTeamMembers(@PathVariable("team_id") long teamId) {
-        var teamMembers = teamService.getTeamMembers(teamId).stream().map(teamMember -> teamMember.getMember().toResponse()).toArray(UserResponse[]::new);
+        var user = getAuthenticatedUser();
+        var teamMembers = teamService.getTeamMembers(teamId, user).stream().map(teamMember -> teamMember.getMember().toResponse()).toArray(UserResponse[]::new);
         return ResponseEntity.ok(teamMembers);
     }
 

@@ -13,7 +13,7 @@ public interface TeamService {
 
     Team getTeam(long id, User owner) throws ResourceNotFoundException;
 
-    List<TeamMember> getTeamMembers(long teamId) throws ResourceNotFoundException;
+    List<TeamMember> getTeamMembers(long teamId, User user) throws ResourceNotFoundException;
 
     Team createTeam(String teamName, User owner) throws DataIntegrityViolationException;
 

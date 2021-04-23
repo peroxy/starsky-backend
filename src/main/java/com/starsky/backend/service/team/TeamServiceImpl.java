@@ -14,6 +14,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,7 +43,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Team getTeam(long id, User owner) throws ResourceNotFoundException {
-        var team = teamRepository.findByIdAndOwner(id, owner);
+        var team = teamRepository.findByIdAndOwnerId(id, owner.getId());
         if (team.isPresent()) {
             return team.get();
         }
@@ -53,8 +54,13 @@ public class TeamServiceImpl implements TeamService {
 
 
     @Override
-    public List<TeamMember> getTeamMembers(long teamId) throws ResourceNotFoundException {
-        var team = teamRepository.findById(teamId);
+    public List<TeamMember> getTeamMembers(long teamId, User user) throws ResourceNotFoundException {
+        Optional<Team> team;
+        if (user.getParentUser() == null) {
+            team = teamRepository.findByIdAndOwnerId(teamId, user.getId());
+        } else {
+            team = teamRepository.findByIdAndOwnerId(teamId, user.getParentUser().getId());
+        }
         if (team.isPresent()) {
             return teamMemberRepository.getAllByTeam(team.get());
         }
