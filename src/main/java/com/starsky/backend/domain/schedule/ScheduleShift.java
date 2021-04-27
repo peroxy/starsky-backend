@@ -1,6 +1,8 @@
 package com.starsky.backend.domain.schedule;
 
+import com.starsky.backend.api.schedule.shift.ScheduleShiftResponse;
 import com.starsky.backend.domain.BaseEntity;
+import org.apache.commons.lang3.NotImplementedException;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -68,5 +70,10 @@ public class ScheduleShift extends BaseEntity {
 
     public void setNumberOfRequiredEmployees(int numberOfRequiredEmployees) {
         this.numberOfRequiredEmployees = numberOfRequiredEmployees;
+    }
+
+    public ScheduleShiftResponse toResponse() {
+        //TODO: after response is OK
+        throw new NotImplementedException();
     }
 }
