@@ -66,9 +66,16 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private void validateDateInterval(Instant start, Instant end) throws DateRangeException {
+        String error = null;
         if (start.isAfter(end)) {
-            var error = "Schedule start timestamp (%s) occurs after schedule end timestamp (%s). Start date has to occur before end date."
+            error = "Schedule start timestamp (%s) occurs after schedule end timestamp (%s). Start date has to occur before end date."
                     .formatted(start, end);
+        } else if (start.equals(end)) {
+            error = "Schedule start timestamp (%s) equals after schedule end timestamp (%s). Start and end date cannot be equal."
+                    .formatted(start, end);
+        }
+
+        if (error != null) {
             this.logger.warn(error);
             throw new DateRangeException(error);
         }
