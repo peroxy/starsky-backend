@@ -1,6 +1,8 @@
 package com.starsky.backend.api.schedule.shift;
 
 import com.starsky.backend.api.BaseController;
+import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.exception.ForbiddenResponse;
 import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.service.schedule.ScheduleShiftService;
 import com.starsky.backend.service.user.UserService;
@@ -34,12 +36,14 @@ public class ScheduleShiftController extends BaseController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all schedule shifts", description = "Returns a list of all schedule shifts created by the currently authenticated user (manager-role only route).")
+    @Operation(summary = "Get all schedule shifts", description = "Returns a list of all schedule shifts created by the currently authenticated user. " +
+            "Managers may access all schedule shifts, while employees will need to be in the specified schedule's team to access this resource.")
     @ApiResponse(responseCode = "200", description = "Response with a list of schedule shifts.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ScheduleShiftResponse.class))))
-    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have necessary permissions to access the schedule.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ForbiddenResponse.class)))
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
-    public ResponseEntity<ScheduleShiftResponse[]> getScheduleShifts(@PathVariable(value = "schedule_id") long scheduleId) {
+    public ResponseEntity<ScheduleShiftResponse[]> getScheduleShifts(@PathVariable(value = "schedule_id") long scheduleId) throws ForbiddenException {
         var user = getAuthenticatedUser();
         var scheduleShifts = scheduleShiftService.getScheduleShifts(scheduleId, user).stream().map(ScheduleShift::toResponse).toArray(ScheduleShiftResponse[]::new);
         return ResponseEntity.ok(scheduleShifts);
