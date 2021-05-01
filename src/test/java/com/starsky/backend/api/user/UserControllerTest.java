@@ -48,7 +48,7 @@ public class UserControllerTest extends TestJwtProvider {
 
     @BeforeAll
     void setup() throws Exception {
-        setupLogins(mockMvc, objectMapper, new LoginRequest("a@a.com", "password"), new LoginRequest("a@a.com", "password"));
+        setupLogins(mockMvc, objectMapper, new LoginRequest("a@a.com", "password"), new LoginRequest("t@t.com", "password"));
     }
 
     @Test
