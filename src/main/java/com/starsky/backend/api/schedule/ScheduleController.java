@@ -2,6 +2,7 @@ package com.starsky.backend.api.schedule;
 
 import com.starsky.backend.api.BaseController;
 import com.starsky.backend.api.exception.DateRangeException;
+import com.starsky.backend.api.exception.ForbiddenException;
 import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.service.schedule.ScheduleService;
 import com.starsky.backend.service.user.UserService;
@@ -34,7 +35,7 @@ public class ScheduleController extends BaseController {
     }
 
     @GetMapping("/user/schedules")
-    @Operation(summary = "Get all schedules", description = "Returns a list of all schedules created by the currently authenticated user (manager-role only route)." +
+    @Operation(summary = "Get all schedules", description = "Returns a list of all schedules created by the currently authenticated user." +
             " Optionally you can filter by team by supplying the query parameter.")
     @ApiResponse(responseCode = "200", description = "Response with a list of schedules.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ScheduleResponse.class))))
@@ -51,12 +52,13 @@ public class ScheduleController extends BaseController {
     }
 
     @GetMapping("/user/schedules/{schedule_id}")
-    @Operation(summary = "Get schedule by id", description = "Returns a schedule with specified id that was created by the currently authenticated user (manager-role only route).")
+    @Operation(summary = "Get schedule by id", description = "Returns a schedule with specified id. " +
+            "Managers can get all schedules they created, while employees may only get schedules from their team.")
     @ApiResponse(responseCode = "200", description = "Response with the schedule.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleResponse.class)))
-    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have sufficient permissions.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
-    public ResponseEntity<ScheduleResponse> getScheduleById(@PathVariable("schedule_id") long scheduleId) {
+    public ResponseEntity<ScheduleResponse> getScheduleById(@PathVariable("schedule_id") long scheduleId) throws ForbiddenException {
         var user = getAuthenticatedUser();
         var schedule = scheduleService.getSchedule(scheduleId, user);
         return ResponseEntity.ok(schedule.toResponse());
@@ -82,7 +84,7 @@ public class ScheduleController extends BaseController {
     @ApiResponse(responseCode = "204", description = "Deleted the schedule successfully.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
-    public ResponseEntity<Void> deleteSchedule(@PathVariable("schedule_id") long scheduleId) {
+    public ResponseEntity<Void> deleteSchedule(@PathVariable("schedule_id") long scheduleId) throws ForbiddenException {
         var user = getAuthenticatedUser();
         scheduleService.deleteSchedule(scheduleId, user);
         return ResponseEntity.noContent().build();
@@ -96,7 +98,7 @@ public class ScheduleController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid schedule date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
-    public ResponseEntity<ScheduleResponse> updateSchedule(@PathVariable("schedule_id") long scheduleId, @Valid @RequestBody UpdateScheduleRequest request) throws DateRangeException {
+    public ResponseEntity<ScheduleResponse> updateSchedule(@PathVariable("schedule_id") long scheduleId, @Valid @RequestBody UpdateScheduleRequest request) throws DateRangeException, ForbiddenException {
         var user = getAuthenticatedUser();
         var schedule = scheduleService.updateSchedule(request, scheduleId, user);
         return ResponseEntity.ok(schedule.toResponse());

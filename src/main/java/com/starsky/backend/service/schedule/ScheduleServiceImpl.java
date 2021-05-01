@@ -1,9 +1,11 @@
 package com.starsky.backend.service.schedule;
 
 import com.starsky.backend.api.exception.DateRangeException;
+import com.starsky.backend.api.exception.ForbiddenException;
 import com.starsky.backend.api.schedule.CreateScheduleRequest;
 import com.starsky.backend.api.schedule.UpdateScheduleRequest;
 import com.starsky.backend.domain.schedule.Schedule;
+import com.starsky.backend.domain.user.Role;
 import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.ScheduleRepository;
 import com.starsky.backend.service.team.TeamService;
@@ -31,16 +33,45 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public List<Schedule> getSchedules(User user) {
-        return scheduleRepository.findAllByTeamOwner(user);
+        var manager = user;
+        if (user.getRole() == Role.EMPLOYEE) {
+            manager = user.getParentUser();
+        }
+
+        var schedules = scheduleRepository.findAllByTeamOwner(manager);
+
+        if (user.getRole() == Role.EMPLOYEE) {
+            var teams = teamService.getTeams(user);
+            schedules.removeIf(schedule -> teams.stream().noneMatch(team -> team.getId() == schedule.getTeam().getId()));
+        }
+
+        return schedules;
     }
 
     @Override
-    public Schedule getSchedule(long scheduleId, User owner) throws ResourceNotFoundException {
-        return scheduleRepository.findByIdAndTeamOwner(scheduleId, owner).orElseThrow(() -> {
+    public Schedule getSchedule(long scheduleId, User user) throws ResourceNotFoundException, ForbiddenException {
+        var manager = user;
+        if (user.getRole() == Role.EMPLOYEE) {
+            manager = user.getParentUser();
+        }
+        var schedule = scheduleRepository.findByIdAndTeamOwner(scheduleId, manager).orElseThrow(() -> {
             var error = "Schedule (id=%d) does not exist.".formatted(scheduleId);
             this.logger.warn(error);
             throw new ResourceNotFoundException(error);
         });
+
+        if (user.getRole() == Role.EMPLOYEE) {
+            var teams = teamService.getTeams(user);
+            if (teams.stream().noneMatch(team -> team.getId() == schedule.getTeam().getId())) {
+                var message =
+                        "Authenticated user (id=%d) does not have necessary permissions to access this schedule - does not belong to schedule's team."
+                                .formatted(user.getId());
+                this.logger.warn(message);
+                throw new ForbiddenException(message);
+            }
+        }
+
+        return schedule;
     }
 
     @Override
@@ -82,7 +113,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Schedule updateSchedule(UpdateScheduleRequest request, long scheduleId, User owner) throws DateRangeException, ResourceNotFoundException {
+    public Schedule updateSchedule(UpdateScheduleRequest request, long scheduleId, User owner) throws DateRangeException, ResourceNotFoundException, ForbiddenException {
         var schedule = getSchedule(scheduleId, owner);
         if (request.getScheduleName().isPresent()) {
             schedule.setName(request.getScheduleName().get());
@@ -108,7 +139,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 
     @Override
-    public void deleteSchedule(long scheduleId, User owner) throws ResourceNotFoundException {
+    public void deleteSchedule(long scheduleId, User owner) throws ResourceNotFoundException, ForbiddenException {
         getSchedule(scheduleId, owner); // will throw resource not found if not found
         scheduleRepository.deleteById(scheduleId);
     }

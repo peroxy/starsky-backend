@@ -56,10 +56,22 @@ public class ScheduleControllerTest extends TestJwtProvider {
     }
 
     @Test
-    public void shouldGetScheduleById() throws Exception {
+    public void managerShouldGetScheduleById() throws Exception {
         var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var scheduleResponse = objectMapper.readValue(result.getResponse().getContentAsString(), ScheduleResponse.class);
+        Assertions.assertEquals("Test schedule 1", scheduleResponse.getScheduleName());
+    }
+
+    @Test
+    public void employeeShouldGetScheduleById() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getEmployeeJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
@@ -78,11 +90,6 @@ public class ScheduleControllerTest extends TestJwtProvider {
 
     @Test
     public void employeeShouldGetForbiddenManagerScheduleRoutes() throws Exception {
-//        mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules/1")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .header("Authorization", getEmployeeJwtHeader()))
-//                .andDo(print())
-//                .andExpect(status().isForbidden());
         mockMvc.perform(MockMvcRequestBuilders.post("/user/teams/1/schedules")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("something")
@@ -100,18 +107,26 @@ public class ScheduleControllerTest extends TestJwtProvider {
                 .header("Authorization", getEmployeeJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isForbidden());
-//        mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .header("Authorization", getEmployeeJwtHeader()))
-//                .andDo(print())
-//                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void shouldGetAllSchedules() throws Exception {
+    public void managerShouldGetAllSchedules() throws Exception {
         var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var scheduleResponse = objectMapper.readValue(result.getResponse().getContentAsString(), ScheduleResponse[].class);
+        Assertions.assertEquals(2, scheduleResponse.length);
+        Assertions.assertTrue(Arrays.stream(scheduleResponse).anyMatch(resp -> resp.getScheduleName().equals("Test schedule 1") || resp.getScheduleName().equals("Test schedule 2")));
+    }
+
+    @Test
+    public void employeeShouldGetAllSchedules() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getEmployeeJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();

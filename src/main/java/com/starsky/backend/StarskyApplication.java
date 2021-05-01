@@ -117,7 +117,7 @@ public class StarskyApplication {
 
                 for (int i = 0; i < 20; i++) {
                     users.add(new User("Scheduling user %d".formatted(i), "scheduling@%d.com".formatted(i), bCryptPasswordEncoder().encode("password"), "Waiter",
-                            null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(2)));
+                            null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(6)));
                 }
                 userRepository.saveAll(users);
 

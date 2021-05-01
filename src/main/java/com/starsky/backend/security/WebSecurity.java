@@ -39,7 +39,6 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/invites", "/user/teams/{teamId}/members/{userId}", "/user/teams").hasRole("MANAGER")
 
                 .antMatchers(HttpMethod.POST, "/user/teams/{team_id}/schedules").hasRole("MANAGER")
-                .antMatchers(HttpMethod.GET, "/user/schedules/**").hasRole("MANAGER")
                 .antMatchers(HttpMethod.PATCH, "/user/schedules/{schedule_id}").hasRole("MANAGER")
                 .antMatchers(HttpMethod.DELETE, "/user/schedules/{schedule_id}").hasRole("MANAGER")
 
