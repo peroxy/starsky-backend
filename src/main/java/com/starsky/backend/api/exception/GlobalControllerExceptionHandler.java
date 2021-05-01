@@ -33,5 +33,12 @@ class GlobalControllerExceptionHandler {
         return new InvalidDateRangeResponse(ex.getMessage());
     }
 
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseBody
+    public ForbiddenResponse handleForbiddenAccess(ForbiddenException ex) {
+        return new ForbiddenResponse(ex.getMessage());
+    }
+
 }
 
