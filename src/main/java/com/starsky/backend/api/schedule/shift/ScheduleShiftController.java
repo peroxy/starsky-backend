@@ -1,10 +1,11 @@
 package com.starsky.backend.api.schedule.shift;
 
 import com.starsky.backend.api.BaseController;
+import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
 import com.starsky.backend.api.exception.ForbiddenResponse;
 import com.starsky.backend.domain.schedule.ScheduleShift;
-import com.starsky.backend.service.schedule.ScheduleShiftService;
+import com.starsky.backend.service.schedule.shift.ScheduleShiftService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -16,10 +17,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/user/schedules/{schedule_id}/shifts", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,5 +47,19 @@ public class ScheduleShiftController extends BaseController {
         var user = getAuthenticatedUser();
         var scheduleShifts = scheduleShiftService.getScheduleShifts(scheduleId, user).stream().map(ScheduleShift::toResponse).toArray(ScheduleShiftResponse[]::new);
         return ResponseEntity.ok(scheduleShifts);
+    }
+
+    @PostMapping
+    @Operation(summary = "Create a new schedule shift", description = "Creates a new schedule shift that is assigned to the specified schedule. Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "200", description = "Created a new schedule shift successfully.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleShiftResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
+    @ApiResponse(responseCode = "422", description = "Invalid schedule shift date range (start timestamp occurs after end timestamp).", content = @Content)
+    public ResponseEntity<ScheduleShiftResponse> createScheduleShift(@Valid @RequestBody CreateScheduleShiftRequest request, @PathVariable(value = "schedule_id") long scheduleId) throws DateRangeException, ForbiddenException {
+        var user = getAuthenticatedUser();
+        var schedule = scheduleShiftService.createScheduleShift(scheduleId, request, user);
+        return ResponseEntity.ok(schedule.toResponse());
     }
 }

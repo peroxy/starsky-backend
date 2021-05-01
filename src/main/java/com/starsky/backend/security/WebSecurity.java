@@ -34,17 +34,33 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, jwtConfig.getRegisterUrl()).permitAll()
-                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .antMatchers(HttpMethod.POST, "/user/invites", "/user/teams/{teamId}/members/{userId}", "/user/teams").hasRole("MANAGER")
 
-                .antMatchers(HttpMethod.POST, "/user/teams/{team_id}/schedules").hasRole("MANAGER")
-                .antMatchers(HttpMethod.PATCH, "/user/schedules/{schedule_id}").hasRole("MANAGER")
-                .antMatchers(HttpMethod.DELETE, "/user/schedules/{schedule_id}").hasRole("MANAGER")
+                /* PERMIT ALL PUBLIC ACCESS */
+                .antMatchers(HttpMethod.POST, jwtConfig.getRegisterUrl(), "/login").permitAll()
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/version").permitAll()
 
-                .antMatchers(HttpMethod.GET, "/user/invites", "/user/employees").hasRole("MANAGER")
-                .antMatchers(HttpMethod.GET, "/version").permitAll()
-                .antMatchers(HttpMethod.POST, "/login").permitAll()
+                /* MANAGER ONLY ROUTES */
+                .antMatchers(HttpMethod.POST,
+                        "/user/invites",
+                        "/user/teams/{teamId}/members/{userId}",
+                        "/user/teams",
+                        "/user/teams/{team_id}/schedules",
+                        "/user/schedules/{schedule_id}/shifts"
+                ).hasRole("MANAGER")
+                .antMatchers(HttpMethod.PATCH,
+                        "/user/schedules/{schedule_id}",
+                        "/user/schedules/{schedule_id}/shifts"
+                ).hasRole("MANAGER")
+                .antMatchers(HttpMethod.DELETE,
+                        "/user/schedules/{schedule_id}",
+                        "/user/schedules/{schedule_id}/shifts"
+                ).hasRole("MANAGER")
+                .antMatchers(HttpMethod.GET,
+                        "/user/invites",
+                        "/user/employees"
+                ).hasRole("MANAGER")
+
+
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), jwtConfig, mapper))

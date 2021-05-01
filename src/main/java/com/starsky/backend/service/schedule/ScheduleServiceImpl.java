@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -23,12 +22,14 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final TeamService teamService;
+    private final DateRangeValidator dateRangeValidator;
     private final Logger logger = LoggerFactory.getLogger(ScheduleServiceImpl.class);
 
     @Autowired
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, TeamService teamService) {
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, TeamService teamService, DateRangeValidator dateRangeValidator) {
         this.scheduleRepository = scheduleRepository;
         this.teamService = teamService;
+        this.dateRangeValidator = dateRangeValidator;
     }
 
     @Override
@@ -81,7 +82,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public Schedule createSchedule(CreateScheduleRequest request, long teamId, User owner) throws DateRangeException, ResourceNotFoundException {
-        validateDateInterval(request.getScheduleStart(), request.getScheduleEnd());
+        dateRangeValidator.validateDateInterval(request.getScheduleStart(), request.getScheduleEnd());
 
         var team = teamService.getTeam(teamId, owner);
 
@@ -94,22 +95,6 @@ public class ScheduleServiceImpl implements ScheduleService {
                 request.getMaxHoursPerShift());
 
         return scheduleRepository.save(schedule);
-    }
-
-    private void validateDateInterval(Instant start, Instant end) throws DateRangeException {
-        String error = null;
-        if (start.isAfter(end)) {
-            error = "Schedule start timestamp (%s) occurs after schedule end timestamp (%s). Start date has to occur before end date."
-                    .formatted(start, end);
-        } else if (start.equals(end)) {
-            error = "Schedule start timestamp (%s) equals after schedule end timestamp (%s). Start and end date cannot be equal."
-                    .formatted(start, end);
-        }
-
-        if (error != null) {
-            this.logger.warn(error);
-            throw new DateRangeException(error);
-        }
     }
 
     @Override
@@ -133,7 +118,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (request.getMaxShiftsPerEmployee().isPresent()) {
             schedule.setMaxShiftsPerEmployee(request.getMaxShiftsPerEmployee().get());
         }
-        validateDateInterval(schedule.getScheduleStart(), schedule.getScheduleEnd());
+        dateRangeValidator.validateDateInterval(schedule.getScheduleStart(), schedule.getScheduleEnd());
         return scheduleRepository.save(schedule);
     }
 

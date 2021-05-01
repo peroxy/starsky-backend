@@ -1,0 +1,16 @@
+package com.starsky.backend.service.schedule.shift;
+
+import com.starsky.backend.api.exception.DateRangeException;
+import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.schedule.shift.CreateScheduleShiftRequest;
+import com.starsky.backend.domain.schedule.ScheduleShift;
+import com.starsky.backend.domain.user.User;
+
+import java.util.List;
+
+public interface ScheduleShiftService {
+    List<ScheduleShift> getScheduleShifts(long scheduleId, User manager) throws ForbiddenException;
+
+    ScheduleShift createScheduleShift(long scheduleId, CreateScheduleShiftRequest shiftRequest, User manager) throws DateRangeException, ForbiddenException;
+}
+

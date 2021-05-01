@@ -1,10 +1,14 @@
-package com.starsky.backend.service.schedule;
+package com.starsky.backend.service.schedule.shift;
 
+import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.schedule.shift.CreateScheduleShiftRequest;
 import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.user.Role;
 import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.ScheduleShiftRepository;
+import com.starsky.backend.service.schedule.DateRangeValidator;
+import com.starsky.backend.service.schedule.ScheduleService;
 import com.starsky.backend.service.team.TeamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +22,14 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
     private final ScheduleShiftRepository scheduleShiftRepository;
     private final ScheduleService scheduleService;
     private final TeamService teamService;
+    private final DateRangeValidator dateRangeValidator;
     private final Logger logger = LoggerFactory.getLogger(ScheduleShiftServiceImpl.class);
 
-    public ScheduleShiftServiceImpl(ScheduleShiftRepository scheduleShiftRepository, ScheduleService scheduleService, TeamService teamService) {
+    public ScheduleShiftServiceImpl(ScheduleShiftRepository scheduleShiftRepository, ScheduleService scheduleService, TeamService teamService, DateRangeValidator dateRangeValidator) {
         this.scheduleShiftRepository = scheduleShiftRepository;
         this.scheduleService = scheduleService;
         this.teamService = teamService;
+        this.dateRangeValidator = dateRangeValidator;
     }
 
     @Override
@@ -41,8 +47,15 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
             this.logger.warn(message);
             throw new ForbiddenException(message);
         }
-
         return scheduleShiftRepository.getAllByScheduleAndScheduleTeamOwner(schedule, manager);
+    }
 
+    @Override
+    public ScheduleShift createScheduleShift(long scheduleId, CreateScheduleShiftRequest shiftRequest, User manager) throws DateRangeException, ForbiddenException {
+        dateRangeValidator.validateDateInterval(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd());
+        var schedule = scheduleService.getSchedule(scheduleId, manager); // will throw resource not found if it doesn't exist
+        var scheduleShift = new ScheduleShift(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd(), schedule, shiftRequest.getNumberOfRequiredEmployees());
+        scheduleShift = scheduleShiftRepository.save(scheduleShift);
+        return scheduleShift;
     }
 }
