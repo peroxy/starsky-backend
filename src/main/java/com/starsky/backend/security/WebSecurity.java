@@ -45,15 +45,18 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/user/teams/{teamId}/members/{userId}",
                         "/user/teams",
                         "/user/teams/{team_id}/schedules",
-                        "/user/schedules/{schedule_id}/shifts"
+                        "/user/schedules/{schedule_id}/shifts",
+                        "/user/shifts/{shift_id}/availabilities"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.PATCH,
                         "/user/schedules/{schedule_id}",
-                        "/user/shifts/{shift_id}"
+                        "/user/shifts/{shift_id}",
+                        "/user/availabilities/{availability_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.DELETE,
                         "/user/schedules/{schedule_id}",
-                        "/user/shifts/{shift_id}"
+                        "/user/shifts/{shift_id}",
+                        "/user/availabilities/{availability_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET,
                         "/user/invites",
