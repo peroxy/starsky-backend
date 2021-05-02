@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -117,7 +118,7 @@ public class ScheduleShiftControllerTest extends TestJwtProvider {
         Assertions.assertEquals(9, shiftResponses.length);
     }
 
-    private CreateScheduleShiftRequest getValidRequest() {
+    private CreateScheduleShiftRequest getCreateShiftRequest() {
         var start = Instant.now();
         var end = start.plus(Duration.ofHours(10));
         var numberOfRequiredEmployees = 10;
@@ -127,7 +128,7 @@ public class ScheduleShiftControllerTest extends TestJwtProvider {
     @Test
     @Transactional
     public void shouldCreateScheduleShift() throws Exception {
-        var request = getValidRequest();
+        var request = getCreateShiftRequest();
         var result = mockMvc.perform(MockMvcRequestBuilders.post("/user/schedules/%d/shifts".formatted(scheduleWithoutShifts.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
@@ -167,7 +168,7 @@ public class ScheduleShiftControllerTest extends TestJwtProvider {
     public void shouldGetNotFoundWhenCreatingNonExistentSchedule() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/user/schedules/575748/shifts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(getValidRequest()))
+                .content(objectMapper.writeValueAsString(getCreateShiftRequest()))
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -191,10 +192,102 @@ public class ScheduleShiftControllerTest extends TestJwtProvider {
     public void employeeShouldGetForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/user/schedules/%d/shifts".formatted(scheduleWithoutShifts.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(getValidRequest()))
+                .content(objectMapper.writeValueAsString(getCreateShiftRequest()))
                 .header("Authorization", getEmployeeJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isForbidden());
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/shifts/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(getUpdateShiftRequest()))
+                .header("Authorization", getEmployeeJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/shifts/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(getUpdateShiftRequest()))
+                .header("Authorization", getEmployeeJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Transactional
+    public void shouldUpdateShift() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules/%d/shifts".formatted(scheduleWithShifts.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var shiftResponse = Arrays.stream(objectMapper.readValue(result.getResponse().getContentAsString(), ScheduleShiftResponse[].class)).findFirst().get();
+
+        var updatedShift = getUpdateShiftRequest();
+        result = mockMvc.perform(MockMvcRequestBuilders.patch("/user/shifts/%d".formatted(shiftResponse.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedShift))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk()).andReturn();
+        var updatedShiftResponse = objectMapper.readValue(result.getResponse().getContentAsString(), ScheduleShiftResponse.class);
+
+        Assertions.assertEquals(updatedShift.getShiftEnd().get(), updatedShiftResponse.getShiftEnd());
+        Assertions.assertEquals(updatedShift.getShiftStart().get(), updatedShiftResponse.getShiftStart());
+        Assertions.assertEquals(updatedShift.getNumberOfRequiredEmployees().get(), updatedShiftResponse.getNumberOfRequiredEmployees());
+    }
+
+    @Test
+    @Transactional
+    public void shouldGetBadRequestWhenUpdating() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/shifts/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString("bad json"))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest()).andReturn();
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/shifts/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new UpdateScheduleShiftRequest(Instant.now(), Instant.now(), -1)))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest()).andReturn();
+    }
+
+    @Test
+    @Transactional
+    public void shouldGetNotFoundWhenUpdating() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/shifts/156434")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(getUpdateShiftRequest()))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNotFound()).andReturn();
+    }
+
+    @Test
+    @Transactional
+    public void shouldGetUnprocessableEntityWhenUpdating() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/shifts/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(getInvalidUpdateShiftRequest()))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity()).andReturn();
+    }
+
+    private UpdateScheduleShiftRequest getUpdateShiftRequest() {
+        var start = Instant.now().plus(Duration.ofHours(20));
+        var end = start.plus(Duration.ofHours(5));
+        var numberOfRequiredEmployees = 17;
+        return new UpdateScheduleShiftRequest(start, end, numberOfRequiredEmployees);
+    }
+
+    private UpdateScheduleShiftRequest getInvalidUpdateShiftRequest() {
+        var end = Instant.now().plus(Duration.ofHours(20));
+        ;
+        var start = end.plus(Duration.ofHours(5));
+        var numberOfRequiredEmployees = 17;
+        return new UpdateScheduleShiftRequest(start, end, numberOfRequiredEmployees);
     }
 
 
