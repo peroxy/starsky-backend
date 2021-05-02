@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/user/schedules/{schedule_id}/shifts", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Schedule Shift", description = "Endpoints for schedule shift management")
 @SecurityRequirement(name = "bearerAuth")
 public class ScheduleShiftController extends BaseController {
@@ -35,7 +35,7 @@ public class ScheduleShiftController extends BaseController {
         this.scheduleShiftService = scheduleShiftService;
     }
 
-    @GetMapping
+    @GetMapping("/user/schedules/{schedule_id}/shifts")
     @Operation(summary = "Get all schedule shifts", description = "Returns a list of all schedule shifts created by the currently authenticated user. " +
             "Managers may access all schedule shifts, while employees will need to be in the specified schedule's team to access this resource.")
     @ApiResponse(responseCode = "200", description = "Response with a list of schedule shifts.",
@@ -49,7 +49,7 @@ public class ScheduleShiftController extends BaseController {
         return ResponseEntity.ok(scheduleShifts);
     }
 
-    @PostMapping
+    @PostMapping("/user/schedules/{schedule_id}/shifts")
     @Operation(summary = "Create a new schedule shift", description = "Creates a new schedule shift that is assigned to the specified schedule. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Created a new schedule shift successfully.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleShiftResponse.class)))
@@ -60,6 +60,32 @@ public class ScheduleShiftController extends BaseController {
     public ResponseEntity<ScheduleShiftResponse> createScheduleShift(@Valid @RequestBody CreateScheduleShiftRequest request, @PathVariable(value = "schedule_id") long scheduleId) throws DateRangeException, ForbiddenException {
         var user = getAuthenticatedUser();
         var schedule = scheduleShiftService.createScheduleShift(scheduleId, request, user);
+        return ResponseEntity.ok(schedule.toResponse());
+    }
+
+    @DeleteMapping("/user/shifts/{shift_id}")
+    @Operation(summary = "Delete schedule shift", description = "Delete a schedule shift. This will also cascade delete employee availabilities." +
+            " Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "204", description = "Deleted the schedule shift successfully.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Shift does not exist.", content = @Content)
+    public ResponseEntity<Void> deleteScheduleShift(@PathVariable("shift_id") long shiftId) {
+        var user = getAuthenticatedUser();
+        scheduleShiftService.deleteScheduleShift(shiftId, user);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/user/shifts/{shift_id}")
+    @Operation(summary = "Update schedule shift", description = "Update any property of the specified shift. Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "200", description = "Updated the schedule shift successfully.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleShiftResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Schedule shift does not exist.", content = @Content)
+    @ApiResponse(responseCode = "422", description = "Invalid date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
+    public ResponseEntity<ScheduleShiftResponse> updateScheduleShift(@PathVariable("shift_id") long shiftId, @Valid @RequestBody UpdateScheduleShiftRequest request) throws DateRangeException {
+        var user = getAuthenticatedUser();
+        var schedule = scheduleShiftService.updateScheduleShift(shiftId, request, user);
         return ResponseEntity.ok(schedule.toResponse());
     }
 }

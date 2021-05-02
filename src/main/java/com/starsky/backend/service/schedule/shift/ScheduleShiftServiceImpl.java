@@ -3,6 +3,7 @@ package com.starsky.backend.service.schedule.shift;
 import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
 import com.starsky.backend.api.schedule.shift.CreateScheduleShiftRequest;
+import com.starsky.backend.api.schedule.shift.UpdateScheduleShiftRequest;
 import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.user.Role;
 import com.starsky.backend.domain.user.User;
@@ -12,6 +13,7 @@ import com.starsky.backend.service.schedule.ScheduleService;
 import com.starsky.backend.service.team.TeamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -57,5 +59,38 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
         var scheduleShift = new ScheduleShift(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd(), schedule, shiftRequest.getNumberOfRequiredEmployees());
         scheduleShift = scheduleShiftRepository.save(scheduleShift);
         return scheduleShift;
+    }
+
+    @Override
+    public void deleteScheduleShift(long shiftId, User manager) throws ResourceNotFoundException {
+        scheduleShiftRepository.getByIdAndScheduleTeamOwner(shiftId, manager)
+                .ifPresentOrElse(scheduleShiftRepository::delete, () -> {
+                    throw getShiftDoesNotExistException(shiftId, manager);
+                });
+    }
+
+    @Override
+    public ScheduleShift updateScheduleShift(long shiftId, UpdateScheduleShiftRequest request, User manager) throws ResourceNotFoundException, DateRangeException {
+        var scheduleShift = scheduleShiftRepository.getByIdAndScheduleTeamOwner(shiftId, manager).orElseThrow(() -> {
+            throw getShiftDoesNotExistException(shiftId, manager);
+        });
+
+        if (request.getShiftStart().isPresent()) {
+            scheduleShift.setShiftStart(request.getShiftStart().get());
+        }
+        if (request.getShiftEnd().isPresent()) {
+            scheduleShift.setShiftEnd(request.getShiftEnd().get());
+        }
+        if (request.getNumberOfRequiredEmployees().isPresent()) {
+            scheduleShift.setNumberOfRequiredEmployees(request.getNumberOfRequiredEmployees().get());
+        }
+        dateRangeValidator.validateDateInterval(scheduleShift.getShiftStart(), scheduleShift.getShiftEnd());
+        return scheduleShiftRepository.save(scheduleShift);
+    }
+
+    private ResourceNotFoundException getShiftDoesNotExistException(long shiftId, User manager) {
+        var message = "Schedule shift (id=%d, owner=%d) does not exist.".formatted(shiftId, manager.getId());
+        this.logger.warn(message);
+        return new ResourceNotFoundException(message);
     }
 }
