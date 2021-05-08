@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/user")
 @Tag(name = "Schedule Shift", description = "Endpoints for schedule shift management")
 @SecurityRequirement(name = "bearerAuth")
 public class ScheduleShiftController extends BaseController {
@@ -35,8 +35,8 @@ public class ScheduleShiftController extends BaseController {
         this.scheduleShiftService = scheduleShiftService;
     }
 
-    @GetMapping("/user/schedules/{schedule_id}/shifts")
-    @Operation(summary = "Get all schedule shifts", description = "Returns a list of all schedule shifts created by the currently authenticated user. " +
+    @GetMapping("/schedules/{schedule_id}/shifts")
+    @Operation(summary = "Get all schedule shifts", description = "Returns a list of all schedule shifts. " +
             "Managers may access all schedule shifts, while employees will need to be in the specified schedule's team to access this resource.")
     @ApiResponse(responseCode = "200", description = "Response with a list of schedule shifts.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ScheduleShiftResponse.class))))
@@ -49,7 +49,7 @@ public class ScheduleShiftController extends BaseController {
         return ResponseEntity.ok(scheduleShifts);
     }
 
-    @PostMapping("/user/schedules/{schedule_id}/shifts")
+    @PostMapping("/schedules/{schedule_id}/shifts")
     @Operation(summary = "Create a new schedule shift", description = "Creates a new schedule shift that is assigned to the specified schedule. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Created a new schedule shift successfully.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleShiftResponse.class)))
@@ -63,7 +63,7 @@ public class ScheduleShiftController extends BaseController {
         return ResponseEntity.ok(schedule.toResponse());
     }
 
-    @DeleteMapping("/user/shifts/{shift_id}")
+    @DeleteMapping("/shifts/{shift_id}")
     @Operation(summary = "Delete schedule shift", description = "Delete a schedule shift. This will also cascade delete employee availabilities." +
             " Authenticated user must have manager role.")
     @ApiResponse(responseCode = "204", description = "Deleted the schedule shift successfully.", content = @Content)
@@ -75,7 +75,7 @@ public class ScheduleShiftController extends BaseController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/user/shifts/{shift_id}")
+    @PatchMapping("/shifts/{shift_id}")
     @Operation(summary = "Update schedule shift", description = "Update any property of the specified shift. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Updated the schedule shift successfully.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleShiftResponse.class)))

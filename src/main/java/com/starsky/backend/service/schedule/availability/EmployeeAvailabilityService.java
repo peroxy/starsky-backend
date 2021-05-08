@@ -10,9 +10,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import java.util.List;
 
 public interface EmployeeAvailabilityService {
-    List<EmployeeAvailability> getEmployeeAvailabilities(long shiftId, User manager) throws ForbiddenException;
+    List<EmployeeAvailability> getEmployeeAvailabilities(long shiftId, User user) throws ForbiddenException;
 
-    EmployeeAvailability getEmployeeAvailability(long availabilityId, User manager) throws ResourceNotFoundException, ForbiddenException;
+    EmployeeAvailability getEmployeeAvailability(long availabilityId, User user) throws ResourceNotFoundException, ForbiddenException;
 
     EmployeeAvailability createEmployeeAvailability(long shiftId, CreateEmployeeAvailabilityRequest request, User manager) throws ResourceNotFoundException;
 

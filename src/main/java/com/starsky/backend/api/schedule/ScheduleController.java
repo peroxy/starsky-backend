@@ -35,7 +35,7 @@ public class ScheduleController extends BaseController {
     }
 
     @GetMapping("/user/schedules")
-    @Operation(summary = "Get all schedules", description = "Returns a list of all schedules created by the currently authenticated user." +
+    @Operation(summary = "Get all schedules", description = "Returns a list of all schedules." +
             " Optionally you can filter by team by supplying the query parameter.")
     @ApiResponse(responseCode = "200", description = "Response with a list of schedules.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ScheduleResponse.class))))

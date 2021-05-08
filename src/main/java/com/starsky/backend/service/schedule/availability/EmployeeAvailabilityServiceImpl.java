@@ -14,12 +14,12 @@ import java.util.List;
 @Service
 public class EmployeeAvailabilityServiceImpl implements EmployeeAvailabilityService {
     @Override
-    public List<EmployeeAvailability> getEmployeeAvailabilities(long shiftId, User manager) throws ForbiddenException {
+    public List<EmployeeAvailability> getEmployeeAvailabilities(long shiftId, User user) throws ForbiddenException {
         throw new NotImplementedException();
     }
 
     @Override
-    public EmployeeAvailability getEmployeeAvailability(long availabilityId, User manager) throws ResourceNotFoundException, ForbiddenException {
+    public EmployeeAvailability getEmployeeAvailability(long availabilityId, User user) throws ResourceNotFoundException, ForbiddenException {
         throw new NotImplementedException();
     }
 
