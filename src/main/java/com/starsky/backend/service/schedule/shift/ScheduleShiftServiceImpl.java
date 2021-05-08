@@ -53,6 +53,29 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
     }
 
     @Override
+    public ScheduleShift getScheduleShift(long shiftId, User user) throws ForbiddenException, ResourceNotFoundException {
+        User manager = user;
+        if (user.getRole() == Role.EMPLOYEE) {
+            manager = user.getParentUser();
+        }
+
+        User finalManager = manager; //lol java
+        var scheduleShift = scheduleShiftRepository.getByIdAndScheduleTeamOwner(shiftId, manager).orElseThrow(() -> {
+            return getShiftDoesNotExistException(shiftId, finalManager);
+        });
+
+        if (user.getRole() == Role.EMPLOYEE && teamService.getTeams(user).stream().noneMatch(team -> team.getId() == scheduleShift.getSchedule().getTeam().getId())) {
+            var message =
+                    "Authenticated user (id=%d) does not have necessary permissions to access this schedule's shifts - does not belong to schedule's team."
+                            .formatted(user.getId());
+            this.logger.warn(message);
+            throw new ForbiddenException(message);
+        }
+
+        return scheduleShift;
+    }
+
+    @Override
     public ScheduleShift createScheduleShift(long scheduleId, CreateScheduleShiftRequest shiftRequest, User manager) throws DateRangeException, ForbiddenException {
         dateRangeValidator.validateDateInterval(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd());
         var schedule = scheduleService.getSchedule(scheduleId, manager); // will throw resource not found if it doesn't exist

@@ -1,6 +1,7 @@
 package com.starsky.backend.api.schedule.availability;
 
 import com.starsky.backend.api.BaseController;
+import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
 import com.starsky.backend.api.exception.ForbiddenResponse;
 import com.starsky.backend.domain.schedule.EmployeeAvailability;
@@ -72,7 +73,7 @@ public class EmployeeAvailabilityController extends BaseController {
     @ApiResponse(responseCode = "404", description = "Shift does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid employee availability date range (start timestamp occurs after end timestamp).", content = @Content)
     public ResponseEntity<EmployeeAvailabilityResponse> createEmployeeAvailability(@Valid @RequestBody CreateEmployeeAvailabilityRequest request,
-                                                                                   @PathVariable(value = "shift_id") long shiftId) {
+                                                                                   @PathVariable(value = "shift_id") long shiftId) throws ForbiddenException, DateRangeException {
         var user = getAuthenticatedUser();
         var employeeAvailability = employeeAvailabilityService.createEmployeeAvailability(shiftId, request, user);
         return ResponseEntity.ok(employeeAvailability.toResponse());
@@ -90,7 +91,8 @@ public class EmployeeAvailabilityController extends BaseController {
     }
 
     @PatchMapping("/availabilities/{availability_id}")
-    @Operation(summary = "Update employee availability", description = "Update any property of the specified employee availability. Authenticated user must have manager role.")
+    @Operation(summary = "Update employee availability", description = "Update any property (except actual employee) of the specified employee availability. " +
+            "Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Updated the employee availability successfully.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EmployeeAvailabilityResponse.class)))
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
@@ -98,7 +100,7 @@ public class EmployeeAvailabilityController extends BaseController {
     @ApiResponse(responseCode = "404", description = "Employee availability does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid date range (start timestamp occurs after end timestamp).", content = @Content)
     public ResponseEntity<EmployeeAvailabilityResponse> updateEmployeeAvailability(@PathVariable("availability_id") long availabilityId,
-                                                                                   @Valid @RequestBody UpdateEmployeeAvailabilityRequest request) {
+                                                                                   @Valid @RequestBody UpdateEmployeeAvailabilityRequest request) throws DateRangeException {
         var user = getAuthenticatedUser();
         var employeeAvailability = employeeAvailabilityService.updateEmployeeAvailability(availabilityId, request, user);
         return ResponseEntity.ok(employeeAvailability.toResponse());

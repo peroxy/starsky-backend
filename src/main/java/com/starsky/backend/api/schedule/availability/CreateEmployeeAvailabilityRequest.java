@@ -21,11 +21,20 @@ public class CreateEmployeeAvailabilityRequest {
     @Schema(example = "8", title = "Maximum hours per shift")
     @Min(1)
     private final int maxHoursPerShift;
+    @NotNull
+    @JsonProperty("employee_id")
+    @Schema(example = "1")
+    private final int employeeId;
 
-    public CreateEmployeeAvailabilityRequest(Instant availabilityStart, Instant availabilityEnd, int maxHoursPerShift) {
+    public CreateEmployeeAvailabilityRequest(Instant availabilityStart, Instant availabilityEnd, int maxHoursPerShift, int employeeId) {
         this.availabilityStart = availabilityStart;
         this.availabilityEnd = availabilityEnd;
         this.maxHoursPerShift = maxHoursPerShift;
+        this.employeeId = employeeId;
+    }
+
+    public int getEmployeeId() {
+        return employeeId;
     }
 
     public Instant getAvailabilityStart() {

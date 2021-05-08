@@ -91,6 +91,6 @@ public class EmployeeAvailability extends BaseEntity {
     }
 
     public EmployeeAvailabilityResponse toResponse() {
-        return new EmployeeAvailabilityResponse(id, availabilityStart, availabilityEnd, maxHoursPerShift);
+        return new EmployeeAvailabilityResponse(id, availabilityStart, availabilityEnd, maxHoursPerShift, getEmployee().getId());
     }
 }

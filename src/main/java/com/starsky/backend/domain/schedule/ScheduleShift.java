@@ -25,7 +25,6 @@ public class ScheduleShift extends BaseEntity {
     private List<EmployeeAvailability> employeeAvailabilities;
     @NotNull
     private int numberOfRequiredEmployees;
-
     public ScheduleShift(@NotNull Instant shiftStart,
                          @NotNull Instant shiftEnd,
                          @NotNull Schedule schedule,
@@ -37,6 +36,10 @@ public class ScheduleShift extends BaseEntity {
     }
 
     public ScheduleShift() {
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Instant getShiftStart() {
@@ -73,5 +76,9 @@ public class ScheduleShift extends BaseEntity {
 
     public ScheduleShiftResponse toResponse() {
         return new ScheduleShiftResponse(id, shiftStart, shiftEnd, numberOfRequiredEmployees);
+    }
+
+    public List<EmployeeAvailability> getEmployeeAvailabilities() {
+        return employeeAvailabilities;
     }
 }

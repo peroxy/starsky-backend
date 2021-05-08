@@ -11,7 +11,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import java.util.List;
 
 public interface ScheduleShiftService {
-    List<ScheduleShift> getScheduleShifts(long scheduleId, User manager) throws ForbiddenException;
+    List<ScheduleShift> getScheduleShifts(long scheduleId, User user) throws ForbiddenException;
+
+    ScheduleShift getScheduleShift(long shiftId, User user) throws ForbiddenException, ResourceNotFoundException;
 
     ScheduleShift createScheduleShift(long scheduleId, CreateScheduleShiftRequest shiftRequest, User manager) throws DateRangeException, ForbiddenException;
 
