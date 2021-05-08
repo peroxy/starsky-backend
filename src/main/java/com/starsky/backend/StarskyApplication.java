@@ -197,8 +197,8 @@ public class StarskyApplication {
                 scheduleShiftRepository.saveAll(scheduleShifts);
 
                 List<EmployeeAvailability> availabilities = new ArrayList<>();
-                for (var employee : users.subList(7, users.size() - 1)) {
-                    for (var shift : scheduleShifts) {
+                for (var employee : users.subList(7, users.size())) { //lol java toIndex is exclusive? chofl my dude, size - 1 UGH don't do it
+                    for (var shift : scheduleShifts.subList(0, 5)) {
                         availabilities.add(new EmployeeAvailability(employee, shift, shift.getShiftStart(), shift.getShiftEnd(), 8));
                     }
                 }

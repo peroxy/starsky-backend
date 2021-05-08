@@ -49,6 +49,20 @@ public class ScheduleShiftController extends BaseController {
         return ResponseEntity.ok(scheduleShifts);
     }
 
+    @GetMapping("/shifts/{shift_id}")
+    @Operation(summary = "Get schedule shift", description = "Returns the specified schedule shifts. " +
+            "Managers may access all schedule shifts, while employees will need to be in the specified schedule's team to access this resource.")
+    @ApiResponse(responseCode = "200", description = "Response with the schedule shifts.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleShiftResponse.class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have necessary permissions to access the schedule.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ForbiddenResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Shift does not exist.", content = @Content)
+    public ResponseEntity<ScheduleShiftResponse> getScheduleShift(@PathVariable(value = "shift_id") long shiftId) throws ForbiddenException {
+        var user = getAuthenticatedUser();
+        var scheduleShift = scheduleShiftService.getScheduleShift(shiftId, user).toResponse();
+        return ResponseEntity.ok(scheduleShift);
+    }
+
     @PostMapping("/schedules/{schedule_id}/shifts")
     @Operation(summary = "Create a new schedule shift", description = "Creates a new schedule shift that is assigned to the specified schedule. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Created a new schedule shift successfully.",
