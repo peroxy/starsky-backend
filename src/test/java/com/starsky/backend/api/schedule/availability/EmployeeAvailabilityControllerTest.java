@@ -380,6 +380,12 @@ public class EmployeeAvailabilityControllerTest extends TestJwtProvider {
                 .andExpect(status().isUnprocessableEntity());
     }
 
+    @Test
+    @DirtiesContext
+    public void shouldGetUnprocessableEntityWhenUpdatingOverlappingAvailability() throws Exception {
+        //TODO
+    }
+
 
 }
 
