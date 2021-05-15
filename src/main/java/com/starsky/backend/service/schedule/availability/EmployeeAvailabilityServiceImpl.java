@@ -65,8 +65,32 @@ public class EmployeeAvailabilityServiceImpl implements EmployeeAvailabilityServ
         var shift = scheduleShiftService.getScheduleShift(shiftId, manager);
         var employee = userService.getEmployeeById(request.getEmployeeId(), manager);
         var availability = new EmployeeAvailability(employee, shift, request.getAvailabilityStart(), request.getAvailabilityEnd(), request.getMaxHoursPerShift());
+
+        checkIfDateIntervalExistsOrOverlaps(availability);
+
         availability = employeeAvailabilityRepository.save(availability);
         return availability;
+    }
+
+    private void checkIfDateIntervalExistsOrOverlaps(EmployeeAvailability availability) throws DateRangeException {
+        List<EmployeeAvailability> existing = employeeAvailabilityRepository.findAllByEmployeeIdAndShiftIdAndAvailabilityBetween(
+                availability.getEmployee().getId(),
+                availability.getShift().getId(),
+                availability.getAvailabilityStart(),
+                availability.getAvailabilityEnd());
+
+        for (var existingAvailability : existing) {
+            if (!existingAvailability.getId().equals(availability.getId())) {
+                throw new DateRangeException(
+                        "Employee (id=%d) availability (id=%d) date range (from %s to %s) already exists or overlaps with another availability for this shift (id=%d)"
+                                .formatted(availability.getEmployee().getId(),
+                                        existingAvailability.getId(),
+                                        existingAvailability.getAvailabilityStart(),
+                                        existingAvailability.getAvailabilityEnd(),
+                                        availability.getShift().getId()));
+            }
+        }
+
     }
 
     @Override
@@ -93,6 +117,8 @@ public class EmployeeAvailabilityServiceImpl implements EmployeeAvailabilityServ
         }
 
         dateRangeValidator.validateDateInterval(availability.getAvailabilityStart(), availability.getAvailabilityEnd());
+        checkIfDateIntervalExistsOrOverlaps(availability);
+
         return employeeAvailabilityRepository.save(availability);
     }
 

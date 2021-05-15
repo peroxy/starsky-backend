@@ -71,7 +71,8 @@ public class EmployeeAvailabilityController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Shift does not exist.", content = @Content)
-    @ApiResponse(responseCode = "422", description = "Invalid employee availability date range (start timestamp occurs after end timestamp).", content = @Content)
+    @ApiResponse(responseCode = "422", description =
+            "Invalid employee availability date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing availability..", content = @Content)
     public ResponseEntity<EmployeeAvailabilityResponse> createEmployeeAvailability(@Valid @RequestBody CreateEmployeeAvailabilityRequest request,
                                                                                    @PathVariable(value = "shift_id") long shiftId) throws ForbiddenException, DateRangeException {
         var user = getAuthenticatedUser();
@@ -98,7 +99,8 @@ public class EmployeeAvailabilityController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Employee availability does not exist.", content = @Content)
-    @ApiResponse(responseCode = "422", description = "Invalid date range (start timestamp occurs after end timestamp).", content = @Content)
+    @ApiResponse(responseCode = "422", description =
+            "Invalid employee availability date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing availability..", content = @Content)
     public ResponseEntity<EmployeeAvailabilityResponse> updateEmployeeAvailability(@PathVariable("availability_id") long availabilityId,
                                                                                    @Valid @RequestBody UpdateEmployeeAvailabilityRequest request) throws DateRangeException {
         var user = getAuthenticatedUser();

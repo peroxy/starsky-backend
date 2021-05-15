@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -342,6 +343,41 @@ public class EmployeeAvailabilityControllerTest extends TestJwtProvider {
         var start = end.plus(Duration.ofHours(5));
         var maxHours = 6;
         return new UpdateEmployeeAvailabilityRequest(start, end, maxHours);
+    }
+
+    @Test
+    @DirtiesContext
+    public void shouldGetUnprocessableEntityWhenCreatingOverlappingAvailability() throws Exception {
+        var request = getEmployeeAvailabilityRequest();
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/user/shifts/%d/availabilities".formatted(shiftWithoutAvailabilities.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var availabilityResponse = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeAvailabilityResponse.class);
+        Assertions.assertEquals(request.getAvailabilityStart(), availabilityResponse.getAvailabilityStart());
+        Assertions.assertEquals(request.getAvailabilityEnd(), availabilityResponse.getAvailabilityEnd());
+        Assertions.assertEquals(request.getMaxHoursPerShift(), availabilityResponse.getMaxHoursPerShift());
+        Assertions.assertEquals(request.getEmployeeId(), availabilityResponse.getEmployeeId());
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/shifts/%d/availabilities".formatted(shiftWithoutAvailabilities.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+
+        var start = Instant.now().plus(Duration.ofHours(2));
+        var end = start.plus(Duration.ofHours(4));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/user/shifts/%d/availabilities".formatted(shiftWithoutAvailabilities.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CreateEmployeeAvailabilityRequest(start, end, 8, 8)))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
     }
 
 
