@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -114,5 +115,17 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public List<Invite> getAllManagerInvites(User manager) {
         return inviteRepository.findAllByManager(manager);
+    }
+
+    @Override
+    public void deleteInvite(long id, User manager) throws ResourceNotFoundException {
+        var invite = inviteRepository.findByIdAndManager(id, manager).orElseThrow(() -> getInviteNotFoundException(id, manager));
+        inviteRepository.delete(invite);
+    }
+
+    private ResourceNotFoundException getInviteNotFoundException(long inviteId, User manager) {
+        var message = "Schedule shift (id=%d, owner=%d) does not exist.".formatted(inviteId, manager.getId());
+        this.logger.warn(message);
+        return new ResourceNotFoundException(message);
     }
 }

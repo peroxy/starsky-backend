@@ -3,6 +3,7 @@ package com.starsky.backend.service.invite;
 import com.starsky.backend.api.invite.CreateInviteRequest;
 import com.starsky.backend.domain.invite.Invite;
 import com.starsky.backend.domain.user.User;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface InviteService {
     InviteValidation validateInvite(Invite invite);
 
     List<Invite> getAllManagerInvites(User manager);
+
+    void deleteInvite(long id, User manager) throws ResourceNotFoundException;
 }

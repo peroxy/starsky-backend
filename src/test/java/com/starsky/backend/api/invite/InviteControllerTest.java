@@ -59,6 +59,43 @@ public class InviteControllerTest extends TestJwtProvider {
     }
 
     @Test
+    public void shouldSendAndDeleteInvite() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.post("/user/invites")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader())
+                .content(objectMapper.writeValueAsString(new CreateInviteRequest("David Starsky", "test1@test2.net"))))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var inviteResponse = objectMapper.readValue(result.getResponse().getContentAsString(), InviteResponse.class);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/invites/%d".formatted(inviteResponse.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
+
+    @Test
+    public void shouldGetNotFoundWhenDeletingNonExistentInvite() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/invites/545872983")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void employeeShouldGetForbiddenWhenDeleting() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/invites/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getEmployeeJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("Should get existing invite")
     public void testGetInvite() throws Exception {
         var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/invites")
