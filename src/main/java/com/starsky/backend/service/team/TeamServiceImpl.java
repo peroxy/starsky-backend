@@ -1,5 +1,6 @@
 package com.starsky.backend.service.team;
 
+import com.starsky.backend.api.team.UpdateTeamRequest;
 import com.starsky.backend.domain.team.Team;
 import com.starsky.backend.domain.team.TeamMember;
 import com.starsky.backend.domain.user.Role;
@@ -43,13 +44,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Team getTeam(long id, User owner) throws ResourceNotFoundException {
-        var team = teamRepository.findByIdAndOwnerId(id, owner.getId());
-        if (team.isPresent()) {
-            return team.get();
-        }
-        var error = "Team (id=%d, owner=%d) does not exist.".formatted(id, owner.getId());
-        this.logger.warn(error);
-        throw new ResourceNotFoundException(error);
+        return teamRepository.findByIdAndOwnerId(id, owner.getId()).orElseThrow(() -> {
+            var error = "Team (id=%d, owner=%d) does not exist.".formatted(id, owner.getId());
+            this.logger.warn(error);
+            return new ResourceNotFoundException(error);
+        });
     }
 
 
@@ -91,5 +90,31 @@ public class TeamServiceImpl implements TeamService {
         }
         var teamMember = new TeamMember(member, team);
         return teamMemberRepository.save(teamMember);
+    }
+
+    @Override
+    public Team updateTeam(long teamId, UpdateTeamRequest request, User owner) throws ResourceNotFoundException {
+        var team = getTeam(teamId, owner);
+        if (request.getName().isPresent()) {
+            team.setName(request.getName().get());
+        }
+        return teamRepository.save(team);
+    }
+
+    @Override
+    public void deleteTeam(long teamId, User owner) throws ResourceNotFoundException {
+        var team = getTeam(teamId, owner);
+        teamRepository.delete(team);
+    }
+
+    @Override
+    public void deleteTeamMember(long teamId, long employeeId, User owner) throws ResourceNotFoundException {
+        var members = getTeamMembers(teamId, owner);
+        var member = members.stream().filter(teamMember -> teamMember.getMember().getId() == employeeId).findAny().orElseThrow(() -> {
+            var error = "Team member (user id=%d) does not exist in team (id=%d).".formatted(employeeId, teamId);
+            this.logger.warn(error);
+            return new ResourceNotFoundException(error);
+        });
+        teamMemberRepository.delete(member);
     }
 }

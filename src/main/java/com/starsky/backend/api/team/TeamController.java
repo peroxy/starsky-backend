@@ -84,4 +84,41 @@ public class TeamController extends BaseController {
         var teamMember = teamService.createTeamMember(employee, team);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/{team_id}")
+    @Operation(summary = "Delete team", description = "Deletes the team. This will also cascade delete team members." +
+            " Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "204", description = "Deleted the team successfully.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Team does not exist.", content = @Content)
+    public ResponseEntity<Void> deleteTeam(@PathVariable("team_id") long teamId) {
+        var user = getAuthenticatedUser();
+        teamService.deleteTeam(teamId, user);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{team_id}/members/{user_id}")
+    @Operation(summary = "Delete team member", description = "Deletes the team member from the team. Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "204", description = "Deleted the team member successfully.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Team or team member does not exist.", content = @Content)
+    public ResponseEntity<Void> deleteTeamMember(@PathVariable("team_id") long teamId, @PathVariable("user_id") long employeeId) {
+        var user = getAuthenticatedUser();
+        teamService.deleteTeamMember(teamId, employeeId, user);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{team_id}")
+    @Operation(summary = "Update team", description = "Update the specified team. Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "200", description = "Updated the team successfully.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Team does not exist.", content = @Content)
+    public ResponseEntity<TeamResponse> updateTeam(@PathVariable("team_id") long teamId, @Valid @RequestBody UpdateTeamRequest request) {
+        var user = getAuthenticatedUser();
+        var team = teamService.updateTeam(teamId, request, user);
+        return ResponseEntity.ok(team.toResponse());
+    }
+
 }

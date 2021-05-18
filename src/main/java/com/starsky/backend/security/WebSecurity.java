@@ -51,13 +51,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PATCH,
                         "/user/schedules/{schedule_id}",
                         "/user/shifts/{shift_id}",
-                        "/user/availabilities/{availability_id}"
+                        "/user/availabilities/{availability_id}",
+                        "/user/teams/{team_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.DELETE,
                         "/user/schedules/{schedule_id}",
                         "/user/shifts/{shift_id}",
                         "/user/availabilities/{availability_id}",
-                        "/user/invites/{invite_id}"
+                        "/user/invites/{invite_id}",
+                        "/user/teams/{team_id}",
+                        "/user/teams/{team_id}/members/{user_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET,
                         "/user/invites",

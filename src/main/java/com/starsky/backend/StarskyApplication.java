@@ -150,7 +150,7 @@ public class StarskyApplication {
 
                 inviteRepository.saveAll(invites);
 
-                var today = Instant.now().truncatedTo(ChronoUnit.DAYS);
+                var today = Instant.now().minus(Duration.ofDays(50)).truncatedTo(ChronoUnit.DAYS);
                 var yesterday = today.minus(Duration.ofDays(1));
                 List<Schedule> schedules = Arrays.asList(
                         new Schedule("Test schedule 1", today, today.plus(Duration.ofDays(5)), teams.get(3), 40, 5, 8),
