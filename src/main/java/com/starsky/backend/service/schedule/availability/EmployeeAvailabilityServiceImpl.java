@@ -90,7 +90,6 @@ public class EmployeeAvailabilityServiceImpl implements EmployeeAvailabilityServ
                                         availability.getShift().getId()));
             }
         }
-
     }
 
     @Override

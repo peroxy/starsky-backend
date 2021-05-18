@@ -80,6 +80,7 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
         dateRangeValidator.validateDateInterval(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd());
         var schedule = scheduleService.getSchedule(scheduleId, manager); // will throw resource not found if it doesn't exist
         var scheduleShift = new ScheduleShift(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd(), schedule, shiftRequest.getNumberOfRequiredEmployees());
+        checkIfDateIntervalExistsOrOverlaps(scheduleShift);
         scheduleShift = scheduleShiftRepository.save(scheduleShift);
         return scheduleShift;
     }
@@ -108,6 +109,7 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
             scheduleShift.setNumberOfRequiredEmployees(request.getNumberOfRequiredEmployees().get());
         }
         dateRangeValidator.validateDateInterval(scheduleShift.getShiftStart(), scheduleShift.getShiftEnd());
+        checkIfDateIntervalExistsOrOverlaps(scheduleShift);
         return scheduleShiftRepository.save(scheduleShift);
     }
 
@@ -115,5 +117,19 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
         var message = "Schedule shift (id=%d, owner=%d) does not exist.".formatted(shiftId, manager.getId());
         this.logger.warn(message);
         return new ResourceNotFoundException(message);
+    }
+
+    private void checkIfDateIntervalExistsOrOverlaps(ScheduleShift shift) throws DateRangeException {
+        var existing = scheduleShiftRepository.findAllByScheduleIdAndShiftBetween(shift.getSchedule().getId(), shift.getShiftStart(), shift.getShiftEnd());
+        for (var existingShift : existing) {
+            if (!existingShift.getId().equals(shift.getId())) {
+                throw new DateRangeException(
+                        "Schedule shift (id=%d) date range (from %s to %s) already exists or overlaps with another shift for this schedule (id=%d)"
+                                .formatted(existingShift.getId(),
+                                        existingShift.getShiftStart(),
+                                        existingShift.getShiftEnd(),
+                                        existingShift.getSchedule().getId()));
+            }
+        }
     }
 }

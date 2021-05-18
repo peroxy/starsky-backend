@@ -4,6 +4,7 @@ import com.starsky.backend.domain.BaseEntity;
 import com.starsky.backend.domain.user.User;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class TeamMember extends BaseEntity {
@@ -14,7 +15,8 @@ public class TeamMember extends BaseEntity {
     private long id;
     @OneToOne
     private User member;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
     private Team team;
 
     public TeamMember() {

@@ -6,6 +6,7 @@ import com.starsky.backend.domain.user.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 public class Team extends BaseEntity {
@@ -19,6 +20,8 @@ public class Team extends BaseEntity {
     @OneToOne
     @NotNull
     private User owner;
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamMember> teamMembers;
 
     public Team(@NotNull String name, @NotNull User owner) {
         this.name = name;

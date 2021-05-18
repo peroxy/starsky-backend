@@ -21,8 +21,7 @@ public interface EmployeeAvailabilityRepository extends JpaRepository<EmployeeAv
             "where ea.employee_id = :employee_id " +
             "and ss.id = :shift_id " +
             "and (:availability_start >= ea.availability_start and :availability_start <= ea.availability_end " +
-            "or ea.availability_start >= :availability_end and ea.availability_end <= :availability_end) " +
-            "limit 1",
+            "or ea.availability_start >= :availability_end and ea.availability_end <= :availability_end)",
             nativeQuery = true)
     List<EmployeeAvailability> findAllByEmployeeIdAndShiftIdAndAvailabilityBetween(@Param("employee_id") long employeeId,
                                                                                    @Param("shift_id") long shiftId,
