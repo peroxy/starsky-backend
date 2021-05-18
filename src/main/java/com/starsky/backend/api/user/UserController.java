@@ -54,5 +54,19 @@ public class UserController extends BaseController {
         return ResponseEntity.ok(user.toResponse());
     }
 
+    @PatchMapping("/user")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Update user", description = "Update specified properties of the currently authenticated user.")
+    @ApiResponse(responseCode = "200", description = "Updated the user successfully.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated.", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
+    public ResponseEntity<UserResponse> updateSchedule(@Valid @RequestBody UpdateUserRequest request) {
+        var user = getAuthenticatedUser();
+        user = userService.updateUser(user, request);
+        return ResponseEntity.ok(user.toResponse());
+    }
+
 }
 

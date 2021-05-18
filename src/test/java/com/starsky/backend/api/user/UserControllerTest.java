@@ -123,6 +123,83 @@ public class UserControllerTest extends TestJwtProvider {
     }
 
     @Test
+    @Transactional
+    public void shouldUpdateUser() throws Exception {
+        var request = new UpdateUserRequest("New name", "new@email.com", "new password", "new job title");
+        var result = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/user")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var userResponse = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class);
+        Assertions.assertEquals(request.getEmail().get(), userResponse.getEmail());
+        Assertions.assertEquals(request.getName().get(), userResponse.getName());
+        Assertions.assertEquals(request.getJobTitle().get(), userResponse.getJobTitle());
+        Assertions.assertEquals("MANAGER", userResponse.getRole());
+        Assertions.assertEquals("EMAIL", userResponse.getNotificationType());
+        Assertions.assertNull(userResponse.getPhoneNumber());
+    }
+
+    @Test
+    public void shouldGetBadRequestWhenUpdatingUser() throws Exception {
+        var request = new UpdateUserRequest("New name", "invalid email", "new password", "new job title");
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        request = new UpdateUserRequest("   ", "mail@asd.com", "new password", "new job title");
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        request = new UpdateUserRequest("my name", null, "short", "new job title");
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        request = new UpdateUserRequest("my name", null, "my new password", "");
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldNonAuthenticatedUserGetForbiddenWhenUpdatingUser() throws Exception {
+        var request = new UpdateUserRequest("New name", "invalid email", "new password", "new job title");
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void shouldGetConflictWhenUpdatingUserWithExistentEmail() throws Exception {
+        var request = new UpdateUserRequest(null, "t@t.com", null, null);
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
     @DisplayName("Unauthenticated user should get forbidden")
     public void testGetNonAuthenticatedUser() throws Exception {
         mockMvc.perform(
