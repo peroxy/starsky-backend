@@ -277,4 +277,167 @@ public class TeamControllerTest extends TestJwtProvider {
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @Transactional
+    public void shouldDeleteTeam() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(TEAMS_ROUTE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse[].class);
+        Assertions.assertEquals(1, response.length);
+        var team = response[0];
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/teams/%d".formatted(team.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void shouldGetNotFoundWhenDeletingTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/teams/12445564")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void employeeShouldGetForbiddenWhenDeletingTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/teams/12445564")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getEmployeeJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Transactional
+    public void shouldDeleteTeamMember() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(TEAMS_ROUTE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse[].class);
+        Assertions.assertEquals(1, response.length);
+        var team = response[0];
+
+        result = mockMvc.perform(MockMvcRequestBuilders.get("/user/teams/%d/members".formatted(team.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var membersResponse = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse[].class);
+        Assertions.assertEquals(1, membersResponse.length);
+        var teamMember = membersResponse[0];
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/teams/%d/members/%d".formatted(team.getId(), teamMember.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void shouldGetNotFoundWhenDeletingTeamMember() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(TEAMS_ROUTE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse[].class);
+        Assertions.assertEquals(1, response.length);
+        var team = response[0];
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/teams/12334/members/48582")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/teams/%d/members/34834578".formatted(team.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void employeeShouldGetForbiddenWhenDeletingTeamMember() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/user/teams/1/members/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getEmployeeJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void employeeShouldGetForbiddenWhenUpdatingTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/teams/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getEmployeeJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Transactional
+    public void shouldUpdateTeam() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(TEAMS_ROUTE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse[].class);
+        Assertions.assertEquals(1, response.length);
+        var team = response[0];
+
+        var request = new UpdateTeamRequest("new team name");
+        result = mockMvc.perform(MockMvcRequestBuilders.patch("/user/teams/%d".formatted(team.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var updatedTeam = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse.class);
+        Assertions.assertEquals(request.getName().get(), updatedTeam.getName());
+    }
+
+    @Test
+    public void shouldGetBadRequestWhenUpdatingTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/teams/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("i am not a valid json")
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/teams/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new UpdateTeamRequest("     ")))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldGetNotFoundWhenUpdatingTeam() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch("/user/teams/154987534789345789")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new UpdateTeamRequest("new name")))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+    }
 }

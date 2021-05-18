@@ -8,10 +8,13 @@ import java.util.Optional;
 public class UpdateTeamRequest {
     @NullOrNotBlank
     @Schema(example = "My Police Squad", title = "Team name")
-    private final String name;
+    private String name;
 
     public UpdateTeamRequest(String name) {
         this.name = name;
+    }
+
+    public UpdateTeamRequest() {
     }
 
     public Optional<String> getName() {
