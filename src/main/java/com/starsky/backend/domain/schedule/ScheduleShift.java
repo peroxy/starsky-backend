@@ -23,8 +23,11 @@ public class ScheduleShift extends BaseEntity {
     private Schedule schedule;
     @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmployeeAvailability> employeeAvailabilities;
+    @OneToMany(mappedBy = "shift", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmployeeAssignment> employeeAssignments;
     @NotNull
     private int numberOfRequiredEmployees;
+
     public ScheduleShift(@NotNull Instant shiftStart,
                          @NotNull Instant shiftEnd,
                          @NotNull Schedule schedule,
@@ -80,5 +83,9 @@ public class ScheduleShift extends BaseEntity {
 
     public List<EmployeeAvailability> getEmployeeAvailabilities() {
         return employeeAvailabilities;
+    }
+
+    public List<EmployeeAssignment> getEmployeeAssignments() {
+        return employeeAssignments;
     }
 }
