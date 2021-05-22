@@ -1,6 +1,10 @@
 package com.starsky.backend.api.schedule.assignment;
 
 import com.starsky.backend.api.BaseController;
+import com.starsky.backend.api.exception.DateRangeException;
+import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.domain.schedule.EmployeeAssignment;
+import com.starsky.backend.service.schedule.assignment.EmployeeAssignmentService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -9,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +25,11 @@ import java.util.List;
 @Tag(name = "Employee assignment", description = "Endpoints for schedule shift employee assignments")
 @SecurityRequirement(name = "bearerAuth")
 public class EmployeeAssignmentController extends BaseController {
-    public EmployeeAssignmentController(UserService userService) {
+    private final EmployeeAssignmentService employeeAssignmentService;
+
+    public EmployeeAssignmentController(UserService userService, EmployeeAssignmentService employeeAssignmentService) {
         super(userService);
+        this.employeeAssignmentService = employeeAssignmentService;
     }
 
     @PutMapping
@@ -36,11 +42,10 @@ public class EmployeeAssignmentController extends BaseController {
     @ApiResponse(responseCode = "404", description = "Schedule, shift or employee does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description =
             "Invalid employee assignment date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing assignment..", content = @Content)
-    public ResponseEntity<Void> createEmployeeAssignment(@Valid @RequestBody List<CreateEmployeeAssignmentRequest> requests, @PathVariable(value = "schedule_id") long scheduleId) {
+    public ResponseEntity<Void> createEmployeeAssignment(@Valid @RequestBody List<CreateEmployeeAssignmentRequest> requests, @PathVariable(value = "schedule_id") long scheduleId) throws ForbiddenException, DateRangeException {
         var user = getAuthenticatedUser();
-        throw new NotImplementedException();
-//        var employeeAvailability = employeeAvailabilityService.createEmployeeAvailability(shiftId, request, user);
-        //return ResponseEntity.noContent().build();
+        employeeAssignmentService.putAll(requests, scheduleId, user);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
@@ -49,11 +54,12 @@ public class EmployeeAssignmentController extends BaseController {
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = EmployeeAssignmentResponse.class))))
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
-    public ResponseEntity<EmployeeAssignmentResponse[]> getEmployeeAssignments(@PathVariable(value = "schedule_id") long scheduleId) {
+    public ResponseEntity<EmployeeAssignmentResponse[]> getEmployeeAssignments(@PathVariable(value = "schedule_id") long scheduleId) throws ForbiddenException {
         var user = getAuthenticatedUser();
-        throw new NotImplementedException();
-//        var employeeAvailability = employeeAvailabilityService.createEmployeeAvailability(shiftId, request, user);
-        //return ResponseEntity.ok(null);
+        var assignments = employeeAssignmentService.getAll(scheduleId, user)
+                .stream().map(EmployeeAssignment::toResponse)
+                .toArray(EmployeeAssignmentResponse[]::new);
+        return ResponseEntity.ok(assignments);
     }
 
 }

@@ -58,6 +58,10 @@ public class Team extends BaseEntity {
     public TeamResponse toResponse() {
         return new TeamResponse(id, name, owner.getName());
     }
+
+    public List<TeamMember> getTeamMembers() {
+        return teamMembers;
+    }
 }
 
 

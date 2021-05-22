@@ -125,4 +125,7 @@ public class Schedule extends BaseEntity {
         return new ScheduleResponse(id, name, scheduleStart, scheduleEnd, team.getId(), maxHoursPerEmployee, maxShiftsPerEmployee, maxHoursPerShift);
     }
 
+    public List<ScheduleShift> getShifts() {
+        return shifts;
+    }
 }
