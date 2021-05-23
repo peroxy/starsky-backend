@@ -64,6 +64,16 @@ public class EmployeeAssignmentServiceImpl implements EmployeeAssignmentService 
 
             dateRangeValidator.validateDateInterval(request.getAssignmentStart(), request.getAssignmentEnd());
 
+            if (request.getAssignmentStart().isBefore(shift.getShiftStart()) ||
+                    request.getAssignmentStart().isAfter(shift.getShiftEnd()) ||
+                    request.getAssignmentEnd().isBefore(shift.getShiftStart()) ||
+                    request.getAssignmentEnd().isAfter(shift.getShiftEnd())) {
+                var error = "Employee assignment (employee id=%d) date range does not overlap with schedule shift date range (assignment (from %s to %s), shift (from %s to %s))."
+                        .formatted(request.getEmployeeId(), request.getAssignmentStart(), request.getAssignmentEnd(), shift.getShiftStart(), shift.getShiftEnd());
+                this.logger.warn(error);
+                throw new DateRangeException(error);
+            }
+
             assignments.add(new EmployeeAssignment(employee.getMember(), shift, request.getAssignmentStart(), request.getAssignmentEnd()));
         }
 
@@ -92,7 +102,6 @@ public class EmployeeAssignmentServiceImpl implements EmployeeAssignmentService 
             }
         }
     }
-
 
     private ResourceNotFoundException logAndGetResourceNotFound(String error) {
         this.logger.warn(error);
