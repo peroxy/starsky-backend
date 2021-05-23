@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.validation.ConstraintViolationException;
+
 @ControllerAdvice
 @Hidden
 class GlobalControllerExceptionHandler {
@@ -38,6 +40,11 @@ class GlobalControllerExceptionHandler {
     @ResponseBody
     public ForbiddenResponse handleForbiddenAccess(ForbiddenException ex) {
         return new ForbiddenResponse(ex.getMessage());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void handleBadListOfObjects() {
     }
 
 }

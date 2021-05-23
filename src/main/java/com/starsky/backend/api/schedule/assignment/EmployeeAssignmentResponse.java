@@ -8,6 +8,9 @@ import java.time.Instant;
 
 public class EmployeeAssignmentResponse {
     @NotNull
+    @Schema(example = "1")
+    private final long id;
+    @NotNull
     @JsonProperty("assignment_start")
     @Schema(example = "1617032176.7171679", title = "Epoch timestamp of assignment start", implementation = Double.class)
     private final Instant assignmentStart;
@@ -24,11 +27,12 @@ public class EmployeeAssignmentResponse {
     @Schema(example = "3")
     private final long shiftId;
 
-    public EmployeeAssignmentResponse(Instant assignmentStart, Instant assignmentEnd, long employeeId, long shiftId) {
+    public EmployeeAssignmentResponse(long id, Instant assignmentStart, Instant assignmentEnd, long employeeId, long shiftId) {
         this.assignmentStart = assignmentStart;
         this.assignmentEnd = assignmentEnd;
         this.employeeId = employeeId;
         this.shiftId = shiftId;
+        this.id = id;
     }
 
     public Instant getAssignmentStart() {
@@ -45,5 +49,9 @@ public class EmployeeAssignmentResponse {
 
     public long getShiftId() {
         return shiftId;
+    }
+
+    public long getId() {
+        return id;
     }
 }

@@ -18,13 +18,13 @@ public class CreateEmployeeAssignmentRequest {
     @NotNull
     @JsonProperty("employee_id")
     @Schema(example = "1")
-    private final int employeeId;
+    private final long employeeId;
     @NotNull
     @JsonProperty("shift_id")
     @Schema(example = "3")
-    private final int shiftId;
+    private final long shiftId;
 
-    public CreateEmployeeAssignmentRequest(Instant assignmentStart, Instant assignmentEnd, int employeeId, int shiftId) {
+    public CreateEmployeeAssignmentRequest(Instant assignmentStart, Instant assignmentEnd, long employeeId, long shiftId) {
         this.assignmentStart = assignmentStart;
         this.assignmentEnd = assignmentEnd;
         this.employeeId = employeeId;
@@ -39,11 +39,11 @@ public class CreateEmployeeAssignmentRequest {
         return assignmentEnd;
     }
 
-    public int getEmployeeId() {
+    public long getEmployeeId() {
         return employeeId;
     }
 
-    public int getShiftId() {
+    public long getShiftId() {
         return shiftId;
     }
 }

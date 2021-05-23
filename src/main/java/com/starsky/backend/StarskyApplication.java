@@ -2,6 +2,7 @@ package com.starsky.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.domain.invite.Invite;
+import com.starsky.backend.domain.schedule.EmployeeAssignment;
 import com.starsky.backend.domain.schedule.EmployeeAvailability;
 import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.domain.schedule.ScheduleShift;
@@ -39,6 +40,7 @@ public class StarskyApplication {
     private final ScheduleShiftRepository scheduleShiftRepository;
     private final EmployeeAvailabilityRepository employeeAvailabilityRepository;
     private final InviteRepository inviteRepository;
+    private final EmployeeAssignmentRepository employeeAssignmentRepository;
     private final Environment environment;
 
     private final Logger logger = LoggerFactory.getLogger(StarskyApplication.class);
@@ -51,6 +53,7 @@ public class StarskyApplication {
                               ScheduleShiftRepository scheduleShiftRepository,
                               EmployeeAvailabilityRepository employeeAvailabilityRepository,
                               InviteRepository inviteRepository,
+                              EmployeeAssignmentRepository employeeAssignmentRepository,
                               Environment environment) {
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
@@ -59,6 +62,7 @@ public class StarskyApplication {
         this.scheduleShiftRepository = scheduleShiftRepository;
         this.employeeAvailabilityRepository = employeeAvailabilityRepository;
         this.inviteRepository = inviteRepository;
+        this.employeeAssignmentRepository = employeeAssignmentRepository;
         this.environment = environment;
     }
 
@@ -87,6 +91,7 @@ public class StarskyApplication {
                 logger.info("Found test/dev profile");
                 logger.info("Delete all data in tables and fill with mock data...");
 
+                employeeAssignmentRepository.deleteAllInBatch();
                 employeeAvailabilityRepository.deleteAllInBatch();
                 scheduleShiftRepository.deleteAllInBatch();
                 scheduleRepository.deleteAllInBatch();
@@ -197,12 +202,15 @@ public class StarskyApplication {
                 scheduleShiftRepository.saveAll(scheduleShifts);
 
                 List<EmployeeAvailability> availabilities = new ArrayList<>();
+                List<EmployeeAssignment> assignments = new ArrayList<>();
                 for (var employee : users.subList(7, users.size())) { //lol java toIndex is exclusive? chofl my dude, size - 1 UGH don't do it
                     for (var shift : scheduleShifts.subList(0, 5)) {
                         availabilities.add(new EmployeeAvailability(employee, shift, shift.getShiftStart(), shift.getShiftEnd(), 8));
+                        assignments.add(new EmployeeAssignment(employee, shift, shift.getShiftStart(), shift.getShiftEnd()));
                     }
                 }
                 employeeAvailabilityRepository.saveAll(availabilities);
+                employeeAssignmentRepository.saveAll(assignments);
 
                 logger.info("Successfully inserted mock data");
             }

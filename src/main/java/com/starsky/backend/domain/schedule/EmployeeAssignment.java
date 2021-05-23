@@ -79,7 +79,7 @@ public class EmployeeAssignment extends BaseEntity {
     }
 
     public EmployeeAssignmentResponse toResponse() {
-        return new EmployeeAssignmentResponse(assignmentStart, assignmentEnd, employee.getId(), shift.getId());
+        return new EmployeeAssignmentResponse(id, assignmentStart, assignmentEnd, employee.getId(), shift.getId());
     }
 
 }
