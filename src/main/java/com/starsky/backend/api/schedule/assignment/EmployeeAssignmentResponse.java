@@ -1,5 +1,6 @@
 package com.starsky.backend.api.schedule.assignment;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,9 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
 public class EmployeeAssignmentResponse {
-    @NotNull
     @Schema(example = "1")
-    private final long id;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final Long id;
     @NotNull
     @JsonProperty("assignment_start")
     @Schema(example = "1617032176.7171679", title = "Epoch timestamp of assignment start", implementation = Double.class)
@@ -27,7 +28,7 @@ public class EmployeeAssignmentResponse {
     @Schema(example = "3")
     private final long shiftId;
 
-    public EmployeeAssignmentResponse(long id, Instant assignmentStart, Instant assignmentEnd, long employeeId, long shiftId) {
+    public EmployeeAssignmentResponse(Long id, Instant assignmentStart, Instant assignmentEnd, long employeeId, long shiftId) {
         this.assignmentStart = assignmentStart;
         this.assignmentEnd = assignmentEnd;
         this.employeeId = employeeId;
@@ -51,7 +52,7 @@ public class EmployeeAssignmentResponse {
         return shiftId;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 }

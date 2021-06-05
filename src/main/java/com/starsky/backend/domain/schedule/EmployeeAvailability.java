@@ -12,7 +12,7 @@ import java.time.Instant;
 public class EmployeeAvailability extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employee-availability-id-generator")
-    @SequenceGenerator(name = "employee-availability-id-generator", sequenceName = "employee_availability_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "employee-availability-id-generator", sequenceName = "employee_availability_sequence")
     private Long id;
     @OneToOne
     @NotNull

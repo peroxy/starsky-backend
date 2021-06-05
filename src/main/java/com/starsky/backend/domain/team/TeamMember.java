@@ -11,7 +11,7 @@ public class TeamMember extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "team-member-id-generator")
-    @SequenceGenerator(name = "team-member-id-generator", sequenceName = "team_member_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "team-member-id-generator", sequenceName = "team_member_sequence")
     private long id;
     @OneToOne
     private User member;

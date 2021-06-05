@@ -12,7 +12,7 @@ import java.util.List;
 public class ScheduleShift extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedule-shift-id-generator")
-    @SequenceGenerator(name = "schedule-shift-id-generator", sequenceName = "schedule_shift_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "schedule-shift-id-generator", sequenceName = "schedule_shift_sequence")
     private Long id;
     @NotNull
     private Instant shiftStart;

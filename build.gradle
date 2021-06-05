@@ -18,9 +18,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'com.auth0:java-jwt:3.4.0'
     implementation 'org.springframework.session:spring-session-core'
+    implementation 'org.optaplanner:optaplanner-spring-boot-starter:8.6.0.Final'
+
     implementation 'org.springdoc:springdoc-openapi-ui:1.5.2'
+    implementation 'com.auth0:java-jwt:3.4.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.2'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -29,6 +31,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'com.h2database:h2:1.4.200'
+    testImplementation 'org.optaplanner:optaplanner-test:8.6.0.Final'
 
 }
 

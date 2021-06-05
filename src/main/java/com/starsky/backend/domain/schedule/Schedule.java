@@ -14,7 +14,7 @@ import java.util.List;
 public class Schedule extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedule-id-generator")
-    @SequenceGenerator(name = "schedule-id-generator", sequenceName = "schedule_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "schedule-id-generator", sequenceName = "schedule_sequence")
     private Long id;
     @NotNull
     private String name;

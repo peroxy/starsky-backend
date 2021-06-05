@@ -15,7 +15,7 @@ public class Invite extends BaseEntity {
     private static final Duration expireAfter = Duration.ofDays(3);
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "invite-id-generator")
-    @SequenceGenerator(name = "invite-id-generator", sequenceName = "invite_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "invite-id-generator", sequenceName = "invite_sequence")
     private long id;
     @NotNull
     private UUID token;

@@ -3,8 +3,11 @@ package com.starsky.backend.api.schedule;
 import com.starsky.backend.api.BaseController;
 import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.schedule.assignment.EmployeeAssignmentResponse;
+import com.starsky.backend.domain.schedule.EmployeeAssignment;
 import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.service.schedule.ScheduleService;
+import com.starsky.backend.service.schedule.solve.ScheduleSolveService;
 import com.starsky.backend.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -27,11 +30,13 @@ import java.util.Optional;
 @SecurityRequirement(name = "bearerAuth")
 public class ScheduleController extends BaseController {
     private final ScheduleService scheduleService;
+    private final ScheduleSolveService scheduleSolveService;
 
     @Autowired
-    public ScheduleController(UserService userService, ScheduleService scheduleService) {
+    public ScheduleController(UserService userService, ScheduleService scheduleService, ScheduleSolveService scheduleSolveService) {
         super(userService);
         this.scheduleService = scheduleService;
+        this.scheduleSolveService = scheduleSolveService;
     }
 
     @GetMapping("/user/schedules")
@@ -62,6 +67,19 @@ public class ScheduleController extends BaseController {
         var user = getAuthenticatedUser();
         var schedule = scheduleService.getSchedule(scheduleId, user);
         return ResponseEntity.ok(schedule.toResponse());
+    }
+
+    @GetMapping("/user/schedules/{schedule_id}/solve")
+    @Operation(summary = "Get solved schedule employee assignments", description = "Returns the solved schedule with employee assignments. " +
+            "Manager only route.")
+    @ApiResponse(responseCode = "200", description = "Response with the schedule.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EmployeeAssignmentResponse[].class)))
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have sufficient permissions.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
+    public ResponseEntity<EmployeeAssignmentResponse[]> solveScheduleById(@PathVariable("schedule_id") long scheduleId) throws ForbiddenException {
+        var user = getAuthenticatedUser();
+        var assignments = scheduleSolveService.solveSchedule(scheduleId, user);
+        return ResponseEntity.ok(assignments.stream().map(EmployeeAssignment::toResponse).toArray(EmployeeAssignmentResponse[]::new));
     }
 
     @PostMapping("/user/teams/{team_id}/schedules")

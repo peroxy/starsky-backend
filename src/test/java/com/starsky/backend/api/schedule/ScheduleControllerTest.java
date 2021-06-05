@@ -3,6 +3,7 @@ package com.starsky.backend.api.schedule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.api.TestJwtProvider;
 import com.starsky.backend.api.authentication.LoginRequest;
+import com.starsky.backend.api.schedule.assignment.EmployeeAssignmentResponse;
 import com.starsky.backend.api.team.TeamResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -120,6 +121,19 @@ public class ScheduleControllerTest extends TestJwtProvider {
         var scheduleResponse = objectMapper.readValue(result.getResponse().getContentAsString(), ScheduleResponse[].class);
         Assertions.assertEquals(2, scheduleResponse.length);
         Assertions.assertTrue(Arrays.stream(scheduleResponse).anyMatch(resp -> resp.getScheduleName().equals("Test schedule 1") || resp.getScheduleName().equals("Test schedule 2")));
+    }
+
+    @Test
+    public void shouldGetSolvedSchedule() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get("/user/schedules/1/solve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var scheduleResponse = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeAssignmentResponse[].class);
+
+
     }
 
     @Test

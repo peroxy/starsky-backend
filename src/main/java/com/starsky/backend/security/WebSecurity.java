@@ -64,7 +64,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET,
                         "/user/invites",
-                        "/user/employees"
+                        "/user/employees",
+                        "/user/schedules/{schedule_id}/solve"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.PUT,
                         "/user/schedules/{schedule_id}/assignments"
