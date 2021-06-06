@@ -1,6 +1,7 @@
 package com.starsky.backend.service.schedule.solve;
 
 import com.starsky.backend.domain.schedule.EmployeeAssignment;
+import com.starsky.backend.domain.schedule.EmployeeAvailability;
 import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.user.User;
 import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
@@ -11,6 +12,7 @@ import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
 import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @PlanningSolution
 public class SolvedSchedule {
@@ -18,6 +20,9 @@ public class SolvedSchedule {
 
     @ProblemFactCollectionProperty
     private List<ScheduleShift> shifts;
+
+    @ProblemFactCollectionProperty
+    private List<EmployeeAvailability> availabilities;
 
     @ValueRangeProvider(id = "employeeRange")
     @ProblemFactCollectionProperty
@@ -34,6 +39,7 @@ public class SolvedSchedule {
         this.shifts = shifts;
         this.employees = employees;
         this.employeeAssignments = employeeAssignments;
+        this.availabilities = shifts.stream().flatMap(scheduleShift -> scheduleShift.getEmployeeAvailabilities().stream()).collect(Collectors.toList());
     }
 
     public SolvedSchedule() {
@@ -58,5 +64,9 @@ public class SolvedSchedule {
 
     public HardSoftScore getScore() {
         return score;
+    }
+
+    public List<EmployeeAvailability> getAvailabilities() {
+        return availabilities;
     }
 }

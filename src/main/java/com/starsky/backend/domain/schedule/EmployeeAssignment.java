@@ -15,12 +15,14 @@ import java.util.UUID;
 @Entity
 @PlanningEntity
 public class EmployeeAssignment extends BaseEntity {
-    // planning ID is used for OptaPlanner and is transient (not an actual field in database)
+    // planning ID and shift date are used for OptaPlanner and are transient (not an actual field in database)
     // entity ID isn't used since it's a generated value and we can't get it's value before persisting (at least not an easy way to do it or without hitting DB)
-    // so this is an OK compromise, just leave it alone lol
     @Transient
     @PlanningId
     private final UUID planningId = UUID.randomUUID();
+    @Transient
+    private ShiftDate shiftDate;
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employee-assignment-id-generator")
     @SequenceGenerator(name = "employee-assignment-id-generator", sequenceName = "employee_assignment_sequence")
@@ -45,9 +47,15 @@ public class EmployeeAssignment extends BaseEntity {
         this.shift = shift;
         this.assignmentStart = assignmentStart;
         this.assignmentEnd = assignmentEnd;
+        this.shiftDate = new ShiftDate(assignmentStart, assignmentEnd);
     }
 
     public EmployeeAssignment() {
+    }
+
+    @PostLoad
+    private void onLoad() {
+        this.shiftDate = new ShiftDate(assignmentStart, assignmentEnd);
     }
 
     public Long getId() {
@@ -94,4 +102,11 @@ public class EmployeeAssignment extends BaseEntity {
         return new EmployeeAssignmentResponse(id, assignmentStart, assignmentEnd, employee.getId(), shift.getId());
     }
 
+    public ShiftDate getShiftDate() {
+        return shiftDate;
+    }
+
+    public void setShiftDate(ShiftDate shiftDate) {
+        this.shiftDate = shiftDate;
+    }
 }

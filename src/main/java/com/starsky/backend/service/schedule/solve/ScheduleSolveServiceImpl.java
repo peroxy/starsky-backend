@@ -45,6 +45,7 @@ public class ScheduleSolveServiceImpl implements ScheduleSolveService {
         var employees = members.stream().map(TeamMember::getMember).collect(Collectors.toList());
 
         var employeeAssignments = getEmployeeAssignments(shifts);
+
         var job = solverManager.solve(UUID.randomUUID(), new SolvedSchedule(scheduleId, shifts, employees, employeeAssignments));
 
         SolvedSchedule solution;

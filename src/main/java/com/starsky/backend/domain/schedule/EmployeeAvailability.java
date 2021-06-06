@@ -26,6 +26,8 @@ public class EmployeeAvailability extends BaseEntity {
     private Instant availabilityEnd;
     @NotNull
     private int maxHoursPerShift;
+    @Transient
+    private ShiftDate shiftDate;
 
     public EmployeeAvailability(@NotNull User employee,
                                 @NotNull ScheduleShift shift,
@@ -37,9 +39,15 @@ public class EmployeeAvailability extends BaseEntity {
         this.availabilityStart = availabilityStart;
         this.availabilityEnd = availabilityEnd;
         this.maxHoursPerShift = maxHoursPerShift;
+        this.shiftDate = new ShiftDate(availabilityStart, availabilityEnd);
     }
 
     public EmployeeAvailability() {
+    }
+
+    @PostLoad
+    private void onLoad() {
+        this.shiftDate = new ShiftDate(availabilityStart, availabilityEnd);
     }
 
     public Long getId() {
@@ -92,5 +100,13 @@ public class EmployeeAvailability extends BaseEntity {
 
     public EmployeeAvailabilityResponse toResponse() {
         return new EmployeeAvailabilityResponse(id, availabilityStart, availabilityEnd, maxHoursPerShift, getEmployee().getId());
+    }
+
+    public ShiftDate getShiftDate() {
+        return shiftDate;
+    }
+
+    public void setShiftDate(ShiftDate shiftDate) {
+        this.shiftDate = shiftDate;
     }
 }
