@@ -14,7 +14,8 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
         return new Constraint[]{
                 oneEmployeePerShift(constraintFactory),
                 employeeIsAvailable(constraintFactory),
-                employeeIsNotAvailable(constraintFactory)
+                employeeIsNotAvailable(constraintFactory),
+
         };
     }
 
@@ -41,4 +42,5 @@ public class ScheduleConstraintProvider implements ConstraintProvider {
                 .filter((assignment, availability) -> !availability.getShiftDate().isSubsetOfShift(assignment.getShiftDate()))
                 .penalize("employee is not available", HardSoftScore.ONE_SOFT);
     }
+
 }

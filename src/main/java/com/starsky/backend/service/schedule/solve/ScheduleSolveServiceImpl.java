@@ -15,6 +15,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -42,7 +43,13 @@ public class ScheduleSolveServiceImpl implements ScheduleSolveService {
         var shifts = schedule.getShifts();
 
         var members = teamService.getTeamMembers(schedule.getTeam().getId(), user);
-        var employees = members.stream().map(TeamMember::getMember).collect(Collectors.toList());
+
+        var availableEmployeeIds = new HashSet<Long>();
+        shifts.forEach(
+                scheduleShift -> scheduleShift.getEmployeeAvailabilities().forEach(
+                        availability -> availableEmployeeIds.add(availability.getEmployee().getId())));
+
+        var employees = members.stream().filter(member -> availableEmployeeIds.contains(member.getId())).map(TeamMember::getMember).collect(Collectors.toList());
 
         var employeeAssignments = getEmployeeAssignments(shifts);
 
