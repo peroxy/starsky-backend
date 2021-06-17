@@ -1,6 +1,7 @@
 package com.starsky.backend.service.schedule.solve;
 
 import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.exception.ScheduleUnsolvableException;
 import com.starsky.backend.domain.schedule.EmployeeAssignment;
 import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.team.TeamMember;
@@ -38,19 +39,27 @@ public class ScheduleSolveServiceImpl implements ScheduleSolveService {
     }
 
     @Override
-    public List<EmployeeAssignment> solveSchedule(long scheduleId, User user) throws ForbiddenException, ResourceNotFoundException {
+    public List<EmployeeAssignment> solveSchedule(long scheduleId, User user) throws ForbiddenException, ResourceNotFoundException, ScheduleUnsolvableException {
         var schedule = scheduleService.getSchedule(scheduleId, user);
         var shifts = schedule.getShifts();
 
-        var members = teamService.getTeamMembers(schedule.getTeam().getId(), user);
+        if (shifts.size() == 0) {
+            logger.warn("Schedule cannot be solved - it does not have any shifts assigned to it!");
+            throw new ScheduleUnsolvableException("Schedule cannot be solved - it does not have any shifts assigned to it!");
+        }
 
+        var members = teamService.getTeamMembers(schedule.getTeam().getId(), user);
         var availableEmployeeIds = new HashSet<Long>();
         shifts.forEach(
                 scheduleShift -> scheduleShift.getEmployeeAvailabilities().forEach(
                         availability -> availableEmployeeIds.add(availability.getEmployee().getId())));
 
-        var employees = members.stream().filter(member -> availableEmployeeIds.contains(member.getId())).map(TeamMember::getMember).collect(Collectors.toList());
+        if (availableEmployeeIds.size() == 0) {
+            logger.warn("Schedule cannot be solved - no available employees!");
+            throw new ScheduleUnsolvableException("Schedule cannot be solved - no available employees!");
+        }
 
+        var employees = members.stream().filter(member -> availableEmployeeIds.contains(member.getId())).map(TeamMember::getMember).collect(Collectors.toList());
         var employeeAssignments = getEmployeeAssignments(shifts);
 
         var job = solverManager.solve(UUID.randomUUID(), new SolvedSchedule(scheduleId, shifts, employees, employeeAssignments));
@@ -60,8 +69,7 @@ public class ScheduleSolveServiceImpl implements ScheduleSolveService {
             solution = job.getFinalBestSolution();
         } catch (InterruptedException | ExecutionException e) {
             logger.error("solving failed", e);
-            throw new IllegalStateException("Solving failed.", e);
-            //TODO: throw something else and handle with rest controller?
+            throw new ScheduleUnsolvableException("Solving failed due to %s.".formatted(e.getMessage()));
         }
 
         return solution.getEmployeeAssignments();

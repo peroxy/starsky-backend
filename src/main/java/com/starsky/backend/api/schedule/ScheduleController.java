@@ -3,6 +3,7 @@ package com.starsky.backend.api.schedule;
 import com.starsky.backend.api.BaseController;
 import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.exception.ScheduleUnsolvableException;
 import com.starsky.backend.api.schedule.assignment.EmployeeAssignmentResponse;
 import com.starsky.backend.domain.schedule.EmployeeAssignment;
 import com.starsky.backend.domain.schedule.Schedule;
@@ -70,13 +71,14 @@ public class ScheduleController extends BaseController {
     }
 
     @GetMapping("/user/schedules/{schedule_id}/solve")
-    @Operation(summary = "Get solved schedule employee assignments", description = "Returns the solved schedule with employee assignments. " +
+    @Operation(summary = "Get solved schedule's employee assignments", description = "Returns the solved schedule with employee assignments. " +
             "Manager only route.")
     @ApiResponse(responseCode = "200", description = "Response with the schedule.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EmployeeAssignmentResponse[].class)))
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have sufficient permissions.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
-    public ResponseEntity<EmployeeAssignmentResponse[]> solveScheduleById(@PathVariable("schedule_id") long scheduleId) throws ForbiddenException {
+    @ApiResponse(responseCode = "422", description = "Schedule cannot be solved.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleUnsolvableResponse.class)))
+    public ResponseEntity<EmployeeAssignmentResponse[]> solveScheduleById(@PathVariable("schedule_id") long scheduleId) throws ForbiddenException, ScheduleUnsolvableException {
         var user = getAuthenticatedUser();
         var assignments = scheduleSolveService.solveSchedule(scheduleId, user);
         return ResponseEntity.ok(assignments.stream().map(EmployeeAssignment::toResponse).toArray(EmployeeAssignmentResponse[]::new));

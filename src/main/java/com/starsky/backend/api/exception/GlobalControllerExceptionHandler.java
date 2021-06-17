@@ -1,6 +1,7 @@
 package com.starsky.backend.api.exception;
 
 import com.starsky.backend.api.schedule.InvalidDateRangeResponse;
+import com.starsky.backend.api.schedule.ScheduleUnsolvableResponse;
 import com.starsky.backend.api.user.InviteInvalidResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -34,6 +35,14 @@ class GlobalControllerExceptionHandler {
     public InvalidDateRangeResponse handleInvalidToken(DateRangeException ex) {
         return new InvalidDateRangeResponse(ex.getMessage());
     }
+
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)
+    @ExceptionHandler(ScheduleUnsolvableException.class)
+    @ResponseBody
+    public ScheduleUnsolvableResponse handleInvalidToken(ScheduleUnsolvableException ex) {
+        return new ScheduleUnsolvableResponse(ex.getMessage());
+    }
+
 
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     @ExceptionHandler(ForbiddenException.class)
