@@ -76,7 +76,7 @@ public class InviteController extends BaseController {
     @ApiResponse(responseCode = "204", description = "Deleted the invite successfully.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Invite does not exist.", content = @Content)
-    public ResponseEntity<Void> deleteScheduleShift(@PathVariable("invite_id") long inviteId) {
+    public ResponseEntity<Void> deleteInvite(@PathVariable("invite_id") long inviteId) {
         var user = getAuthenticatedUser();
         inviteService.deleteInvite(inviteId, user);
         return ResponseEntity.noContent().build();

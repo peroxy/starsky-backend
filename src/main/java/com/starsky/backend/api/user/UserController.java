@@ -62,10 +62,19 @@ public class UserController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
-    public ResponseEntity<UserResponse> updateSchedule(@Valid @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UpdateUserRequest request) {
         var user = getAuthenticatedUser();
         user = userService.updateUser(user, request);
         return ResponseEntity.ok(user.toResponse());
+    }
+
+    @GetMapping(value = "/user/authentication")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "Check if currently authenticated user is valid", description = "Check if the currently authenticated user has correct credentials (has logged in and has supplied correct bearer JWT token in header).")
+    @ApiResponse(responseCode = "204", description = "User is authenticated correctly.", content = @Content)
+    @ApiResponse(responseCode = "401", description = "User is not authenticated.")
+    public ResponseEntity<Void> validateAuthentication() {
+        return ResponseEntity.ok().build();
     }
 
 }
