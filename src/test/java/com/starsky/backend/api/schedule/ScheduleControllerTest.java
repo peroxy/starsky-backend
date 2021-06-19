@@ -132,8 +132,6 @@ public class ScheduleControllerTest extends TestJwtProvider {
                 .andExpect(status().isOk())
                 .andReturn();
         var scheduleResponse = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeAssignmentResponse[].class);
-
-
     }
 
     @Test
