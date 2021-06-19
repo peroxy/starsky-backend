@@ -1,4 +1,4 @@
-# Starsky backend
+# Starsky backend :star:
 
 Starsky backend represents the API and database portion of starsky application for employee scheduling. 
 It uses Java (Spring Boot) for REST API, PostgreSQL for data storage and Nginx for reverse proxy in production. 
@@ -7,12 +7,12 @@ Front-end React application is located in a repository called [starsky-frontend]
 
 It also uses the transactional email API that is located in a repository called [starsky-mail](https://github.com/peroxy/starsky-mail).
 
-## Requirements
+## Requirements :clipboard:
 
 - [docker](https://docs.docker.com/get-docker/)
 - [docker-compose](https://docs.docker.com/compose/install/) (at least 3.8 version support)
 
-## Development
+## Development :computer:
 
 ### Running with docker
 
@@ -63,7 +63,7 @@ You can generate an OpenAPI client by running backend API locally, then running 
 docker run --rm --network host -v "${PWD}:/local" openapitools/openapi-generator-cli generate -i http://localhost:8080/api/v3/api-docs -g typescript -o /local/out/ts
 ```
 
-## Deployment
+## Deployment :rocket:
 
 We host entire infrastructure on Azure, specifically using Azure Virtual Machine.
 
