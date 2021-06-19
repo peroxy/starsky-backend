@@ -37,6 +37,16 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "failed", "standardError"
+
+        showExceptions true
+        exceptionFormat "full"
+        showCauses true
+        showStackTraces true
+
+        showStandardStreams = false
+    }
 }
 
 jar {
