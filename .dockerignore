@@ -1,0 +1,10 @@
+.gradle
+.github
+.idea
+**/.git
+build
+docker
+.env
+.gitignore
+README.md
+starskyInfrastructure.drawio
