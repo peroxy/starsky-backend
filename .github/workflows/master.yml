@@ -4,9 +4,6 @@ on:
   push:
     tags: [ '*.*.*' ]
 
-  # Allows you to run this workflow manually from the Action tab
-  workflow_dispatch:
-
 jobs:
   build:
     name: Build and deploy to DockerHub and Azure VM
