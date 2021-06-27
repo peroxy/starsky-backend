@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsky.backend.config.JwtConfig;
 import com.starsky.backend.service.authentication.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,19 +17,29 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtConfig jwtConfig;
     private final ObjectMapper mapper;
+    private final String frontendOrigin;
 
     @Autowired
-    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtConfig jwtConfig, ObjectMapper mapper) {
+    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtConfig jwtConfig, ObjectMapper mapper,
+                       @Value("${starsky.frontend.register-url}") String frontendRegisterUrl) throws MalformedURLException {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtConfig = jwtConfig;
         this.mapper = mapper;
+        var url = new URL(frontendRegisterUrl);
+        this.frontendOrigin = url.getProtocol() + "://" + url.getAuthority();
     }
 
     @Override
@@ -88,7 +99,26 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        var configuration = new CorsConfiguration();
+
+        configuration.setAllowedMethods(Arrays.asList(
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.DELETE.name(),
+                HttpMethod.PATCH.name(),
+                HttpMethod.PUT.name(),
+                HttpMethod.HEAD.name(),
+                HttpMethod.OPTIONS.name()
+        ));
+        // allow all headers
+        configuration.addAllowedHeader("*");
+        // max age of 30 minutes
+        configuration.setMaxAge(Duration.ofMinutes(30));
+        // only allow access from frontend
+        configuration.setAllowedOrigins(Collections.singletonList(frontendOrigin));
+
+        // register the above configuration for all resources
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }
