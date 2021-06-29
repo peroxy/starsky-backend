@@ -61,7 +61,7 @@ public class TeamController extends BaseController {
     @PostMapping
     @Operation(summary = "Create a new team", description = "Create a new team - manager only route. Team name must be unique for this user, can't have 2 teams with same name.")
     @ApiResponse(responseCode = "200", description = "Response with the newly created team.",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = TeamResponse.class))))
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = TeamResponse.class)))
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Team name already exists.", content = @Content)
