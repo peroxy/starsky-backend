@@ -2,9 +2,11 @@ package com.starsky.backend.service.schedule.availability;
 
 import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.schedule.availability.CreateEmployeeAvailabilitiesRequest;
 import com.starsky.backend.api.schedule.availability.CreateEmployeeAvailabilityRequest;
 import com.starsky.backend.api.schedule.availability.UpdateEmployeeAvailabilityRequest;
 import com.starsky.backend.domain.schedule.EmployeeAvailability;
+import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.user.Role;
 import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.EmployeeAvailabilityRepository;
@@ -16,7 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeAvailabilityServiceImpl implements EmployeeAvailabilityService {
@@ -119,6 +124,40 @@ public class EmployeeAvailabilityServiceImpl implements EmployeeAvailabilityServ
         checkIfDateIntervalExistsOrOverlaps(availability);
 
         return employeeAvailabilityRepository.save(availability);
+    }
+
+    @Override
+    @Transactional
+    public void putAll(List<CreateEmployeeAvailabilitiesRequest> availabilities, User manager) throws DateRangeException {
+
+        var shiftIds = availabilities.stream().map(CreateEmployeeAvailabilitiesRequest::getShiftId).collect(Collectors.toList());
+        // validate
+        // check if all shift ids exist, if all employee ids exist, if date range is correct,
+        if (!scheduleShiftService.shiftsExist(shiftIds, manager)) {
+            var message = "Schedule shift ids (one or many) invalid - they do not exist for this manager.";
+            this.logger.warn(message);
+            throw new ResourceNotFoundException(message);
+        }
+        ;
+        if (!userService.employeesExist(availabilities.stream().map(CreateEmployeeAvailabilitiesRequest::getEmployeeId).toArray(Long[]::new), manager)) {
+            var message = "Employee ids (one or many) invalid - they do not exist for this manager.";
+            this.logger.warn(message);
+            throw new ResourceNotFoundException(message);
+        }
+
+        var employeeAvailabilities = new ArrayList<EmployeeAvailability>();
+        for (var availability : availabilities) {
+            dateRangeValidator.validateDateInterval(availability.getAvailabilityStart(), availability.getAvailabilityEnd());
+            var user = new User();
+            user.setId(availability.getEmployeeId());
+            var shift = new ScheduleShift();
+            shift.setId(availability.getShiftId());
+            employeeAvailabilities.add(
+                    new EmployeeAvailability(user, shift, availability.getAvailabilityStart(), availability.getAvailabilityEnd(), availability.getMaxHoursPerShift()));
+        }
+
+        employeeAvailabilityRepository.deleteAllByShiftIdInAndShiftScheduleTeamOwner(shiftIds, manager);
+        employeeAvailabilityRepository.saveAll(employeeAvailabilities);
     }
 
     private ResourceNotFoundException getResourceNotFoundException(long availabilityId, User manager) {

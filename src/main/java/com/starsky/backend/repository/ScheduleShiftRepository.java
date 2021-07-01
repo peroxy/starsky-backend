@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,8 @@ public interface ScheduleShiftRepository extends JpaRepository<ScheduleShift, Lo
     List<ScheduleShift> getAllByScheduleAndScheduleTeamOwner(Schedule schedule, User owner);
 
     Optional<ScheduleShift> getByIdAndScheduleTeamOwner(long shiftId, User owner);
+
+    boolean existsByIdInAndScheduleTeamOwner(Collection<Long> shiftIds, User owner);
 
     @Query(value = "select ss.* from {h-schema}schedule_shift ss " +
             "where ss.schedule_id = :schedule_id " +

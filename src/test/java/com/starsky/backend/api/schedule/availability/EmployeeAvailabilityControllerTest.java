@@ -182,6 +182,31 @@ public class EmployeeAvailabilityControllerTest extends TestJwtProvider {
 
     @Test
     @Transactional
+    public void shouldCreateEmployeeAvailabilities() throws Exception {
+        var request = getEmployeeAvailabilityRequest();
+        var result = mockMvc.perform(MockMvcRequestBuilders.put("/user/availabilities")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new CreateEmployeeAvailabilitiesRequest[]{
+                        new CreateEmployeeAvailabilitiesRequest(
+                                request.getAvailabilityStart(),
+                                request.getAvailabilityEnd(),
+                                request.getMaxHoursPerShift(),
+                                request.getEmployeeId(),
+                                shiftWithAvailabilities.getId()),
+                        new CreateEmployeeAvailabilitiesRequest(
+                                request.getAvailabilityStart(),
+                                request.getAvailabilityEnd(),
+                                request.getMaxHoursPerShift(),
+                                request.getEmployeeId() + 1,
+                                shiftWithAvailabilities.getId()),
+                }))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Transactional
     public void shouldGetBadRequestWhenCreatingInvalidEmployeeAvailability() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/user/shifts/%d/availabilities".formatted(shiftWithoutAvailabilities.getId()))
                 .contentType(MediaType.APPLICATION_JSON)

@@ -7,7 +7,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
-public class CreateEmployeeAvailabilityRequest {
+public class CreateEmployeeAvailabilitiesRequest {
     @NotNull
     @JsonProperty("availability_start")
     @Schema(example = "1617032176.7171679", title = "Epoch timestamp of availability start", implementation = Double.class)
@@ -24,17 +24,18 @@ public class CreateEmployeeAvailabilityRequest {
     @NotNull
     @JsonProperty("employee_id")
     @Schema(example = "1")
-    private final int employeeId;
+    private final long employeeId;
+    @NotNull
+    @JsonProperty("shift_id")
+    @Schema(example = "1")
+    private final long shiftId;
 
-    public CreateEmployeeAvailabilityRequest(Instant availabilityStart, Instant availabilityEnd, int maxHoursPerShift, int employeeId) {
+    public CreateEmployeeAvailabilitiesRequest(Instant availabilityStart, Instant availabilityEnd, int maxHoursPerShift, long employeeId, long shiftId) {
         this.availabilityStart = availabilityStart;
         this.availabilityEnd = availabilityEnd;
         this.maxHoursPerShift = maxHoursPerShift;
         this.employeeId = employeeId;
-    }
-
-    public int getEmployeeId() {
-        return employeeId;
+        this.shiftId = shiftId;
     }
 
     public Instant getAvailabilityStart() {
@@ -48,5 +49,13 @@ public class CreateEmployeeAvailabilityRequest {
     public int getMaxHoursPerShift() {
         return maxHoursPerShift;
     }
-}
 
+    public long getEmployeeId() {
+        return employeeId;
+    }
+
+    public long getShiftId() {
+        return shiftId;
+    }
+
+}

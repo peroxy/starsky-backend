@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,4 +28,6 @@ public interface EmployeeAvailabilityRepository extends JpaRepository<EmployeeAv
                                                                                    @Param("shift_id") long shiftId,
                                                                                    @Param("availability_start") Instant availabilityStart,
                                                                                    @Param("availability_end") Instant availabilityEnd);
+
+    void deleteAllByShiftIdInAndShiftScheduleTeamOwner(Collection<Long> shiftIds, User owner);
 }

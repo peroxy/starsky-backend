@@ -8,6 +8,7 @@ import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.user.User;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ScheduleShiftService {
@@ -20,5 +21,7 @@ public interface ScheduleShiftService {
     void deleteScheduleShift(long shiftId, User manager) throws ResourceNotFoundException;
 
     ScheduleShift updateScheduleShift(long shiftId, UpdateScheduleShiftRequest request, User manager) throws DateRangeException;
+
+    boolean shiftsExist(Collection<Long> shiftIds, User owner);
 }
 

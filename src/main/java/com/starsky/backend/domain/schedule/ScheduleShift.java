@@ -88,4 +88,8 @@ public class ScheduleShift extends BaseEntity {
     public List<EmployeeAssignment> getEmployeeAssignments() {
         return employeeAssignments;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

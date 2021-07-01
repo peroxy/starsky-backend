@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/user")
@@ -70,7 +71,7 @@ public class EmployeeAvailabilityController extends BaseController {
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EmployeeAvailabilityResponse.class)))
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
-    @ApiResponse(responseCode = "404", description = "Shift does not exist.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Shift or employee does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description =
             "Invalid employee availability date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing availability..", content = @Content)
     public ResponseEntity<EmployeeAvailabilityResponse> createEmployeeAvailability(@Valid @RequestBody CreateEmployeeAvailabilityRequest request,
@@ -78,6 +79,22 @@ public class EmployeeAvailabilityController extends BaseController {
         var user = getAuthenticatedUser();
         var employeeAvailability = employeeAvailabilityService.createEmployeeAvailability(shiftId, request, user);
         return ResponseEntity.ok(employeeAvailability.toResponse());
+    }
+
+    @PutMapping("/availabilities")
+    @Operation(summary = "Create or update multiple employee availabilities", description = "Creates or updates employee availabilities. " +
+            "Please note that this operation can be destructive - it will always delete all of the previous/existing employee availabilities (if they exist) for the specified shift and create or update with the new ones. " +
+            "Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "204", description = "Created/updated employee availabilities successfully.", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Shift or employee does not exist.", content = @Content)
+    @ApiResponse(responseCode = "422", description =
+            "Invalid employee availability date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing availability..", content = @Content)
+    public ResponseEntity<Void> createEmployeeAvailabilities(@Valid @RequestBody List<CreateEmployeeAvailabilitiesRequest> availabilities) throws DateRangeException {
+        var user = getAuthenticatedUser();
+        employeeAvailabilityService.putAll(availabilities, user);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/availabilities/{availability_id}")

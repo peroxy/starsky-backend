@@ -2,6 +2,7 @@ package com.starsky.backend.service.schedule.availability;
 
 import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
+import com.starsky.backend.api.schedule.availability.CreateEmployeeAvailabilitiesRequest;
 import com.starsky.backend.api.schedule.availability.CreateEmployeeAvailabilityRequest;
 import com.starsky.backend.api.schedule.availability.UpdateEmployeeAvailabilityRequest;
 import com.starsky.backend.domain.schedule.EmployeeAvailability;
@@ -20,4 +21,6 @@ public interface EmployeeAvailabilityService {
     void deleteEmployeeAvailability(long availabilityId, User manager) throws ResourceNotFoundException;
 
     EmployeeAvailability updateEmployeeAvailability(long availabilityId, UpdateEmployeeAvailabilityRequest request, User manager) throws ResourceNotFoundException, DateRangeException;
+
+    void putAll(List<CreateEmployeeAvailabilitiesRequest> availabilities, User manager) throws DateRangeException;
 }
