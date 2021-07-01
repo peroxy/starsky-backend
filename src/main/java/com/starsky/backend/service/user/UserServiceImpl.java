@@ -114,4 +114,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    @Override
+    public boolean employeesExist(Long[] employeeIds, User owner) {
+        return userRepository.existsAllByIdInAndParentUserAndEnabled(employeeIds, owner, true);
+    }
+
 }

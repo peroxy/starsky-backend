@@ -16,5 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByParentUserAndEnabled(User parentUser, boolean enabled);
 
     Optional<User> findByIdAndParentUserAndEnabled(long id, User owner, boolean enabled);
+
+    boolean existsAllByIdInAndParentUserAndEnabled(Long[] ids, User owner, boolean enabled);
 }
 

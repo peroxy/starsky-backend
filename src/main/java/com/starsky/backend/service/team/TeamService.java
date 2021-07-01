@@ -1,5 +1,6 @@
 package com.starsky.backend.service.team;
 
+import com.starsky.backend.api.team.CreateTeamMemberRequest;
 import com.starsky.backend.api.team.UpdateTeamRequest;
 import com.starsky.backend.domain.team.Team;
 import com.starsky.backend.domain.team.TeamMember;
@@ -25,4 +26,6 @@ public interface TeamService {
     void deleteTeam(long teamId, User owner) throws ResourceNotFoundException;
 
     void deleteTeamMember(long teamId, long employeeId, User owner) throws ResourceNotFoundException;
+
+    void putAll(List<CreateTeamMemberRequest> requests, long teamId, User owner);
 }

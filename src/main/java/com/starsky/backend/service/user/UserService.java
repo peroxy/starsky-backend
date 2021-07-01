@@ -20,4 +20,6 @@ public interface UserService {
     List<User> getEmployees(User manager);
 
     User updateUser(User user, UpdateUserRequest request);
+
+    boolean employeesExist(Long[] employeeIds, User owner);
 }

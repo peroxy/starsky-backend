@@ -140,6 +140,39 @@ public class TeamControllerTest extends TestJwtProvider {
     }
 
     @Test
+    @Transactional
+    public void testCreateTeamMembers() throws Exception {
+        var result = mockMvc.perform(MockMvcRequestBuilders.get(TEAMS_ROUTE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var teamResponse = objectMapper.readValue(result.getResponse().getContentAsString(), TeamResponse[].class);
+        Assertions.assertEquals(1, teamResponse.length);
+        var team = teamResponse[0];
+
+        result = mockMvc.perform(MockMvcRequestBuilders.get("/user/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var employeesResponse = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse[].class);
+        Assertions.assertEquals(2, employeesResponse.length);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/teams/%d/members".formatted(team.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(
+                        new CreateTeamMemberRequest[]{
+                                new CreateTeamMemberRequest(employeesResponse[0].getId()),
+                                new CreateTeamMemberRequest(employeesResponse[1].getId())}))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
     @DisplayName("Should get conflict when adding an existing member to team")
     public void testAddExistingTeamMember() throws Exception {
         var result = mockMvc.perform(MockMvcRequestBuilders.get(TEAMS_ROUTE)

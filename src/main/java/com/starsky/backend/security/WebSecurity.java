@@ -20,7 +20,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
 
 @EnableWebSecurity
@@ -79,7 +78,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/user/schedules/{schedule_id}/solve"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.PUT,
-                        "/user/schedules/{schedule_id}/assignments"
+                        "/user/schedules/{schedule_id}/assignments",
+                        "/user/teams/{team_id}/members"
                 ).hasRole("MANAGER")
 
 
@@ -101,15 +101,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         var configuration = new CorsConfiguration();
 
-        configuration.setAllowedMethods(Arrays.asList(
-                HttpMethod.GET.name(),
-                HttpMethod.POST.name(),
-                HttpMethod.DELETE.name(),
-                HttpMethod.PATCH.name(),
-                HttpMethod.PUT.name(),
-                HttpMethod.HEAD.name(),
-                HttpMethod.OPTIONS.name()
-        ));
+        // allow all http methods
+        configuration.addAllowedMethod("*");
         // allow all headers
         configuration.addAllowedHeader("*");
         // max age of 30 minutes

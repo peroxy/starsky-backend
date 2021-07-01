@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/user/teams", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,6 +83,20 @@ public class TeamController extends BaseController {
         var team = teamService.getTeam(teamId, manager);
         var employee = userService.getEmployeeById(employeeId, manager);
         var teamMember = teamService.createTeamMember(employee, team);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{team_id}/members")
+    @Operation(summary = "Create or update team members", description = "Creates or updates team members. " +
+            "Please note that this operation can be destructive - it will always delete all of the previous/existing team members (if they exist) for the specified team and create or update with the new ones. " +
+            "Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "204", description = "Created/updated team members successfully.", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Team or employee does not exist.", content = @Content)
+    public ResponseEntity<Void> createTeamMembers(@Valid @RequestBody List<CreateTeamMemberRequest> employees, @PathVariable(value = "team_id") long teamId) {
+        var user = getAuthenticatedUser();
+        teamService.putAll(employees, teamId, user);
         return ResponseEntity.noContent().build();
     }
 
