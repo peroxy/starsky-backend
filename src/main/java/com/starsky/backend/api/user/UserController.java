@@ -38,7 +38,7 @@ public class UserController extends BaseController {
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invite token invalid.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = InviteInvalidResponse.class)))
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) throws InvalidInviteTokenException {
+    public ResponseEntity<UserResponse> postUser(@Valid @RequestBody CreateUserRequest request) throws InvalidInviteTokenException {
         var user = userService.createUser(request);
         return ResponseEntity.ok(user.toResponse());
     }
@@ -62,7 +62,7 @@ public class UserController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
-    public ResponseEntity<UserResponse> updateUser(@Valid @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserResponse> patchUser(@Valid @RequestBody UpdateUserRequest request) {
         var user = getAuthenticatedUser();
         user = userService.updateUser(user, request);
         return ResponseEntity.ok(user.toResponse());

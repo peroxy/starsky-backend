@@ -72,7 +72,7 @@ public class ScheduleShiftController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid schedule shift date range (start timestamp occurs after end timestamp).", content = @Content)
-    public ResponseEntity<ScheduleShiftResponse> createScheduleShift(@Valid @RequestBody CreateScheduleShiftRequest request, @PathVariable(value = "schedule_id") long scheduleId) throws DateRangeException, ForbiddenException {
+    public ResponseEntity<ScheduleShiftResponse> postScheduleShift(@Valid @RequestBody CreateScheduleShiftRequest request, @PathVariable(value = "schedule_id") long scheduleId) throws DateRangeException, ForbiddenException {
         var user = getAuthenticatedUser();
         var schedule = scheduleShiftService.createScheduleShift(scheduleId, request, user);
         return ResponseEntity.ok(schedule.toResponse());
@@ -98,7 +98,7 @@ public class ScheduleShiftController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule shift does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
-    public ResponseEntity<ScheduleShiftResponse> updateScheduleShift(@PathVariable("shift_id") long shiftId, @Valid @RequestBody UpdateScheduleShiftRequest request) throws DateRangeException {
+    public ResponseEntity<ScheduleShiftResponse> patchScheduleShift(@PathVariable("shift_id") long shiftId, @Valid @RequestBody UpdateScheduleShiftRequest request) throws DateRangeException {
         var user = getAuthenticatedUser();
         var schedule = scheduleShiftService.updateScheduleShift(shiftId, request, user);
         return ResponseEntity.ok(schedule.toResponse());
@@ -114,7 +114,7 @@ public class ScheduleShiftController extends BaseController {
     @ApiResponse(responseCode = "404", description = "Shift or schedule does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description =
             "Invalid shift date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing shift..", content = @Content)
-    public ResponseEntity<Void> createScheduleShifts(@Valid @RequestBody List<CreateScheduleShiftRequest> shifts, @PathVariable("schedule_id") long scheduleId) throws ForbiddenException, DateRangeException {
+    public ResponseEntity<Void> putScheduleShifts(@Valid @RequestBody List<CreateScheduleShiftRequest> shifts, @PathVariable("schedule_id") long scheduleId) throws ForbiddenException, DateRangeException {
         var user = getAuthenticatedUser();
         scheduleShiftService.putAll(shifts, user, scheduleId);
         return ResponseEntity.noContent().build();

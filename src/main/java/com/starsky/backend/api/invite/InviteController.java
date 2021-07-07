@@ -41,7 +41,7 @@ public class InviteController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Invite body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
-    public ResponseEntity<InviteResponse> createInvite(@Valid @RequestBody CreateInviteRequest request) {
+    public ResponseEntity<InviteResponse> postInvite(@Valid @RequestBody CreateInviteRequest request) {
         var manager = getAuthenticatedUser();
         var invite = inviteService.createInvite(manager, request);
         return ResponseEntity.ok(invite.toResponse());

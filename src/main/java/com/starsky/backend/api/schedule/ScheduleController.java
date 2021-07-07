@@ -92,7 +92,7 @@ public class ScheduleController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Team does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid schedule date range (start timestamp occurs after end timestamp).", content = @Content)
-    public ResponseEntity<ScheduleResponse> createSchedule(@Valid @RequestBody CreateScheduleRequest request, @PathVariable("team_id") long teamId) throws DateRangeException {
+    public ResponseEntity<ScheduleResponse> postSchedule(@Valid @RequestBody CreateScheduleRequest request, @PathVariable("team_id") long teamId) throws DateRangeException {
         var user = getAuthenticatedUser();
         var schedule = scheduleService.createSchedule(request, teamId, user);
         return ResponseEntity.ok(schedule.toResponse());
@@ -118,7 +118,7 @@ public class ScheduleController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid schedule date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
-    public ResponseEntity<ScheduleResponse> updateSchedule(@PathVariable("schedule_id") long scheduleId, @Valid @RequestBody UpdateScheduleRequest request) throws DateRangeException, ForbiddenException {
+    public ResponseEntity<ScheduleResponse> patchSchedule(@PathVariable("schedule_id") long scheduleId, @Valid @RequestBody UpdateScheduleRequest request) throws DateRangeException, ForbiddenException {
         var user = getAuthenticatedUser();
         var schedule = scheduleService.updateSchedule(request, scheduleId, user);
         return ResponseEntity.ok(schedule.toResponse());

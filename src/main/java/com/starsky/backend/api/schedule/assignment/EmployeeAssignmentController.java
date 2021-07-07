@@ -44,7 +44,7 @@ public class EmployeeAssignmentController extends BaseController {
     @ApiResponse(responseCode = "404", description = "Schedule, shift or employee does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description =
             "Invalid employee assignment date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing assignment..", content = @Content)
-    public ResponseEntity<Void> createEmployeeAssignment(@Valid @RequestBody List<CreateEmployeeAssignmentRequest> requests, @PathVariable(value = "schedule_id") long scheduleId) throws ForbiddenException, DateRangeException {
+    public ResponseEntity<Void> putEmployeeAssignment(@Valid @RequestBody List<CreateEmployeeAssignmentRequest> requests, @PathVariable(value = "schedule_id") long scheduleId) throws ForbiddenException, DateRangeException {
         var user = getAuthenticatedUser();
         employeeAssignmentService.putAll(requests, scheduleId, user);
         return ResponseEntity.noContent().build();

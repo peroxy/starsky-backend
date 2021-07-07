@@ -66,7 +66,7 @@ public class TeamController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Team name already exists.", content = @Content)
-    public ResponseEntity<TeamResponse> createTeam(@Valid @RequestBody CreateTeamRequest request) {
+    public ResponseEntity<TeamResponse> postTeam(@Valid @RequestBody CreateTeamRequest request) {
         var user = getAuthenticatedUser();
         var team = teamService.createTeam(request.getName(), user);
         return ResponseEntity.ok(team.toResponse());
@@ -78,7 +78,7 @@ public class TeamController extends BaseController {
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Team or employee does not exist.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Employee already present in the team.", content = @Content)
-    public ResponseEntity<Void> createTeamMember(@PathVariable("team_id") long teamId, @PathVariable("user_id") long employeeId) {
+    public ResponseEntity<Void> postTeamMember(@PathVariable("team_id") long teamId, @PathVariable("user_id") long employeeId) {
         var manager = getAuthenticatedUser();
         var team = teamService.getTeam(teamId, manager);
         var employee = userService.getEmployeeById(employeeId, manager);
@@ -94,7 +94,7 @@ public class TeamController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Team or employee does not exist.", content = @Content)
-    public ResponseEntity<Void> createTeamMembers(@Valid @RequestBody List<CreateTeamMemberRequest> employees, @PathVariable(value = "team_id") long teamId) {
+    public ResponseEntity<Void> putTeamMembers(@Valid @RequestBody List<CreateTeamMemberRequest> employees, @PathVariable(value = "team_id") long teamId) {
         var user = getAuthenticatedUser();
         teamService.putAll(employees, teamId, user);
         return ResponseEntity.noContent().build();
@@ -130,7 +130,7 @@ public class TeamController extends BaseController {
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Team does not exist.", content = @Content)
-    public ResponseEntity<TeamResponse> updateTeam(@PathVariable("team_id") long teamId, @Valid @RequestBody UpdateTeamRequest request) {
+    public ResponseEntity<TeamResponse> patchTeam(@PathVariable("team_id") long teamId, @Valid @RequestBody UpdateTeamRequest request) {
         var user = getAuthenticatedUser();
         var team = teamService.updateTeam(teamId, request, user);
         return ResponseEntity.ok(team.toResponse());
