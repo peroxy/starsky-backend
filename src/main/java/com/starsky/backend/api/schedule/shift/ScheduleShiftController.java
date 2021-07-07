@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/user")
@@ -101,5 +102,21 @@ public class ScheduleShiftController extends BaseController {
         var user = getAuthenticatedUser();
         var schedule = scheduleShiftService.updateScheduleShift(shiftId, request, user);
         return ResponseEntity.ok(schedule.toResponse());
+    }
+
+    @PutMapping("/schedules/{schedule_id}/shifts")
+    @Operation(summary = "Create or update multiple schedule shifts", description = "Creates or updates schedule shifts. " +
+            "Please note that this operation can be destructive - it will always delete all of the previous/existing schedule shifts (if they exist) for the specified schedule and create or update with the new ones. " +
+            "Authenticated user must have manager role.")
+    @ApiResponse(responseCode = "204", description = "Created/updated schedule shifts successfully.", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Shift or schedule does not exist.", content = @Content)
+    @ApiResponse(responseCode = "422", description =
+            "Invalid shift date range, start timestamp occurs after end timestamp, date range exists or overlaps with existing shift..", content = @Content)
+    public ResponseEntity<Void> createScheduleShifts(@Valid @RequestBody List<CreateScheduleShiftRequest> shifts, @PathVariable("schedule_id") long scheduleId) throws ForbiddenException, DateRangeException {
+        var user = getAuthenticatedUser();
+        scheduleShiftService.putAll(shifts, user, scheduleId);
+        return ResponseEntity.noContent().build();
     }
 }

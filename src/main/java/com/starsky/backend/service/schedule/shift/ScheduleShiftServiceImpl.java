@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -117,6 +119,21 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
     @Override
     public boolean shiftsExist(Collection<Long> shiftIds, User owner) {
         return scheduleShiftRepository.existsByIdInAndScheduleTeamOwner(shiftIds, owner);
+    }
+
+    @Override
+    @Transactional
+    public void putAll(List<CreateScheduleShiftRequest> requests, User owner, long scheduleId) throws DateRangeException, ResourceNotFoundException, ForbiddenException {
+        var schedule = scheduleService.getSchedule(scheduleId, owner);
+
+        var shifts = new ArrayList<ScheduleShift>();
+        for (var shift : requests) {
+            dateRangeValidator.validateDateInterval(shift.getShiftStart(), shift.getShiftEnd());
+            shifts.add(new ScheduleShift(shift.getShiftStart(), shift.getShiftEnd(), schedule, shift.getNumberOfRequiredEmployees()));
+        }
+
+        scheduleShiftRepository.deleteByScheduleIdAndScheduleTeamOwner(scheduleId, owner);
+        scheduleShiftRepository.saveAll(shifts);
     }
 
     private ResourceNotFoundException getShiftDoesNotExistException(long shiftId, User manager) {

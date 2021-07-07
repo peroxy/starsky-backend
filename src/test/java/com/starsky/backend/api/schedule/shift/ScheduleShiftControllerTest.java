@@ -182,6 +182,24 @@ public class ScheduleShiftControllerTest extends TestJwtProvider {
 
     @Test
     @Transactional
+    public void shouldCreateScheduleShifts() throws Exception {
+        var request = getCreateShiftRequest();
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/schedules/%d/shifts".formatted(scheduleWithShifts.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Arrays.asList(request, request, request)))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+        mockMvc.perform(MockMvcRequestBuilders.put("/user/schedules/%d/shifts".formatted(scheduleWithoutShifts.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Arrays.asList(request, request)))
+                .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Transactional
     public void shouldGetBadRequestWhenCreatingInvalidScheduleShift() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/user/schedules/%d/shifts".formatted(scheduleWithoutShifts.getId()))
                 .contentType(MediaType.APPLICATION_JSON)

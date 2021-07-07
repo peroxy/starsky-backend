@@ -21,6 +21,8 @@ public interface ScheduleShiftRepository extends JpaRepository<ScheduleShift, Lo
 
     boolean existsByIdInAndScheduleTeamOwner(Collection<Long> shiftIds, User owner);
 
+    void deleteByScheduleIdAndScheduleTeamOwner(long scheduleId, User owner);
+
     @Query(value = "select ss.* from {h-schema}schedule_shift ss " +
             "where ss.schedule_id = :schedule_id " +
             "and (:shift_start >= ss.shift_start and :shift_start <= ss.shift_end " +
