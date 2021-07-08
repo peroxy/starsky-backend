@@ -22,7 +22,7 @@ public class Schedule extends BaseEntity {
     private Instant scheduleStart;
     @NotNull
     private Instant scheduleEnd;
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     private Team team;
     @NotNull
@@ -37,6 +37,7 @@ public class Schedule extends BaseEntity {
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleShift> shifts;
+
 
     public Schedule(@NotNull String name,
                     @NotNull Instant scheduleStart,

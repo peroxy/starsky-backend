@@ -2,6 +2,7 @@ package com.starsky.backend.domain.team;
 
 import com.starsky.backend.api.team.TeamResponse;
 import com.starsky.backend.domain.BaseEntity;
+import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.domain.user.User;
 
 import javax.persistence.*;
@@ -22,6 +23,8 @@ public class Team extends BaseEntity {
     private User owner;
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> teamMembers;
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules;
 
     public Team(@NotNull String name, @NotNull User owner) {
         this.name = name;
