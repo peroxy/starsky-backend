@@ -104,25 +104,25 @@ public class StarskyApplication {
 
                 List<User> users = new ArrayList<>(Arrays.asList(
                         new User("Harold C. Dobey", "mail@example.com", bCryptPasswordEncoder().encode("password"), "Police Captain",
-                                null, true, NotificationType.EMAIL, Role.MANAGER, null),
+                                null, true, NotificationType.EMAIL, Role.MANAGER, null, false),
                         new User("Test Manager", "a@a.com", bCryptPasswordEncoder().encode("password"), "Test Manager",
-                                null, true, NotificationType.EMAIL, Role.MANAGER, null)
+                                null, true, NotificationType.EMAIL, Role.MANAGER, null, false)
                 ));
 
                 users.add(new User("David Starsky", "david@starsky.net", bCryptPasswordEncoder().encode("password"), "Police Detective",
-                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(0)));
+                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(0), false));
                 users.add(new User("Kenneth Hutchinson", "kenneth@starsky.net", bCryptPasswordEncoder().encode("password"), "Police Detective",
-                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(0)));
+                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(0), false));
                 users.add(new User("Test Employee", "t@t.com", bCryptPasswordEncoder().encode("password"), "Animator",
-                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1)));
+                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1), false));
                 users.add(new User("Without Team", "no@team.com", bCryptPasswordEncoder().encode("password"), "Jobless",
-                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1)));
+                        null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(1), false));
                 users.add(new User("Scheduling test", "scheduling@a.com", bCryptPasswordEncoder().encode("password"), "Manager",
-                        null, true, NotificationType.EMAIL, Role.MANAGER, null));
+                        null, true, NotificationType.EMAIL, Role.MANAGER, null, false));
 
                 for (int i = 0; i < 20; i++) {
                     users.add(new User("Scheduling user %d".formatted(i), "scheduling@%d.com".formatted(i), bCryptPasswordEncoder().encode("password"), "Waiter",
-                            null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(6)));
+                            null, true, NotificationType.EMAIL, Role.EMPLOYEE, users.get(6), false));
                 }
                 userRepository.saveAll(users);
 
@@ -211,6 +211,10 @@ public class StarskyApplication {
                 }
                 employeeAvailabilityRepository.saveAll(availabilities);
                 employeeAssignmentRepository.saveAll(assignments);
+
+                var managerOfManualUser = new User("Manager Of Manual User", "manual@manager.com", "password", "Management of Manual", null, true, NotificationType.EMAIL, Role.MANAGER, null, false);
+                var manualUser = new User("Manual User Test", "manual@employee.com", null, "Manual Job", null, true, NotificationType.EMAIL, Role.EMPLOYEE, managerOfManualUser, true);
+                userRepository.saveAll(Arrays.asList(managerOfManualUser, manualUser));
 
                 logger.info("Successfully inserted mock data");
             }

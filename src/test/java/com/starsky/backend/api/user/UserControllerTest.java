@@ -73,6 +73,7 @@ public class UserControllerTest extends TestJwtProvider {
         Assertions.assertEquals("David Starsky", response.getName());
         Assertions.assertEquals("EMAIL", response.getNotificationType());
         Assertions.assertEquals("MANAGER", response.getRole());
+        Assertions.assertFalse(response.isManuallyAdded());
         Assertions.assertNull(response.getPhoneNumber()); //atm phone numbers are only supported in database, but not when actually registering
     }
 
@@ -119,6 +120,7 @@ public class UserControllerTest extends TestJwtProvider {
         Assertions.assertEquals("Test Manager", userResponse.getJobTitle());
         Assertions.assertEquals("MANAGER", userResponse.getRole());
         Assertions.assertEquals("EMAIL", userResponse.getNotificationType());
+        Assertions.assertFalse(userResponse.isManuallyAdded());
         Assertions.assertNull(userResponse.getPhoneNumber());
     }
 
@@ -140,6 +142,7 @@ public class UserControllerTest extends TestJwtProvider {
         Assertions.assertEquals(request.getJobTitle().get(), userResponse.getJobTitle());
         Assertions.assertEquals("MANAGER", userResponse.getRole());
         Assertions.assertEquals("EMAIL", userResponse.getNotificationType());
+        Assertions.assertFalse(userResponse.isManuallyAdded());
         Assertions.assertNull(userResponse.getPhoneNumber());
     }
 
@@ -270,7 +273,7 @@ public class UserControllerTest extends TestJwtProvider {
     }
 
     @Test
-    @DisplayName("Should create new employee")
+    @DisplayName("Should create new employee from invite token")
     @Transactional
     public void testCreateNewEmployee() throws Exception {
         var result = mockMvc.perform(
@@ -291,7 +294,108 @@ public class UserControllerTest extends TestJwtProvider {
         Assertions.assertEquals("David Starsky", response.getName());
         Assertions.assertEquals("EMAIL", response.getNotificationType());
         Assertions.assertEquals("EMPLOYEE", response.getRole());
+        Assertions.assertFalse(response.isManuallyAdded());
         Assertions.assertNull(response.getPhoneNumber()); //atm phone numbers are only supported in database, but not when actually registering
+    }
+
+    @Test
+    @Transactional
+    public void testCreateNewManualEmployee() throws Exception {
+        var result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateEmployeeRequest("David Starsky",
+                                        "david@s.io",
+                                        "Employee Numero Uno")))
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var response = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class);
+        Assertions.assertEquals("david@s.io", response.getEmail());
+        Assertions.assertEquals("Employee Numero Uno", response.getJobTitle());
+        Assertions.assertEquals("David Starsky", response.getName());
+        Assertions.assertEquals("EMAIL", response.getNotificationType());
+        Assertions.assertEquals("EMPLOYEE", response.getRole());
+        Assertions.assertTrue(response.isManuallyAdded());
+        Assertions.assertNull(response.getPhoneNumber()); //atm phone numbers are only supported in database, but not when actually registering
+    }
+
+    @Test
+    @Transactional
+    public void shouldGetBadRequestWhenCreatingManualEmployee() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateEmployeeRequest("",
+                                        "david@s.io",
+                                        "Employee Numero Uno")))
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateEmployeeRequest("asd",
+                                        "david",
+                                        "Employee Numero Uno")))
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateEmployeeRequest("asd",
+                                        "david@david.com",
+                                        null)))
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldGetConflictWhenCreatingManualEmployeeWithExistingEmail() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateEmployeeRequest("asd",
+                                        "a@a.com",
+                                        "Employee Numero Uno")))
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @Transactional
+    public void nonAuthenticatedUserShouldGetAccessDeniedWhenCreatingEmployee() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateEmployeeRequest("David Starsky",
+                                        "david@s.io",
+                                        "Employee Numero Uno"))))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new CreateEmployeeRequest("David Starsky",
+                                        "david@s.io",
+                                        "Employee Numero Uno")))
+                        .header("Authorization", getEmployeeJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 
     @Test

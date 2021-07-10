@@ -18,7 +18,6 @@ public class User extends BaseEntity {
     @NotNull
     @Column(unique = true)
     private String email;
-    @NotNull
     private String password;
     @NotNull
     private String jobTitle;
@@ -33,19 +32,22 @@ public class User extends BaseEntity {
     private Role role;
     @OneToOne
     private User parentUser;
+    @NotNull
+    private boolean manuallyAdded;
 
     public User() {
     }
 
-    public User(@NotNull String name,
-                @NotNull String email,
-                @NotNull String password,
-                @NotNull String jobTitle,
+    public User(String name,
+                String email,
+                String password,
+                String jobTitle,
                 String phoneNumber,
-                @NotNull boolean enabled,
-                @NotNull NotificationType notificationType,
-                @NotNull Role role,
-                User parentUser) {
+                boolean enabled,
+                NotificationType notificationType,
+                Role role,
+                User parentUser,
+                boolean manuallyAdded) {
 
         this.name = name;
         this.email = email;
@@ -56,10 +58,19 @@ public class User extends BaseEntity {
         this.notificationType = notificationType;
         this.role = role;
         this.parentUser = parentUser;
+        this.manuallyAdded = manuallyAdded;
+    }
+
+    public boolean isManuallyAdded() {
+        return manuallyAdded;
+    }
+
+    public void setManuallyAdded(boolean manuallyAdded) {
+        this.manuallyAdded = manuallyAdded;
     }
 
     public UserResponse toResponse() {
-        return new UserResponse(getId(), getName(), getEmail(), getJobTitle(), getPhoneNumber(), getNotificationType().name(), getRole().name());
+        return new UserResponse(getId(), getName(), getEmail(), getJobTitle(), getPhoneNumber(), getNotificationType().name(), getRole().name(), isManuallyAdded());
     }
 
     public long getId() {

@@ -62,6 +62,23 @@ public class AuthenticationControllerTest {
     }
 
     @Test
+    public void manualUserShouldNotBeAbleToLogin() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new LoginRequest("manual@employee.com", null))))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new LoginRequest("manual@employee.com", "password"))))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @DisplayName("Bad login requests should be unauthorized")
     public void testMalformedRequest() throws Exception {
         mockMvc.perform(

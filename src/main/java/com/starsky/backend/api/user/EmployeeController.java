@@ -13,9 +13,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/user/employees", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,5 +40,20 @@ public class EmployeeController extends BaseController {
         var manager = getAuthenticatedUser();
         var employees = userService.getEmployees(manager).stream().map(User::toResponse).toArray(UserResponse[]::new);
         return ResponseEntity.ok(employees);
+    }
+
+    @PostMapping
+    @Operation(summary = "Manually create a new employee", description = "Manually create a new employee for the currently authenticated user - manager only route. " +
+            "This employee will not be able to login - employees should be invited if they want to access the platform and register themselves. " +
+            "This is used when a manager wants to add employees that don't necessarily need platform access, but he still needs to create schedules.")
+    @ApiResponse(responseCode = "200", description = "Response with newly created employee.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
+    public ResponseEntity<UserResponse> postEmployee(@Valid @RequestBody CreateEmployeeRequest request) {
+        var manager = getAuthenticatedUser();
+        var employee = userService.createEmployee(request, manager);
+        return ResponseEntity.ok(employee.toResponse());
     }
 }

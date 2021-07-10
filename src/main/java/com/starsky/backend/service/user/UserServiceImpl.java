@@ -1,6 +1,7 @@
 package com.starsky.backend.service.user;
 
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
+import com.starsky.backend.api.user.CreateEmployeeRequest;
 import com.starsky.backend.api.user.CreateUserRequest;
 import com.starsky.backend.api.user.UpdateUserRequest;
 import com.starsky.backend.domain.invite.Invite;
@@ -39,7 +40,7 @@ public class UserServiceImpl implements UserService {
         Invite invite = null;
         if (request.getInviteToken() == null) {
             user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
-                    null, true, NotificationType.EMAIL, Role.MANAGER, null);
+                    null, true, NotificationType.EMAIL, Role.MANAGER, null, false);
         } else {
             invite = inviteService.getByToken(request.getInviteToken());
             var validation = inviteService.validateInvite(invite);
@@ -48,7 +49,7 @@ public class UserServiceImpl implements UserService {
             }
 
             user = new User(request.getName(), request.getEmail(), bCryptPasswordEncoder.encode(request.getPassword()), request.getJobTitle(),
-                    null, true, NotificationType.EMAIL, Role.EMPLOYEE, invite.getManager());
+                    null, true, NotificationType.EMAIL, Role.EMPLOYEE, invite.getManager(), false);
         }
 
         user = userRepository.save(user);
@@ -60,8 +61,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User createEmployee(CreateEmployeeRequest request, User manager) {
+        var user = new User(request.getName(),
+                request.getEmail(),
+                null,
+                request.getJobTitle(),
+                null,
+                true,
+                NotificationType.EMAIL,
+                Role.EMPLOYEE,
+                manager,
+                true);
+        user = userRepository.save(user);
+        return user;
+    }
+
+    @Override
     public User getUserByEmail(String email) throws ResourceNotFoundException {
         var user = userRepository.findByEmailAndEnabled(email, true);
+        if (user.isPresent()) {
+            return user.get();
+        }
+        var error = "User (email=%s) does not exist.".formatted(email);
+        this.logger.warn(error);
+        throw new ResourceNotFoundException(error);
+    }
+
+    public User getUserByEmailAndManuallyAdded(String email, boolean manuallyAdded) throws ResourceNotFoundException {
+        var user = userRepository.findByEmailAndEnabledAndManuallyAdded(email, true, manuallyAdded);
         if (user.isPresent()) {
             return user.get();
         }

@@ -11,6 +11,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmailAndEnabled(String email, boolean enabled);
 
+    Optional<User> findByEmailAndEnabledAndManuallyAdded(String email, boolean enabled, boolean manuallyAdded);
+
     Optional<User> findByIdAndEnabled(long id, boolean enabled);
 
     List<User> findAllByParentUserAndEnabled(User parentUser, boolean enabled);

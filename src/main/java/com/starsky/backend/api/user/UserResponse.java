@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class UserResponse {
-
-
     @Schema(example = "1", title = "User id")
     private final long id;
     @Schema(example = "David Starsky", title = "User name")
@@ -23,8 +21,11 @@ public class UserResponse {
     private final String notificationType;
     @Schema(example = "EMPLOYEE", title = "User role")
     private final String role;
+    @Schema(example = "false", title = "Manually added")
+    @JsonProperty("manually_added")
+    private final boolean manuallyAdded;
 
-    public UserResponse(long id, String name, String email, String jobTitle, String phoneNumber, String notificationType, String role) {
+    public UserResponse(long id, String name, String email, String jobTitle, String phoneNumber, String notificationType, String role, boolean manuallyAdded) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -32,6 +33,7 @@ public class UserResponse {
         this.phoneNumber = phoneNumber;
         this.notificationType = notificationType;
         this.role = role;
+        this.manuallyAdded = manuallyAdded;
     }
 
     public long getId() {
@@ -62,4 +64,7 @@ public class UserResponse {
         return role;
     }
 
+    public boolean isManuallyAdded() {
+        return manuallyAdded;
+    }
 }

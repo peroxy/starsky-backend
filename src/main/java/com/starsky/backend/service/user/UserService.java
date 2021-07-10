@@ -1,6 +1,7 @@
 package com.starsky.backend.service.user;
 
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
+import com.starsky.backend.api.user.CreateEmployeeRequest;
 import com.starsky.backend.api.user.CreateUserRequest;
 import com.starsky.backend.api.user.UpdateUserRequest;
 import com.starsky.backend.domain.user.User;
@@ -11,7 +12,11 @@ import java.util.List;
 public interface UserService {
     User createUser(CreateUserRequest request) throws InvalidInviteTokenException;
 
+    User createEmployee(CreateEmployeeRequest request, User manager);
+
     User getUserByEmail(String email) throws ResourceNotFoundException;
+
+    User getUserByEmailAndManuallyAdded(String email, boolean manuallyAdded) throws ResourceNotFoundException;
 
     User getUserById(long id) throws ResourceNotFoundException;
 
