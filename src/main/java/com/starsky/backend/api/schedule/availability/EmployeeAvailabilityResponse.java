@@ -8,15 +8,19 @@ import java.time.Instant;
 
 public class EmployeeAvailabilityResponse {
     @Schema(example = "1")
+    @NotNull
     private final long id;
     @JsonProperty("shift_start")
     @Schema(example = "1617032176.7171679", title = "Epoch timestamp of availability start", implementation = Double.class)
+    @NotNull
     private final Instant availabilityStart;
     @JsonProperty("shift_end")
     @Schema(example = "1617052176.7171679", title = "Epoch timestamp of availability end", implementation = Double.class)
+    @NotNull
     private final Instant availabilityEnd;
     @JsonProperty("max_hours_per_shift")
     @Schema(example = "8", title = "Maximum hours per shift")
+    @NotNull
     private final int maxHoursPerShift;
     @NotNull
     @JsonProperty("employee_id")

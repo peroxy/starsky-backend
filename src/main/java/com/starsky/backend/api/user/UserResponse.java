@@ -3,26 +3,35 @@ package com.starsky.backend.api.user;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import javax.validation.constraints.NotNull;
+
 public class UserResponse {
     @Schema(example = "1", title = "User id")
+    @NotNull
     private final long id;
     @Schema(example = "David Starsky", title = "User name")
+    @NotNull
     private final String name;
     @Schema(example = "david@example.com", title = "User email")
+    @NotNull
     private final String email;
     @JsonProperty("job_title")
     @Schema(example = "Police detective", title = "User job title")
+    @NotNull
     private final String jobTitle;
     @JsonProperty("phone_number")
     @Schema(example = "+38641891123", title = "User phone number")
     private final String phoneNumber;
     @JsonProperty("notification_type")
     @Schema(example = "EMAIL", title = "User notification preference")
+    @NotNull
     private final String notificationType;
     @Schema(example = "EMPLOYEE", title = "User role")
+    @NotNull
     private final String role;
     @Schema(example = "false", title = "Manually added")
     @JsonProperty("manually_added")
+    @NotNull
     private final boolean manuallyAdded;
 
     public UserResponse(long id, String name, String email, String jobTitle, String phoneNumber, String notificationType, String role, boolean manuallyAdded) {
