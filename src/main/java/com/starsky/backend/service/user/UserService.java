@@ -3,6 +3,7 @@ package com.starsky.backend.service.user;
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.user.CreateEmployeeRequest;
 import com.starsky.backend.api.user.CreateUserRequest;
+import com.starsky.backend.api.user.UpdateEmployeeRequest;
 import com.starsky.backend.api.user.UpdateUserRequest;
 import com.starsky.backend.domain.user.User;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -13,6 +14,8 @@ public interface UserService {
     User createUser(CreateUserRequest request) throws InvalidInviteTokenException;
 
     User createEmployee(CreateEmployeeRequest request, User manager);
+
+    User updateEmployee(UpdateEmployeeRequest request, User manager, long employeeId);
 
     User getUserByEmail(String email) throws ResourceNotFoundException;
 

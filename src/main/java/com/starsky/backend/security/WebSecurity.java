@@ -63,6 +63,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/user/schedules/{schedule_id}",
                         "/user/shifts/{shift_id}",
                         "/user/availabilities/{availability_id}",
+                        "/user/employees/{employee_id}",
                         "/user/teams/{team_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.DELETE,

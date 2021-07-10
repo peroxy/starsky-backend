@@ -3,6 +3,7 @@ package com.starsky.backend.service.user;
 import com.starsky.backend.api.exception.InvalidInviteTokenException;
 import com.starsky.backend.api.user.CreateEmployeeRequest;
 import com.starsky.backend.api.user.CreateUserRequest;
+import com.starsky.backend.api.user.UpdateEmployeeRequest;
 import com.starsky.backend.api.user.UpdateUserRequest;
 import com.starsky.backend.domain.invite.Invite;
 import com.starsky.backend.domain.user.NotificationType;
@@ -74,6 +75,23 @@ public class UserServiceImpl implements UserService {
                 true);
         user = userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public User updateEmployee(UpdateEmployeeRequest request, User manager, long employeeId) {
+        var employee = getEmployeeById(employeeId, manager);
+
+        if (request.getEmail().isPresent()) {
+            employee.setEmail(request.getEmail().get());
+        }
+        if (request.getName().isPresent()) {
+            employee.setName(request.getName().get());
+        }
+        if (request.getJobTitle().isPresent()) {
+            employee.setJobTitle(request.getJobTitle().get());
+        }
+
+        return userRepository.save(employee);
     }
 
     @Override

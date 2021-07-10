@@ -56,4 +56,18 @@ public class EmployeeController extends BaseController {
         var employee = userService.createEmployee(request, manager);
         return ResponseEntity.ok(employee.toResponse());
     }
+
+    @PatchMapping("/{employee_id}")
+    @Operation(summary = "Update an existing employee", description = "Update an existing employee's properties - manager only route. ")
+    @ApiResponse(responseCode = "200", description = "Response with updated employee.",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
+    @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Employee does not exist.", content = @Content)
+    @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
+    public ResponseEntity<UserResponse> patchEmployee(@Valid @RequestBody UpdateEmployeeRequest request, @PathVariable("employee_id") long employeeId) {
+        var manager = getAuthenticatedUser();
+        var employee = userService.updateEmployee(request, manager, employeeId);
+        return ResponseEntity.ok(employee.toResponse());
+    }
 }
