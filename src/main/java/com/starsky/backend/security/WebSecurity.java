@@ -72,6 +72,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/user/availabilities/{availability_id}",
                         "/user/invites/{invite_id}",
                         "/user/teams/{team_id}",
+                        "/user/employees/{employee_id}",
                         "/user/teams/{team_id}/members/{user_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET,

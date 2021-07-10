@@ -164,4 +164,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsAllByIdInAndParentUserAndEnabled(employeeIds, owner, true);
     }
 
+    @Override
+    public void deleteEmployee(long employeeId, User manager) throws ResourceNotFoundException {
+        var employee = getEmployeeById(employeeId, manager);
+        employee.setEnabled(false);
+        userRepository.save(employee);
+    }
+
 }

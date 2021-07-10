@@ -30,4 +30,6 @@ public interface UserService {
     User updateUser(User user, UpdateUserRequest request);
 
     boolean employeesExist(Long[] employeeIds, User owner);
+
+    void deleteEmployee(long employeeId, User manager) throws ResourceNotFoundException;
 }

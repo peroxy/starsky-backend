@@ -84,6 +84,46 @@ public class EmployeeControllerTest extends TestJwtProvider {
     }
 
     @Test
+    public void shouldCreateAndDeleteEmployee() throws Exception {
+        var result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CreateEmployeeRequest("Test employee", "test@testsiissi.com", "job")))
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var employee = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse.class);
+
+        result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        var employees = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse[].class);
+        Assertions.assertEquals(3, employees.length);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/user/employees/%d".formatted(employee.getId()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/user/employees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", getManagerJwtHeader()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        employees = objectMapper.readValue(result.getResponse().getContentAsString(), UserResponse[].class);
+        Assertions.assertEquals(2, employees.length);
+    }
+
+    @Test
     public void shouldGetConflictWhenUpdateEmployeeWithExistingEmail() throws Exception {
         var result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/user/employees")

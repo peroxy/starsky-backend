@@ -70,4 +70,15 @@ public class EmployeeController extends BaseController {
         var employee = userService.updateEmployee(request, manager, employeeId);
         return ResponseEntity.ok(employee.toResponse());
     }
+
+    @DeleteMapping("/{employee_id}")
+    @Operation(summary = "Delete an existing employee", description = "Deletes an existing employee - manager only route. ")
+    @ApiResponse(responseCode = "204", description = "Successfully deleted employee.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Employee does not exist.", content = @Content)
+    public ResponseEntity<Void> deleteEmployee(@PathVariable("employee_id") long employeeId) {
+        var manager = getAuthenticatedUser();
+        userService.deleteEmployee(employeeId, manager);
+        return ResponseEntity.noContent().build();
+    }
 }
