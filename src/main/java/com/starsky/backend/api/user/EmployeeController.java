@@ -47,7 +47,7 @@ public class EmployeeController extends BaseController {
             "This employee will not be able to login - employees should be invited if they want to access the platform and register themselves. " +
             "This is used when a manager wants to add employees that don't necessarily need platform access, but he still needs to create schedules.")
     @ApiResponse(responseCode = "200", description = "Response with newly created employee.",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponse.class)))
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
     @ApiResponse(responseCode = "409", description = "Email already exists.", content = @Content)
@@ -60,7 +60,7 @@ public class EmployeeController extends BaseController {
     @PatchMapping("/{employee_id}")
     @Operation(summary = "Update an existing employee", description = "Update an existing employee's properties - manager only route. ")
     @ApiResponse(responseCode = "200", description = "Response with updated employee.",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = UserResponse.class))))
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserResponse.class)))
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have the manager role.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Employee does not exist.", content = @Content)
