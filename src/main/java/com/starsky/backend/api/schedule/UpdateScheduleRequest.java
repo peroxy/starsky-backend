@@ -29,14 +29,18 @@ public class UpdateScheduleRequest {
     @Schema(example = "8", title = "Maximum allowed hours per shift")
     @Min(0)
     private final Integer maxHoursPerShift;
+    @JsonProperty("team_id")
+    @Schema(example = "1", title = "Team id assigned to schedule")
+    private final Long teamId;
 
-    public UpdateScheduleRequest(String scheduleName, Instant scheduleStart, Instant scheduleEnd, Integer maxHoursPerEmployee, Integer maxShiftsPerEmployee, Integer maxHoursPerShift) {
+    public UpdateScheduleRequest(String scheduleName, Instant scheduleStart, Instant scheduleEnd, Integer maxHoursPerEmployee, Integer maxShiftsPerEmployee, Integer maxHoursPerShift, Long teamId) {
         this.scheduleName = scheduleName;
         this.scheduleStart = scheduleStart;
         this.scheduleEnd = scheduleEnd;
         this.maxHoursPerEmployee = maxHoursPerEmployee;
         this.maxShiftsPerEmployee = maxShiftsPerEmployee;
         this.maxHoursPerShift = maxHoursPerShift;
+        this.teamId = teamId;
     }
 
     public Optional<String> getScheduleName() {
@@ -61,6 +65,10 @@ public class UpdateScheduleRequest {
 
     public Optional<Integer> getMaxHoursPerShift() {
         return Optional.ofNullable(maxHoursPerShift);
+    }
+
+    public Optional<Long> getTeamId() {
+        return Optional.ofNullable(teamId);
     }
 }
 

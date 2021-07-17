@@ -240,7 +240,7 @@ public class ScheduleControllerTest extends TestJwtProvider {
         result = mockMvc.perform(MockMvcRequestBuilders.patch("/user/schedules/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                        new UpdateScheduleRequest("updated schedule", null, null, null, null, null)))
+                        new UpdateScheduleRequest("updated schedule", null, null, null, null, null, null)))
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -261,7 +261,7 @@ public class ScheduleControllerTest extends TestJwtProvider {
         mockMvc.perform(MockMvcRequestBuilders.patch("/user/schedules/1584848")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                        new UpdateScheduleRequest(null, now, now, null, null, null)))
+                        new UpdateScheduleRequest(null, now, now, null, null, null, null)))
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -274,7 +274,7 @@ public class ScheduleControllerTest extends TestJwtProvider {
         mockMvc.perform(MockMvcRequestBuilders.patch("/user/schedules/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                        new UpdateScheduleRequest(null, now, now, null, null, null)))
+                        new UpdateScheduleRequest(null, now, now, null, null, null, null)))
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());

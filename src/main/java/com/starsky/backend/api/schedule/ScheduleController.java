@@ -116,7 +116,7 @@ public class ScheduleController extends BaseController {
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleResponse.class)))
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
-    @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Schedule or team does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Invalid schedule date range (start timestamp occurs after end timestamp) supplied.", content = @Content)
     public ResponseEntity<ScheduleResponse> patchSchedule(@PathVariable("schedule_id") long scheduleId, @Valid @RequestBody UpdateScheduleRequest request) throws DateRangeException, ForbiddenException {
         var user = getAuthenticatedUser();

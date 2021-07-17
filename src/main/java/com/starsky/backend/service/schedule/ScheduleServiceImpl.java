@@ -118,6 +118,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (request.getMaxShiftsPerEmployee().isPresent()) {
             schedule.setMaxShiftsPerEmployee(request.getMaxShiftsPerEmployee().get());
         }
+        if (request.getTeamId().isPresent()) {
+            var team = teamService.getTeam(request.getTeamId().get(), owner);
+            schedule.setTeam(team);
+        }
         dateRangeValidator.validateDateInterval(schedule.getScheduleStart(), schedule.getScheduleEnd());
         return scheduleRepository.save(schedule);
     }
