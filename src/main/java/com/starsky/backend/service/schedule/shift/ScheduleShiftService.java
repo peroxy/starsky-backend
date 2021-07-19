@@ -24,6 +24,6 @@ public interface ScheduleShiftService {
 
     boolean shiftsExist(Collection<Long> shiftIds, User owner);
 
-    void putAll(List<CreateScheduleShiftRequest> shifts, User owner, long scheduleId) throws DateRangeException, ResourceNotFoundException, ForbiddenException;
+    List<ScheduleShift> putAll(List<CreateScheduleShiftRequest> shifts, User owner, long scheduleId) throws DateRangeException, ResourceNotFoundException, ForbiddenException;
 }
 

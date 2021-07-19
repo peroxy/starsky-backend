@@ -189,13 +189,13 @@ public class ScheduleShiftControllerTest extends TestJwtProvider {
                 .content(objectMapper.writeValueAsString(Arrays.asList(request, request, request)))
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
         mockMvc.perform(MockMvcRequestBuilders.put("/user/schedules/%d/shifts".formatted(scheduleWithoutShifts.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(Arrays.asList(request, request)))
                 .header("Authorization", getManagerJwtHeader()))
                 .andDo(print())
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test

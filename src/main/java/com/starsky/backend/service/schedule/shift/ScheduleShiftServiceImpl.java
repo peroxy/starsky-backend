@@ -123,7 +123,7 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
 
     @Override
     @Transactional
-    public void putAll(List<CreateScheduleShiftRequest> requests, User owner, long scheduleId) throws DateRangeException, ResourceNotFoundException, ForbiddenException {
+    public List<ScheduleShift> putAll(List<CreateScheduleShiftRequest> requests, User owner, long scheduleId) throws DateRangeException, ResourceNotFoundException, ForbiddenException {
         var schedule = scheduleService.getSchedule(scheduleId, owner);
 
         var shifts = new ArrayList<ScheduleShift>();
@@ -133,7 +133,7 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
         }
 
         scheduleShiftRepository.deleteByScheduleIdAndScheduleTeamOwner(scheduleId, owner);
-        scheduleShiftRepository.saveAll(shifts);
+        return scheduleShiftRepository.saveAll(shifts);
     }
 
     private ResourceNotFoundException getShiftDoesNotExistException(long shiftId, User manager) {
