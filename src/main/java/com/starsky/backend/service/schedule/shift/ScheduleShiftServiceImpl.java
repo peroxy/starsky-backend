@@ -132,7 +132,7 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
             shifts.add(new ScheduleShift(shift.getShiftStart(), shift.getShiftEnd(), schedule, shift.getNumberOfRequiredEmployees()));
         }
 
-        scheduleShiftRepository.deleteByScheduleIdAndScheduleTeamOwner(scheduleId, owner);
+//        scheduleShiftRepository.deleteByScheduleIdAndScheduleTeamOwner(scheduleId, owner);
         return scheduleShiftRepository.saveAll(shifts);
     }
 

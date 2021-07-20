@@ -105,9 +105,7 @@ public class ScheduleShiftController extends BaseController {
     }
 
     @PutMapping("/schedules/{schedule_id}/shifts")
-    @Operation(summary = "Create or update multiple schedule shifts", description = "Creates or updates schedule shifts. " +
-            "Please note that this operation can be destructive - it will always delete all of the previous/existing schedule shifts (if they exist) for the specified schedule and create or update with the new ones. " +
-            "Authenticated user must have manager role.")
+    @Operation(summary = "Create or update multiple schedule shifts", description = "Creates or updates schedule shifts. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "List of created/updates schedule shifts.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ScheduleShiftResponse.class))))
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)

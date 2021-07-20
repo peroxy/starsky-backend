@@ -82,9 +82,7 @@ public class EmployeeAvailabilityController extends BaseController {
     }
 
     @PutMapping("/availabilities")
-    @Operation(summary = "Create or update multiple employee availabilities", description = "Creates or updates employee availabilities. " +
-            "Please note that this operation can be destructive - it will always delete all of the previous/existing employee availabilities (if they exist) for the specified shift and create or update with the new ones. " +
-            "Authenticated user must have manager role.")
+    @Operation(summary = "Create or update multiple employee availabilities", description = "Creates or updates employee availabilities. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "204", description = "Created/updated employee availabilities successfully.", content = @Content)
     @ApiResponse(responseCode = "400", description = "Request body invalid.", content = @Content)
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have manager role.", content = @Content)
