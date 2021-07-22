@@ -83,7 +83,7 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
         dateRangeValidator.validateDateInterval(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd());
         var schedule = scheduleService.getSchedule(scheduleId, manager); // will throw resource not found if it doesn't exist
         var scheduleShift = new ScheduleShift(shiftRequest.getShiftStart(), shiftRequest.getShiftEnd(), schedule, shiftRequest.getNumberOfRequiredEmployees());
-        checkIfDateIntervalExistsOrOverlaps(scheduleShift);
+//        checkIfDateIntervalExistsOrOverlaps(scheduleShift);
         scheduleShift = scheduleShiftRepository.save(scheduleShift);
         return scheduleShift;
     }
@@ -112,7 +112,7 @@ public class ScheduleShiftServiceImpl implements ScheduleShiftService {
             scheduleShift.setNumberOfRequiredEmployees(request.getNumberOfRequiredEmployees().get());
         }
         dateRangeValidator.validateDateInterval(scheduleShift.getShiftStart(), scheduleShift.getShiftEnd());
-        checkIfDateIntervalExistsOrOverlaps(scheduleShift);
+//        checkIfDateIntervalExistsOrOverlaps(scheduleShift);
         return scheduleShiftRepository.save(scheduleShift);
     }
 
