@@ -156,7 +156,7 @@ public class EmployeeAvailabilityServiceImpl implements EmployeeAvailabilityServ
                     new EmployeeAvailability(user, shift, availability.getAvailabilityStart(), availability.getAvailabilityEnd(), availability.getMaxHoursPerShift()));
         }
 
-//        employeeAvailabilityRepository.deleteAllByShiftIdInAndShiftScheduleTeamOwner(shiftIds, manager);
+        employeeAvailabilityRepository.deleteAllByShiftIdInAndShiftScheduleTeamOwner(shiftIds, manager);
         employeeAvailabilityRepository.saveAll(employeeAvailabilities);
     }
 
