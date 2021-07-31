@@ -74,7 +74,7 @@ public class ScheduleController extends BaseController {
     @Operation(summary = "Get solved schedule's employee assignments", description = "Returns the solved schedule with employee assignments. " +
             "Manager only route.")
     @ApiResponse(responseCode = "200", description = "Response with the schedule.",
-            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = EmployeeAssignmentResponse[].class)))
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = EmployeeAssignmentResponse.class))))
     @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have sufficient permissions.", content = @Content)
     @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
     @ApiResponse(responseCode = "422", description = "Schedule cannot be solved.", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ScheduleUnsolvableResponse.class)))
