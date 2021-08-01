@@ -3,12 +3,16 @@ package com.starsky.backend.service.schedule.assignment;
 import com.starsky.backend.api.exception.DateRangeException;
 import com.starsky.backend.api.exception.ForbiddenException;
 import com.starsky.backend.api.schedule.assignment.CreateEmployeeAssignmentRequest;
+import com.starsky.backend.api.schedule.assignment.PutEmployeeAssignmentRequest;
+import com.starsky.backend.api.schedule.assignment.UpdateEmployeeAssignmentRequest;
 import com.starsky.backend.domain.schedule.EmployeeAssignment;
+import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.user.User;
 import com.starsky.backend.repository.EmployeeAssignmentRepository;
 import com.starsky.backend.service.schedule.DateRangeValidator;
 import com.starsky.backend.service.schedule.ScheduleService;
-import com.starsky.backend.service.team.TeamService;
+import com.starsky.backend.service.schedule.shift.ScheduleShiftService;
+import com.starsky.backend.service.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +20,9 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class EmployeeAssignmentServiceImpl implements EmployeeAssignmentService {
@@ -26,14 +30,18 @@ public class EmployeeAssignmentServiceImpl implements EmployeeAssignmentService 
     private final ScheduleService scheduleService;
     private final EmployeeAssignmentRepository employeeAssignmentRepository;
     private final DateRangeValidator dateRangeValidator;
+    private final ScheduleShiftService scheduleShiftService;
+    private final UserService userService;
 
     private final Logger logger = LoggerFactory.getLogger(EmployeeAssignmentServiceImpl.class);
 
     @Autowired
-    public EmployeeAssignmentServiceImpl(ScheduleService scheduleService, EmployeeAssignmentRepository employeeAssignmentRepository, TeamService teamService, DateRangeValidator dateRangeValidator) {
+    public EmployeeAssignmentServiceImpl(ScheduleService scheduleService, EmployeeAssignmentRepository employeeAssignmentRepository, DateRangeValidator dateRangeValidator, ScheduleShiftService scheduleShiftService, UserService userService) {
         this.scheduleService = scheduleService;
         this.employeeAssignmentRepository = employeeAssignmentRepository;
         this.dateRangeValidator = dateRangeValidator;
+        this.scheduleShiftService = scheduleShiftService;
+        this.userService = userService;
     }
 
     @Override
@@ -43,8 +51,53 @@ public class EmployeeAssignmentServiceImpl implements EmployeeAssignmentService 
     }
 
     @Override
+    public EmployeeAssignment update(long assignmentId, long scheduleId, User user, UpdateEmployeeAssignmentRequest request) throws ForbiddenException, DateRangeException {
+        var schedule = scheduleService.getSchedule(scheduleId, user); // this will throw if user does not have permission or if schedule does not exist
+
+        var assignment = employeeAssignmentRepository.findByIdAndShiftSchedule(assignmentId, schedule).orElseThrow(() -> {
+            var error = "Assignment (id=%d) does not exist for schedule (id=%d).".formatted(assignmentId, scheduleId);
+            return logAndGetResourceNotFound(error);
+        });
+
+        if (request.getAssignmentStart().isPresent()) {
+            assignment.setAssignmentStart(request.getAssignmentStart().get());
+        }
+
+        if (request.getAssignmentEnd().isPresent()) {
+            assignment.setAssignmentEnd(request.getAssignmentEnd().get());
+        }
+
+        validateAssignmentDateRange(assignment.getAssignmentStart(), assignment.getAssignmentEnd(), assignment.getShift(), assignment.getEmployee().getId());
+
+        return employeeAssignmentRepository.save(assignment);
+    }
+
+    @Override
+    public void delete(long assignmentId, long scheduleId, User user) throws ForbiddenException, ResourceNotFoundException {
+        var schedule = scheduleService.getSchedule(scheduleId, user); // this will throw if user does not have permission or if schedule does not exist
+
+        var assignment = employeeAssignmentRepository.findByIdAndShiftSchedule(assignmentId, schedule).orElseThrow(() -> {
+            var error = "Assignment (id=%d) does not exist for schedule (id=%d).".formatted(assignmentId, scheduleId);
+            return logAndGetResourceNotFound(error);
+        });
+
+        employeeAssignmentRepository.delete(assignment);
+    }
+
+    @Override
+    public EmployeeAssignment create(long scheduleId, long shiftId, long employeeId, User owner, CreateEmployeeAssignmentRequest request) throws ForbiddenException, ResourceNotFoundException, DateRangeException {
+        var shift = scheduleShiftService.getScheduleShift(shiftId, owner);
+        var employee = userService.getEmployeeById(employeeId, owner);
+
+        validateAssignmentDateRange(request.getAssignmentStart(), request.getAssignmentEnd(), shift, employeeId);
+
+        var assignment = new EmployeeAssignment(employee, shift, request.getAssignmentStart(), request.getAssignmentEnd());
+        return employeeAssignmentRepository.save(assignment);
+    }
+
+    @Override
     @Transactional
-    public void putAll(List<CreateEmployeeAssignmentRequest> requests, long scheduleId, User owner) throws ForbiddenException, DateRangeException {
+    public void putAll(List<PutEmployeeAssignmentRequest> requests, long scheduleId, User owner) throws ForbiddenException, DateRangeException {
         // 1. validate schedule, shifts, user permissions, time intervals (they dont overlap) before saving anything
         var schedule = scheduleService.getSchedule(scheduleId, owner);
         var employees = schedule.getTeam().getTeamMembers();
@@ -62,34 +115,38 @@ public class EmployeeAssignmentServiceImpl implements EmployeeAssignmentService 
                 return logAndGetResourceNotFound(error);
             });
 
-            dateRangeValidator.validateDateInterval(request.getAssignmentStart(), request.getAssignmentEnd());
-
-            if (request.getAssignmentStart().isBefore(shift.getShiftStart()) ||
-                    request.getAssignmentStart().isAfter(shift.getShiftEnd()) ||
-                    request.getAssignmentEnd().isBefore(shift.getShiftStart()) ||
-                    request.getAssignmentEnd().isAfter(shift.getShiftEnd())) {
-                var error = "Employee assignment (employee id=%d) date range does not overlap with schedule shift date range (assignment (from %s to %s), shift (from %s to %s))."
-                        .formatted(request.getEmployeeId(), request.getAssignmentStart(), request.getAssignmentEnd(), shift.getShiftStart(), shift.getShiftEnd());
-                this.logger.warn(error);
-                throw new DateRangeException(error);
-            }
+            validateAssignmentDateRange(request.getAssignmentStart(), request.getAssignmentEnd(), shift, request.getEmployeeId());
 
             assignments.add(new EmployeeAssignment(employee.getMember(), shift, request.getAssignmentStart(), request.getAssignmentEnd()));
         }
 
-        var grouped = requests.stream().collect(Collectors.groupingBy(CreateEmployeeAssignmentRequest::getEmployeeId));
-        for (var group : grouped.entrySet()) {
-            anyTimestampsOverlap(group.getValue().toArray(CreateEmployeeAssignmentRequest[]::new));
-        }
 
-        // 2. validation OK, delete old assignments as a transaction, should rollback if anything goes wrong when deleting or saving
+        // we were checking if any of the timestamps were overlapped in the request, but this should not be needed,
+        // let the user shoot in the foot if they want to schedule someone like this
+//        var grouped = requests.stream().collect(Collectors.groupingBy(PutEmployeeAssignmentRequest::getEmployeeId));
+//        for (var group : grouped.entrySet()) {
+//            anyTimestampsOverlap(group.getValue().toArray(PutEmployeeAssignmentRequest[]::new));
+//        }
+
+        // 2. validation OK, delete old assignments as a transaction, should roll back if anything goes wrong when deleting or saving
         employeeAssignmentRepository.deleteAllByShiftSchedule(schedule);
 
         // 3. save all assignments
         employeeAssignmentRepository.saveAll(assignments);
     }
 
-    private void anyTimestampsOverlap(CreateEmployeeAssignmentRequest[] requests) throws DateRangeException {
+    private void validateAssignmentDateRange(Instant start, Instant end, ScheduleShift shift, long employeeId) throws DateRangeException {
+        dateRangeValidator.validateDateInterval(start, end);
+
+        if (start.isBefore(shift.getShiftStart()) || start.isAfter(shift.getShiftEnd()) || end.isBefore(shift.getShiftStart()) || end.isAfter(shift.getShiftEnd())) {
+            var error = "Employee assignment (employee id=%d) date range does not overlap with schedule shift date range (assignment (from %s to %s), shift (from %s to %s))."
+                    .formatted(employeeId, start, end, shift.getShiftStart(), shift.getShiftEnd());
+            logger.warn(error);
+            throw new DateRangeException(error);
+        }
+    }
+
+    private void anyTimestampsOverlap(PutEmployeeAssignmentRequest[] requests) throws DateRangeException {
         for (int i = 0; i < requests.length; i++) {
             var request = requests[i];
             for (int j = i + 1; j < requests.length; j++) {

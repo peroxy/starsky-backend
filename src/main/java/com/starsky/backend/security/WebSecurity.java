@@ -57,14 +57,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/user/teams/{team_id}/schedules",
                         "/user/schedules/{schedule_id}/shifts",
                         "/user/employees",
-                        "/user/shifts/{shift_id}/availabilities"
+                        "/user/shifts/{shift_id}/availabilities",
+                        "/user/schedules/{schedule_id}/shifts/{shift_id}/employees/{employee_id}/assignments"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.PATCH,
                         "/user/schedules/{schedule_id}",
                         "/user/shifts/{shift_id}",
                         "/user/availabilities/{availability_id}",
                         "/user/employees/{employee_id}",
-                        "/user/teams/{team_id}"
+                        "/user/teams/{team_id}",
+                        "/user/schedules/{schedule_id}/assignments/{assignment_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.DELETE,
                         "/user/schedules/{schedule_id}",
@@ -73,7 +75,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                         "/user/invites/{invite_id}",
                         "/user/teams/{team_id}",
                         "/user/employees/{employee_id}",
-                        "/user/teams/{team_id}/members/{user_id}"
+                        "/user/teams/{team_id}/members/{user_id}",
+                        "/user/schedules/{schedule_id}/assignments/{assignment_id}"
                 ).hasRole("MANAGER")
                 .antMatchers(HttpMethod.GET,
                         "/user/invites",

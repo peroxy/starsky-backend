@@ -107,7 +107,7 @@ public class EmployeeAvailabilityControllerTest extends TestJwtProvider {
                 .andExpect(status().isOk())
                 .andReturn();
         var availabilityResponses = objectMapper.readValue(result.getResponse().getContentAsString(), EmployeeAvailabilityResponse[].class);
-        Assertions.assertEquals(20, availabilityResponses.length); //19 scheduling employees should each have 1 availability
+        Assertions.assertEquals(20, availabilityResponses.length); //20 scheduling employees should each have 1 availability
     }
 
     @Test
