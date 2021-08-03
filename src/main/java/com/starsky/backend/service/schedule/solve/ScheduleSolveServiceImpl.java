@@ -59,7 +59,7 @@ public class ScheduleSolveServiceImpl implements ScheduleSolveService {
             throw new ScheduleUnsolvableException("Schedule cannot be solved - no available employees!");
         }
 
-        var employees = members.stream().filter(member -> availableEmployeeIds.contains(member.getId())).map(TeamMember::getMember).collect(Collectors.toList());
+        var employees = members.stream().filter(member -> availableEmployeeIds.contains(member.getMember().getId())).map(TeamMember::getMember).collect(Collectors.toList());
         var employeeAssignments = getEmployeeAssignments(shifts);
 
         var job = solverManager.solve(UUID.randomUUID(), new SolvedSchedule(scheduleId, shifts, employees, employeeAssignments));
