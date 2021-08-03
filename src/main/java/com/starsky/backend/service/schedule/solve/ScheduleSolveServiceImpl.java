@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -61,6 +58,10 @@ public class ScheduleSolveServiceImpl implements ScheduleSolveService {
 
         var employees = members.stream().filter(member -> availableEmployeeIds.contains(member.getMember().getId())).map(TeamMember::getMember).collect(Collectors.toList());
         var employeeAssignments = getEmployeeAssignments(shifts);
+
+        // shuffle to avoid bias for the order of employees..
+        Collections.shuffle(shifts);
+        Collections.shuffle(employees);
 
         var job = solverManager.solve(UUID.randomUUID(), new SolvedSchedule(scheduleId, shifts, employees, employeeAssignments));
 

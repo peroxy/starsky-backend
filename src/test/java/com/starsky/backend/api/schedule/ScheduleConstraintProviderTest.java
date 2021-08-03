@@ -2,6 +2,7 @@ package com.starsky.backend.api.schedule;
 
 import com.starsky.backend.domain.schedule.EmployeeAssignment;
 import com.starsky.backend.domain.schedule.EmployeeAvailability;
+import com.starsky.backend.domain.schedule.Schedule;
 import com.starsky.backend.domain.schedule.ScheduleShift;
 import com.starsky.backend.domain.user.User;
 import com.starsky.backend.service.schedule.solve.ScheduleConstraintProvider;
@@ -89,5 +90,55 @@ public class ScheduleConstraintProviderTest {
         constraintVerifier.verifyThat(ScheduleConstraintProvider::employeeIsNotAvailable)
                 .givenSolution(solvedSchedule)
                 .penalizes(2);
+    }
+
+    @Test
+    public void testEmployeeHasTooManyShiftsAssignedConstraint() {
+        var start = Instant.parse("2020-01-01T08:00:00Z");
+        var end = Instant.parse("2020-01-01T16:00:00Z");
+        var employee = Mockito.mock(User.class);
+        var employee2 = Mockito.mock(User.class);
+        var employee3 = Mockito.mock(User.class);
+        var shift = Mockito.mock(ScheduleShift.class);
+        var schedule = Mockito.mock(Schedule.class);
+
+        Mockito.when(schedule.getMaxShiftsPerEmployee()).thenReturn(1);
+        Mockito.when(shift.getSchedule()).thenReturn(schedule);
+
+        var assignment = new EmployeeAssignment(employee, shift, start, end);
+        var assignment2 = new EmployeeAssignment(employee, shift, start, end);
+        var assignment3 = new EmployeeAssignment(employee, shift, start, end);
+
+        var solvedSchedule = new SolvedSchedule(1, Collections.singletonList(shift), Arrays.asList(employee, employee2, employee3),
+                Arrays.asList(assignment, assignment2, assignment3));
+
+        constraintVerifier.verifyThat(ScheduleConstraintProvider::employeeHasTooManyShiftsAssigned)
+                .givenSolution(solvedSchedule)
+                .penalizes(1);
+    }
+
+    @Test
+    public void testEmployeeHasLessThanMaxShiftsAssignedConstraint() {
+        var start = Instant.parse("2020-01-01T08:00:00Z");
+        var end = Instant.parse("2020-01-01T16:00:00Z");
+        var employee = Mockito.mock(User.class);
+        var employee2 = Mockito.mock(User.class);
+        var employee3 = Mockito.mock(User.class);
+        var shift = Mockito.mock(ScheduleShift.class);
+        var schedule = Mockito.mock(Schedule.class);
+
+        Mockito.when(schedule.getMaxShiftsPerEmployee()).thenReturn(2);
+        Mockito.when(shift.getSchedule()).thenReturn(schedule);
+
+        var assignment = new EmployeeAssignment(employee, shift, start, end);
+        var assignment2 = new EmployeeAssignment(employee2, shift, start, end);
+        var assignment3 = new EmployeeAssignment(employee3, shift, start, end);
+
+        var solvedSchedule = new SolvedSchedule(1, Collections.singletonList(shift), Arrays.asList(employee, employee2, employee3),
+                Arrays.asList(assignment, assignment2, assignment3));
+
+        constraintVerifier.verifyThat(ScheduleConstraintProvider::employeeHasLessThanMaxShiftsAssigned)
+                .givenSolution(solvedSchedule)
+                .rewards(3);
     }
 }

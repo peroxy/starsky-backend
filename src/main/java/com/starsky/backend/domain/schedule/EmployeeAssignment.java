@@ -9,7 +9,9 @@ import org.optaplanner.core.api.domain.variable.PlanningVariable;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Entity
@@ -104,6 +106,14 @@ public class EmployeeAssignment extends BaseEntity {
 
     public ShiftDate getShiftDate() {
         return shiftDate;
+    }
+
+    public int getShiftDayNumber() {
+        return assignmentStart.atOffset(ZoneOffset.UTC).getDayOfMonth();
+    }
+
+    public long getHourDuration() {
+        return Duration.between(assignmentStart, assignmentEnd).toHours();
     }
 
     public void setShiftDate(ShiftDate shiftDate) {
