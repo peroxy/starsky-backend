@@ -18,7 +18,7 @@ services:
     image: nginx:1.19.7-alpine
     restart: always
     ports:
-      - 443:443
+      - "443:443"
     networks:
       - starskynet
     volumes:
