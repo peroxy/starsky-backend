@@ -22,4 +22,6 @@ public interface ScheduleService {
     Schedule updateSchedule(UpdateScheduleRequest request, long scheduleId, User owner) throws DateRangeException, ResourceNotFoundException, ForbiddenException;
 
     void deleteSchedule(long scheduleId, User owner) throws ResourceNotFoundException, ForbiddenException;
+
+    void notifyEmployees(long scheduleId, User owner) throws ResourceNotFoundException, ForbiddenException;
 }

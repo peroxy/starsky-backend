@@ -110,6 +110,18 @@ public class ScheduleController extends BaseController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/user/schedules/{schedule_id}/notify")
+    @Operation(summary = "Notify employees.", description = "Send an email with schedule information to every employee that has an assigned schedule shift. " +
+            "Manager only route.")
+    @ApiResponse(responseCode = "202", description = "Notification request has been accepted and will be processed.", content = @Content)
+    @ApiResponse(responseCode = "403", description = "Forbidden, user is not authenticated or does not have sufficient permissions.", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Schedule does not exist.", content = @Content)
+    public ResponseEntity<Void> notifyScheduleEmployees(@PathVariable("schedule_id") long scheduleId) throws ForbiddenException {
+        var user = getAuthenticatedUser();
+        scheduleService.notifyEmployees(scheduleId, user);
+        return ResponseEntity.accepted().build();
+    }
+
     @PatchMapping("/user/schedules/{schedule_id}")
     @Operation(summary = "Update schedule", description = "Update any property of the specified schedule. Authenticated user must have manager role.")
     @ApiResponse(responseCode = "200", description = "Updated the schedule successfully.",
