@@ -33,13 +33,13 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: docker/api/Dockerfile
+          file: docker/api/Dockerfile.aarch64
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/starsky-backend-api:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/starsky-backend-api:${{ env.GIT_TAG }}
-      - name: Copy files to Azure VM
+      - name: Copy files via SSH
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -47,7 +47,7 @@ jobs:
           source: "docker/docker-compose.yml,docker/docker-compose.prod.yml,.env,nginx/conf.d/api.conf"
           target: "~/docker/starsky-backend/"
           key: ${{ secrets.SERVER_SSH_KEY }}
-      - name: Stop, pull and start application on Azure VM
+      - name: Stop, pull and start applications on remote host
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}

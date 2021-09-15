@@ -1,0 +1,13 @@
+FROM gradle:jdk15@sha256:f5a698b5c7a577d1ec5eadda8740c086eb4584ab456eb9eae25b9d192d8bf890 AS build
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build --no-daemon
+
+FROM adoptopenjdk/openjdk15:aarch64-ubuntu-jre-15.0.2_7
+
+EXPOSE 8080
+
+RUN mkdir /app
+
+COPY --from=build /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
